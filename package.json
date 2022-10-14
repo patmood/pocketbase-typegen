@@ -6,6 +6,7 @@
   "bin": {
     "pocketbase-typegen": "build/index.js"
   },
+  "type": "module",
   "scripts": {
     "test": "jest --coverage",
     "test:watch": "jest --watch",
