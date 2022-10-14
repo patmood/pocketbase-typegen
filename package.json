@@ -13,7 +13,6 @@
     "test:update": "jest -u",
     "build": "esbuild src/index.ts --bundle --outfile=build/index.js --external:./node_modules/* --format=esm --platform=node"
   },
-  "type": "module",
   "author": "@patmood",
   "license": "ISC",
   "dependencies": {
