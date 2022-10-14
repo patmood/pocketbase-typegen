@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { promises as fs } from "fs"
 import { generate } from "./lib"
 import { open } from "sqlite"
