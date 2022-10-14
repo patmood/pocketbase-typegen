@@ -2,4 +2,4 @@
 
 Run it:
 
-`npm run build && node ./build/out.js`
+`npm run build && node ./build/index.js -d test/test.db `
