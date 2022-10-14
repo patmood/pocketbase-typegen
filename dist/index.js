@@ -1,7 +1,26 @@
 #!/usr/bin/env node
+"use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 
 // src/index.ts
-import { promises as fs } from "fs";
+var import_fs = require("fs");
 
 // src/utils.ts
 function toPascalCase(str) {
@@ -69,31 +88,31 @@ function createTypeField(name, required, pbType) {
 }
 
 // src/index.ts
-import { open } from "../node_modules/sqlite/build/index.mjs";
-import { program } from "../node_modules/commander/esm.mjs";
-import sqlite3 from "../node_modules/sqlite3/lib/sqlite3.js";
+var import_sqlite = require("sqlite");
+var import_commander = require("commander");
+var import_sqlite3 = __toESM(require("sqlite3"), 1);
 
 // package.json
 var version = "1.0.1";
 
 // src/index.ts
 async function main(dbPath, outPath) {
-  const db = await open({
+  const db = await (0, import_sqlite.open)({
     filename: dbPath,
-    driver: sqlite3.Database
+    driver: import_sqlite3.default.Database
   });
   const results = await db.all("SELECT * FROM _collections");
   const typeString = generate(results);
-  await fs.writeFile(outPath, typeString, "utf8");
+  await import_fs.promises.writeFile(outPath, typeString, "utf8");
   console.log(`Created typescript definitions at ${outPath}`);
 }
-program.name("Pocketbase Typegen").version(version).description(
+import_commander.program.name("Pocketbase Typegen").version(version).description(
   "CLI to create typescript typings for your pocketbase.io records"
 ).requiredOption("-d, --db <char>", "path to the pocketbase SQLite database").option(
   "-o, --out <char>",
   "path to save the typescript output file",
   "pocketbase-types.ts"
 );
-program.parse(process.argv);
-var options = program.opts();
+import_commander.program.parse(process.argv);
+var options = import_commander.program.opts();
 main(options.db, options.out);

@@ -7,7 +7,7 @@ import { program } from "commander"
 import sqlite3 from "sqlite3"
 import { version } from "../package.json"
 
-async function main(dbPath, outPath) {
+async function main(dbPath: string, outPath: string) {
   const db = await open({
     filename: dbPath,
     driver: sqlite3.Database,

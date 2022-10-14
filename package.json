@@ -2,28 +2,29 @@
   "name": "pocketbase-typegen",
   "version": "1.0.1",
   "description": "Generate pocketbase record types from your database",
-  "main": "build/index.js",
+  "main": "dist/index.js",
   "bin": {
-    "pocketbase-typegen": "build/index.js"
+    "pocketbase-typegen": "dist/index.js"
   },
   "type": "module",
   "scripts": {
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "test:update": "jest -u",
-    "build": "esbuild src/index.ts --bundle --outfile=build/index.js --external:./node_modules/* --format=esm --platform=node"
+    "build": "tsc --noEmit --resolveJsonModule && rm -rf dist && node build.js"
   },
   "author": "@patmood",
   "license": "ISC",
   "dependencies": {
     "commander": "^9.4.1",
-    "esbuild": "^0.15.10",
     "sqlite": "^4.1.2",
     "sqlite3": "^5.1.2"
   },
   "devDependencies": {
     "@types/jest": "^29.1.2",
     "@types/node": "^18.8.3",
+    "esbuild": "^0.15.11",
+    "esbuild-node-externals": "^1.5.0",
     "jest": "^29.1.2",
     "ts-jest": "^29.0.3",
     "typescript": "^4.8.4"
