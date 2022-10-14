@@ -70,20 +70,11 @@ function createTypeField(name, required, pbType) {
 import { open } from "../node_modules/sqlite/build/index.mjs";
 import { program } from "../node_modules/commander/esm.mjs";
 import sqlite3 from "../node_modules/sqlite3/lib/sqlite3.js";
-program.name("Pocketbase Typegen").description(
-  "CLI to create typescript typings for your pocketbase.io records"
-).option(
-  "-d, --db <char>",
-  "path to the pocketbase SQLite database",
-  "pb_data/data.db"
-).option(
-  "-o, --out <char>",
-  "path to save the typescript output file",
-  "pocketbase-types.ts"
-);
-program.parse(process.argv);
-var options = program.opts();
-main(options.db, options.out);
+
+// package.json
+var version = "1.0.0";
+
+// src/index.ts
 async function main(dbPath, outPath) {
   const db = await open({
     filename: dbPath,
@@ -94,3 +85,13 @@ async function main(dbPath, outPath) {
   await fs.writeFile(outPath, typeString, "utf8");
   console.log(`Created typescript definitions at ${outPath}`);
 }
+program.name("Pocketbase Typegen").version(version).description(
+  "CLI to create typescript typings for your pocketbase.io records"
+).requiredOption("-d, --db <char>", "path to the pocketbase SQLite database").option(
+  "-o, --out <char>",
+  "path to save the typescript output file",
+  "pocketbase-types.ts"
+);
+program.parse(process.argv);
+var options = program.opts();
+main(options.db, options.out);
