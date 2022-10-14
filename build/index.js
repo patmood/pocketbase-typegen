@@ -1,24 +1,4 @@
 #!/usr/bin/env node
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
 
 // src/index.ts
 import { promises as fs } from "fs";
@@ -94,20 +74,18 @@ import { program } from "../node_modules/commander/esm.mjs";
 import sqlite3 from "../node_modules/sqlite3/lib/sqlite3.js";
 
 // package.json
-var version = "1.0.0";
+var version = "1.0.1";
 
 // src/index.ts
-function main(dbPath, outPath) {
-  return __async(this, null, function* () {
-    const db = yield open({
-      filename: dbPath,
-      driver: sqlite3.Database
-    });
-    const results = yield db.all("SELECT * FROM _collections");
-    const typeString = generate(results);
-    yield fs.writeFile(outPath, typeString, "utf8");
-    console.log(`Created typescript definitions at ${outPath}`);
+async function main(dbPath, outPath) {
+  const db = await open({
+    filename: dbPath,
+    driver: sqlite3.Database
   });
+  const results = await db.all("SELECT * FROM _collections");
+  const typeString = generate(results);
+  await fs.writeFile(outPath, typeString, "utf8");
+  console.log(`Created typescript definitions at ${outPath}`);
 }
 program.name("Pocketbase Typegen").version(version).description(
   "CLI to create typescript typings for your pocketbase.io records"
