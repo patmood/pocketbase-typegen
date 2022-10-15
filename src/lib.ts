@@ -1,3 +1,5 @@
+import { CollectionRecord, RecordSchema } from "./types"
+
 import { promises as fs } from "fs"
 import { toPascalCase } from "./utils"
 
@@ -15,7 +17,7 @@ const pbSchemaTypescriptMap = {
   user: "string",
 }
 
-export function generate(results: Array<any>) {
+export function generate(results: Array<CollectionRecord>) {
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
 
@@ -42,7 +44,10 @@ export function createCollectionEnum(collectionNames: Array<string>) {
   return typeString
 }
 
-export function createRecordType(name: string, schema: Array<any>): string {
+export function createRecordType(
+  name: string,
+  schema: Array<RecordSchema>
+): string {
   let typeString = `export type ${toPascalCase(name)}Record = {\n`
   schema.forEach((field: any) => {
     typeString += createTypeField(field.name, field.required, field.type)

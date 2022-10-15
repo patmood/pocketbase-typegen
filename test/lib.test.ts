@@ -1,3 +1,4 @@
+import { CollectionRecord, RecordSchema } from "../src/types"
 import {
   createCollectionEnum,
   createRecordType,
@@ -7,15 +8,30 @@ import {
 
 describe("generate", () => {
   it("generates correct output given db input", () => {
-    const name = "books"
-    const schema = JSON.stringify([
+    const collections: Array<CollectionRecord> = [
       {
-        name: "title",
-        type: "text",
-        required: false,
+        name: "books",
+        id: "123",
+        system: false,
+        listRule: null,
+        viewRule: null,
+        createRule: null,
+        updateRule: null,
+        deleteRule: null,
+        schema: [
+          {
+            name: "title",
+            type: "text",
+            required: false,
+            id: "xyz",
+            system: false,
+            unique: false,
+            options: {},
+          },
+        ],
       },
-    ])
-    const result = generate([{ name, schema }])
+    ]
+    const result = generate(collections)
     expect(result).toMatchSnapshot()
   })
 })

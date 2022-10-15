@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
+import type { CollectionRecord, Options } from "./types"
 import { fromDatabase, fromJSON } from "./schema"
 import { generate, saveFile } from "./lib"
 
-import type { Options } from "./types"
 import { program } from "commander"
 import { version } from "../package.json"
 
 async function main(options: Options) {
-  let schema: any[]
+  let schema: Array<CollectionRecord>
   if (options.db) {
     schema = await fromDatabase(options.db)
   } else if (options.json) {
