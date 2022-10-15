@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 // src/schema.ts
+import FormData from "form-data";
+import fetch from "cross-fetch";
 import { promises as fs } from "fs";
 import { open } from "sqlite";
 import sqlite3 from "sqlite3";
@@ -18,6 +20,21 @@ async function fromDatabase(dbPath) {
 async function fromJSON(path) {
   const schemaStr = await fs.readFile(path, { encoding: "utf8" });
   return JSON.parse(schemaStr);
+}
+async function fromURL(url, email = "", password = "") {
+  const formData = new FormData();
+  formData.append("email", email);
+  formData.append("password", password);
+  const { token } = await fetch(`${url}/api/admins/auth-via-email`, {
+    method: "post",
+    body: formData
+  }).then((res) => res.json());
+  const result = await fetch(`${url}/api/collections?perPage=200`, {
+    headers: {
+      Authorization: `Admin ${token}`
+    }
+  }).then((res) => res.json());
+  return result.items;
 }
 
 // src/lib.ts
@@ -105,6 +122,8 @@ async function main(options2) {
     schema = await fromDatabase(options2.db);
   } else if (options2.json) {
     schema = await fromJSON(options2.json);
+  } else if (options2.url) {
+    schema = await fromURL(options2.url, options2.email, options2.password);
   } else {
     return console.error(
       "Missing schema path. Check options: pocketbase-typegen --help"
@@ -119,6 +138,15 @@ program.name("Pocketbase Typegen").version(version).description(
 ).option("-d, --db <char>", "path to the pocketbase SQLite database").option(
   "-j, --json <char>",
   "path to JSON schema exported from pocketbase admin UI"
+).option(
+  "-u, --url <char>",
+  "URL to your hosted pocketbase instance. When using this options you must also provide email and password options."
+).option(
+  "-e, --email <char>",
+  "email for an admin pocketbase user. Use this with the --url option"
+).option(
+  "-p, --password <char>",
+  "password for an admin pocketbase user. Use this with the --url option"
 ).option(
   "-o, --out <char>",
   "path to save the typescript output file",

@@ -1,4 +1,6 @@
 import { CollectionRecord } from "./types"
+import FormData from "form-data"
+import fetch from "cross-fetch"
 import { promises as fs } from "fs"
 import { open } from "sqlite"
 import sqlite3 from "sqlite3"
@@ -22,6 +24,28 @@ export async function fromJSON(path: string): Promise<Array<CollectionRecord>> {
   return JSON.parse(schemaStr)
 }
 
-export async function fromAPI(): Promise<Array<CollectionRecord>> {
-  throw "not implemented"
+export async function fromURL(
+  url: string,
+  email: string = "",
+  password: string = ""
+): Promise<Array<CollectionRecord>> {
+  const formData = new FormData()
+  formData.append("email", email)
+  formData.append("password", password)
+
+  // Login
+  const { token } = await fetch(`${url}/api/admins/auth-via-email`, {
+    method: "post",
+    // @ts-ignore
+    body: formData,
+  }).then((res) => res.json())
+
+  // Get the collection
+  const result = await fetch(`${url}/api/collections?perPage=200`, {
+    headers: {
+      Authorization: `Admin ${token}`,
+    },
+  }).then((res) => res.json())
+
+  return result.items as Array<CollectionRecord>
 }

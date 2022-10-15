@@ -1,7 +1,10 @@
 export type Options = {
   db?: string
+  url?: string
   out: string
   json?: string
+  email?: string
+  password?: string
 }
 
 export type RecordSchema = {
