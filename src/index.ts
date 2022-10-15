@@ -1,22 +1,15 @@
 #!/usr/bin/env node
 
-import { promises as fs } from "fs"
-import { generate } from "./lib"
-import { open } from "sqlite"
+import { generate, saveFile } from "./lib"
+
+import { fromDatabase } from "./schema"
 import { program } from "commander"
-import sqlite3 from "sqlite3"
 import { version } from "../package.json"
 
 async function main(dbPath: string, outPath: string) {
-  const db = await open({
-    filename: dbPath,
-    driver: sqlite3.Database,
-  })
-  const results = await db.all("SELECT * FROM _collections")
-  const typeString = generate(results)
-  await fs.writeFile(outPath, typeString, "utf8")
-
-  console.log(`Created typescript definitions at ${outPath}`)
+  const schema = await fromDatabase(dbPath)
+  const typeString = generate(schema)
+  await saveFile(outPath, typeString)
 }
 
 program

@@ -1,3 +1,4 @@
+import { promises as fs } from "fs"
 import { toPascalCase } from "./utils"
 
 const pbSchemaTypescriptMap = {
@@ -56,4 +57,9 @@ export function createTypeField(
   pbType: keyof typeof pbSchemaTypescriptMap
 ) {
   return `\t${name}${required ? "" : "?"}: ${pbSchemaTypescriptMap[pbType]};\n`
+}
+
+export async function saveFile(outPath: string, typeString: string) {
+  await fs.writeFile(outPath, typeString, "utf8")
+  console.log(`Created typescript definitions at ${outPath}`)
 }

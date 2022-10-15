@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// src/index.ts
+// src/lib.ts
 import { promises as fs } from "fs";
 
 // src/utils.ts
@@ -67,25 +67,34 @@ function createTypeField(name, required, pbType) {
   return `	${name}${required ? "" : "?"}: ${pbSchemaTypescriptMap[pbType]};
 `;
 }
+async function saveFile(outPath, typeString) {
+  await fs.writeFile(outPath, typeString, "utf8");
+  console.log(`Created typescript definitions at ${outPath}`);
+}
 
-// src/index.ts
+// src/schema.ts
 import { open } from "sqlite";
-import { program } from "commander";
 import sqlite3 from "sqlite3";
-
-// package.json
-var version = "1.0.2";
-
-// src/index.ts
-async function main(dbPath, outPath) {
+async function fromDatabase(dbPath) {
   const db = await open({
     filename: dbPath,
     driver: sqlite3.Database
   });
-  const results = await db.all("SELECT * FROM _collections");
-  const typeString = generate(results);
-  await fs.writeFile(outPath, typeString, "utf8");
-  console.log(`Created typescript definitions at ${outPath}`);
+  const schema = await db.all("SELECT * FROM _collections");
+  return schema;
+}
+
+// src/index.ts
+import { program } from "commander";
+
+// package.json
+var version = "1.0.3";
+
+// src/index.ts
+async function main(dbPath, outPath) {
+  const schema = await fromDatabase(dbPath);
+  const typeString = generate(schema);
+  await saveFile(outPath, typeString);
 }
 program.name("Pocketbase Typegen").version(version).description(
   "CLI to create typescript typings for your pocketbase.io records"

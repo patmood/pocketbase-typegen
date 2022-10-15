@@ -11,7 +11,7 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "test:update": "jest -u",
-    "build": "tsc --noEmit --resolveJsonModule && rm -rf dist && node build.js"
+    "build": "tsc && rm -rf dist && node build.js"
   },
   "author": "@patmood",
   "license": "ISC",

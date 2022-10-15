@@ -4,3 +4,4 @@ coverage
 *.db-shm
 *.db-wal
 .DS_Store
+sample
