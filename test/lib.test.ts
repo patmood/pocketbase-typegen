@@ -30,7 +30,7 @@ describe("createCollectionEnum", () => {
 describe("createRecordType", () => {
   it("creates type definition for a record", () => {
     const name = "books"
-    const schema = JSON.stringify([
+    const schema = [
       {
         system: false,
         id: "hhnwjkke",
@@ -40,7 +40,7 @@ describe("createRecordType", () => {
         unique: false,
         options: { min: null, max: null, pattern: "" },
       },
-    ])
+    ]
     const result = createRecordType(name, schema)
     expect(result).toMatchSnapshot()
   })

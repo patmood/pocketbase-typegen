@@ -1,7 +1,27 @@
 #!/usr/bin/env node
 
-// src/lib.ts
+// src/schema.ts
 import { promises as fs } from "fs";
+import { open } from "sqlite";
+import sqlite3 from "sqlite3";
+async function fromDatabase(dbPath) {
+  const db = await open({
+    filename: dbPath,
+    driver: sqlite3.Database
+  });
+  const result = await db.all("SELECT * FROM _collections");
+  return result.map((collection) => ({
+    ...collection,
+    schema: JSON.parse(collection.schema)
+  }));
+}
+async function fromJSON(path) {
+  const schemaStr = await fs.readFile(path, { encoding: "utf8" });
+  return JSON.parse(schemaStr);
+}
+
+// src/lib.ts
+import { promises as fs2 } from "fs";
 
 // src/utils.ts
 function toPascalCase(str) {
@@ -57,7 +77,7 @@ function createCollectionEnum(collectionNames) {
 function createRecordType(name, schema) {
   let typeString = `export type ${toPascalCase(name)}Record = {
 `;
-  JSON.parse(schema).forEach((field) => {
+  schema.forEach((field) => {
     typeString += createTypeField(field.name, field.required, field.type);
   });
   typeString += `}`;
@@ -68,20 +88,8 @@ function createTypeField(name, required, pbType) {
 `;
 }
 async function saveFile(outPath, typeString) {
-  await fs.writeFile(outPath, typeString, "utf8");
+  await fs2.writeFile(outPath, typeString, "utf8");
   console.log(`Created typescript definitions at ${outPath}`);
-}
-
-// src/schema.ts
-import { open } from "sqlite";
-import sqlite3 from "sqlite3";
-async function fromDatabase(dbPath) {
-  const db = await open({
-    filename: dbPath,
-    driver: sqlite3.Database
-  });
-  const schema = await db.all("SELECT * FROM _collections");
-  return schema;
 }
 
 // src/index.ts
@@ -91,18 +99,31 @@ import { program } from "commander";
 var version = "1.0.3";
 
 // src/index.ts
-async function main(dbPath, outPath) {
-  const schema = await fromDatabase(dbPath);
+async function main(options2) {
+  let schema;
+  if (options2.db) {
+    schema = await fromDatabase(options2.db);
+  } else if (options2.json) {
+    schema = await fromJSON(options2.json);
+  } else {
+    return console.error(
+      "Missing schema path. Check options: pocketbase-typegen --help"
+    );
+  }
+  console.log(schema);
   const typeString = generate(schema);
-  await saveFile(outPath, typeString);
+  await saveFile(options2.out, typeString);
 }
 program.name("Pocketbase Typegen").version(version).description(
   "CLI to create typescript typings for your pocketbase.io records"
-).requiredOption("-d, --db <char>", "path to the pocketbase SQLite database").option(
+).option("-d, --db <char>", "path to the pocketbase SQLite database").option(
+  "-j, --json <char>",
+  "path to JSON schema exported from pocketbase admin UI"
+).option(
   "-o, --out <char>",
   "path to save the typescript output file",
   "pocketbase-types.ts"
 );
 program.parse(process.argv);
 var options = program.opts();
-main(options.db, options.out);
+main(options);

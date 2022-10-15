@@ -42,9 +42,9 @@ export function createCollectionEnum(collectionNames: Array<string>) {
   return typeString
 }
 
-export function createRecordType(name: string, schema: string): string {
+export function createRecordType(name: string, schema: Array<any>): string {
   let typeString = `export type ${toPascalCase(name)}Record = {\n`
-  JSON.parse(schema).forEach((field: any) => {
+  schema.forEach((field: any) => {
     typeString += createTypeField(field.name, field.required, field.type)
   })
   typeString += `}`
