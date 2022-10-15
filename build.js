@@ -5,10 +5,10 @@ esbuild
     entryPoints: ["./src/index.ts"],
     outfile: "dist/index.js",
     bundle: true,
-    minify: false,
+    // minify: false,
     treeShaking: true,
     platform: "node",
-    format: "cjs",
+    format: "esm",
     target: "node14",
     plugins: [nodeExternalsPlugin()],
   })
