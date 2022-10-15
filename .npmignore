@@ -2,3 +2,4 @@ src
 coverage
 test
 tsconfig.json
+build.js

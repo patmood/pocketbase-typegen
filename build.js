@@ -5,7 +5,6 @@ esbuild
     entryPoints: ["./src/index.ts"],
     outfile: "dist/index.js",
     bundle: true,
-    // minify: false,
     treeShaking: true,
     platform: "node",
     format: "esm",
@@ -13,5 +12,3 @@ esbuild
     plugins: [nodeExternalsPlugin()],
   })
   .catch(() => process.exit(1))
-
-// esbuild src/index.ts --bundle --outfile=dist/index.js --external:./node_modules/* --format=esm --platform=node
