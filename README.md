@@ -2,29 +2,11 @@
 
 Generate typescript definitions from your [pocketbase.io](https://pocketbase.io/) schema.
 
-### Run it once
+## Quickstart
 
 `npx pocketbase-typegen --db ./pb_data/data.db --out pocketbase-types.ts`
 
 This will produce types for all your pocketbase collections to use in your frontend typescript codebase.
-
-### Install in your project and run it often
-
-Install: `npm install --save-dev pocketbase-typegen`
-
-Add to your `package.json` scripts:
-
-```json
-  "scripts": {
-    "start": "...",
-    "build": "...",
-    "typegen": "pocketbase-typegen -d pb_data/data.db -o src/pocketbase-types.ts"
-  },
-```
-
-Run it any time you modify your pocketbase collections:
-
-`npm run typegen`
 
 ## Usage
 
