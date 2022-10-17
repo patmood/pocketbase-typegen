@@ -13,6 +13,7 @@ const pbSchemaTypescriptMap = {
   select: "string",
   json: "string",
   file: "string",
+  files: "string[]",
   relation: "string",
   user: "string",
 }
@@ -49,8 +50,14 @@ export function createRecordType(
   schema: Array<RecordSchema>
 ): string {
   let typeString = `export type ${toPascalCase(name)}Record = {\n`
-  schema.forEach((field: any) => {
-    typeString += createTypeField(field.name, field.required, field.type)
+  schema.forEach((field: RecordSchema) => {
+    const pbType =
+      field.type === "file" &&
+      field.options.maxSelect &&
+      field.options.maxSelect > 1
+        ? "files"
+        : field.type
+    typeString += createTypeField(field.name, field.required, pbType)
   })
   typeString += `}`
   return typeString
@@ -59,9 +66,15 @@ export function createRecordType(
 export function createTypeField(
   name: string,
   required: boolean,
-  pbType: keyof typeof pbSchemaTypescriptMap
+  pbType: string
 ) {
-  return `\t${name}${required ? "" : "?"}: ${pbSchemaTypescriptMap[pbType]};\n`
+  if (pbType in pbSchemaTypescriptMap) {
+    return `\t${name}${required ? "" : "?"}: ${
+      pbSchemaTypescriptMap[pbType as keyof typeof pbSchemaTypescriptMap]
+    };\n`
+  } else {
+    throw new Error(`unknown type ${pbType} found in schema`)
+  }
 }
 
 export async function saveFile(outPath: string, typeString: string) {

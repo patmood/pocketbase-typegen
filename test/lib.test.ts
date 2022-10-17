@@ -60,6 +60,23 @@ describe("createRecordType", () => {
     const result = createRecordType(name, schema)
     expect(result).toMatchSnapshot()
   })
+
+  it("handles file fields with multiple files", () => {
+    const name = "books"
+    const schema = [
+      {
+        system: false,
+        id: "hhnwjkke",
+        name: "avatars",
+        type: "file",
+        required: false,
+        unique: false,
+        options: { maxSelect: 2 },
+      },
+    ]
+    const result = createRecordType(name, schema)
+    expect(result).toMatchSnapshot()
+  })
 })
 
 describe("createTypeField", () => {
@@ -97,11 +114,20 @@ describe("createTypeField", () => {
     expect(createTypeField("fileField", true, "file")).toEqual(
       "\tfileField: string;\n"
     )
+    expect(createTypeField("manyFiles", true, "files")).toEqual(
+      "\tmanyFiles: string[];\n"
+    )
     expect(createTypeField("relationField", true, "relation")).toEqual(
       "\trelationField: string;\n"
     )
     expect(createTypeField("userField", true, "user")).toEqual(
       "\tuserField: string;\n"
+    )
+  })
+
+  it("throws for unexpected types", () => {
+    expect(() => createTypeField("name", true, "unknowntype")).toThrowError(
+      "unknown type unknowntype found in schema"
     )
   })
 })

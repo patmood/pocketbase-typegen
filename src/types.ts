@@ -14,7 +14,7 @@ export type RecordSchema = {
   system: boolean
   required: boolean
   unique: boolean
-  options: object
+  options: RecordOptions
 }
 
 export type CollectionRecord = {
@@ -27,4 +27,11 @@ export type CollectionRecord = {
   updateRule: string | null
   deleteRule: string | null
   schema: Array<RecordSchema>
+}
+
+export type RecordOptions = {
+  maxSelect?: number | null
+  min?: number | null
+  max?: number | null
+  pattern?: string
 }

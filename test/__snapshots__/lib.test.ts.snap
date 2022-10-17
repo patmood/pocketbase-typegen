@@ -13,6 +13,12 @@ exports[`createRecordType creates type definition for a record 1`] = `
 }"
 `;
 
+exports[`createRecordType handles file fields with multiple files 1`] = `
+"export type BooksRecord = {
+	avatars?: string[];
+}"
+`;
+
 exports[`generate generates correct output given db input 1`] = `
 "// Generated using pocketbase-typegen
 
