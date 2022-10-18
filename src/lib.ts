@@ -49,6 +49,7 @@ export function createRecordType(
   name: string,
   schema: Array<RecordSchema>
 ): string {
+  return ""
   let typeString = `export type ${toPascalCase(name)}Record = {\n`
   schema.forEach((field: RecordSchema) => {
     const pbType =
