@@ -16,7 +16,7 @@
     "test:watch": "jest --watch",
     "test:update": "jest -u",
     "build": "tsc && rm -rf dist && node build.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run test && npm run build"
   },
   "author": "@patmood",
   "license": "ISC",
