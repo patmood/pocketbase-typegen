@@ -62,6 +62,7 @@ var pbSchemaTypescriptMap = {
   select: "string",
   json: "string",
   file: "string",
+  files: "string[]",
   relation: "string",
   user: "string"
 };
@@ -95,14 +96,19 @@ function createRecordType(name, schema) {
   let typeString = `export type ${toPascalCase(name)}Record = {
 `;
   schema.forEach((field) => {
-    typeString += createTypeField(field.name, field.required, field.type);
+    const pbType = field.type === "file" && field.options.maxSelect && field.options.maxSelect > 1 ? "files" : field.type;
+    typeString += createTypeField(field.name, field.required, pbType);
   });
   typeString += `}`;
   return typeString;
 }
 function createTypeField(name, required, pbType) {
-  return `	${name}${required ? "" : "?"}: ${pbSchemaTypescriptMap[pbType]};
+  if (pbType in pbSchemaTypescriptMap) {
+    return `	${name}${required ? "" : "?"}: ${pbSchemaTypescriptMap[pbType]};
 `;
+  } else {
+    throw new Error(`unknown type ${pbType} found in schema`);
+  }
 }
 async function saveFile(outPath, typeString) {
   await fs2.writeFile(outPath, typeString, "utf8");
@@ -113,7 +119,7 @@ async function saveFile(outPath, typeString) {
 import { program } from "commander";
 
 // package.json
-var version = "1.0.3";
+var version = "1.0.5";
 
 // src/index.ts
 async function main(options2) {
