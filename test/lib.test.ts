@@ -109,7 +109,7 @@ describe("createTypeField", () => {
       "\tselectField: string;\n"
     )
     expect(createTypeField("jsonField", true, "json")).toEqual(
-      "\tjsonField: string;\n"
+      "\tjsonField: null | unknown;\n"
     )
     expect(createTypeField("fileField", true, "file")).toEqual(
       "\tfileField: string;\n"

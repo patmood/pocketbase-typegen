@@ -11,7 +11,7 @@ const pbSchemaTypescriptMap = {
   url: "string",
   date: "string",
   select: "string",
-  json: "string",
+  json: "null | unknown",
   file: "string",
   files: "string[]",
   relation: "string",
