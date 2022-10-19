@@ -20,7 +20,6 @@ async function main(options: Options) {
       "Missing schema path. Check options: pocketbase-typegen --help"
     )
   }
-  console.log(schema)
   const typeString = generate(schema)
   await saveFile(options.out, typeString)
 }

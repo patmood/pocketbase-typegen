@@ -60,7 +60,7 @@ var pbSchemaTypescriptMap = {
   url: "string",
   date: "string",
   select: "string",
-  json: "string",
+  json: "null | unknown",
   file: "string",
   files: "string[]",
   relation: "string",
@@ -78,6 +78,7 @@ function generate(results) {
   const fileParts = [
     `// Generated using pocketbase-typegen`,
     createCollectionEnum(collectionNames),
+    createCollectionRecord(collectionNames),
     ...recordTypes
   ];
   return fileParts.join("\n\n");
@@ -87,6 +88,16 @@ function createCollectionEnum(collectionNames) {
 `;
   collectionNames.forEach((name) => {
     typeString += `	${toPascalCase(name)} = "${name}",
+`;
+  });
+  typeString += `}`;
+  return typeString;
+}
+function createCollectionRecord(collectionNames) {
+  let typeString = `export type CollectionRecords = {
+`;
+  collectionNames.forEach((name) => {
+    typeString += `	${name}: ${toPascalCase(name)}Record
 `;
   });
   typeString += `}`;
@@ -104,7 +115,7 @@ function createRecordType(name, schema) {
 }
 function createTypeField(name, required, pbType) {
   if (pbType in pbSchemaTypescriptMap) {
-    return `	${name}${required ? "" : "?"}: ${pbSchemaTypescriptMap[pbType]};
+    return `	${name}${required ? "" : "?"}: ${pbSchemaTypescriptMap[pbType]}
 `;
   } else {
     throw new Error(`unknown type ${pbType} found in schema`);
@@ -119,7 +130,7 @@ async function saveFile(outPath, typeString) {
 import { program } from "commander";
 
 // package.json
-var version = "1.0.6";
+var version = "1.0.7";
 
 // src/index.ts
 async function main(options2) {
@@ -135,7 +146,6 @@ async function main(options2) {
       "Missing schema path. Check options: pocketbase-typegen --help"
     );
   }
-  console.log(schema);
   const typeString = generate(schema);
   await saveFile(options2.out, typeString);
 }

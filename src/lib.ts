@@ -30,6 +30,7 @@ export function generate(results: Array<CollectionRecord>) {
   const fileParts = [
     `// Generated using pocketbase-typegen`,
     createCollectionEnum(collectionNames),
+    createCollectionRecord(collectionNames),
     ...recordTypes,
   ]
 
@@ -40,6 +41,15 @@ export function createCollectionEnum(collectionNames: Array<string>) {
   let typeString = `export enum Collections {\n`
   collectionNames.forEach((name) => {
     typeString += `\t${toPascalCase(name)} = "${name}",\n`
+  })
+  typeString += `}`
+  return typeString
+}
+
+export function createCollectionRecord(collectionNames: Array<string>) {
+  let typeString = `export type CollectionRecords = {\n`
+  collectionNames.forEach((name) => {
+    typeString += `\t${name}: ${toPascalCase(name)}Record\n`
   })
   typeString += `}`
   return typeString
@@ -71,7 +81,7 @@ export function createTypeField(
   if (pbType in pbSchemaTypescriptMap) {
     return `\t${name}${required ? "" : "?"}: ${
       pbSchemaTypescriptMap[pbType as keyof typeof pbSchemaTypescriptMap]
-    };\n`
+    }\n`
   } else {
     throw new Error(`unknown type ${pbType} found in schema`)
   }

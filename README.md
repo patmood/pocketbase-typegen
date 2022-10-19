@@ -41,15 +41,23 @@ The output is a typescript file `pocketbase-types.ts` which will contain an enum
 ```typescript
 export enum Collections {
   Profiles = "profiles",
-  Books = "books",
-  Magazines = "magazines",
-  Everything = "everything",
+  Orders = "orders",
+}
+
+export type CollectionRecords = {
+  "profiles": ProfilesRecord
+  "orders" : OrdersRecord
 }
 
 export type ProfilesRecord = {
   userId: string
   name?: string
   avatar?: string
+}
+
+export type OrdersRecord = {
+  id: string
+  amount:
 }
 ```
 

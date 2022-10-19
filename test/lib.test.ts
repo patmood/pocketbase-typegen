@@ -81,47 +81,47 @@ describe("createRecordType", () => {
 
 describe("createTypeField", () => {
   it("handles required and optional fields", () => {
-    expect(createTypeField("name", true, "text")).toEqual("\tname: string;\n")
-    expect(createTypeField("name", false, "text")).toEqual("\tname?: string;\n")
+    expect(createTypeField("name", true, "text")).toEqual("\tname: string\n")
+    expect(createTypeField("name", false, "text")).toEqual("\tname?: string\n")
   })
 
   it("converts pocketbase schema types to typescript", () => {
-    expect(createTypeField("name", true, "text")).toEqual("\tname: string;\n")
+    expect(createTypeField("name", true, "text")).toEqual("\tname: string\n")
     expect(createTypeField("textField", true, "text")).toEqual(
-      "\ttextField: string;\n"
+      "\ttextField: string\n"
     )
     expect(createTypeField("numberField", true, "number")).toEqual(
-      "\tnumberField: number;\n"
+      "\tnumberField: number\n"
     )
     expect(createTypeField("boolField", true, "bool")).toEqual(
-      "\tboolField: boolean;\n"
+      "\tboolField: boolean\n"
     )
     expect(createTypeField("emailField", true, "email")).toEqual(
-      "\temailField: string;\n"
+      "\temailField: string\n"
     )
     expect(createTypeField("urlField", true, "url")).toEqual(
-      "\turlField: string;\n"
+      "\turlField: string\n"
     )
     expect(createTypeField("dateField", true, "date")).toEqual(
-      "\tdateField: string;\n"
+      "\tdateField: string\n"
     )
     expect(createTypeField("selectField", true, "select")).toEqual(
-      "\tselectField: string;\n"
+      "\tselectField: string\n"
     )
     expect(createTypeField("jsonField", true, "json")).toEqual(
-      "\tjsonField: null | unknown;\n"
+      "\tjsonField: null | unknown\n"
     )
     expect(createTypeField("fileField", true, "file")).toEqual(
-      "\tfileField: string;\n"
+      "\tfileField: string\n"
     )
     expect(createTypeField("manyFiles", true, "files")).toEqual(
-      "\tmanyFiles: string[];\n"
+      "\tmanyFiles: string[]\n"
     )
     expect(createTypeField("relationField", true, "relation")).toEqual(
-      "\trelationField: string;\n"
+      "\trelationField: string\n"
     )
     expect(createTypeField("userField", true, "user")).toEqual(
-      "\tuserField: string;\n"
+      "\tuserField: string\n"
     )
   })
 
