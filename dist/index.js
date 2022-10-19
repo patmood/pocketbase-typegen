@@ -130,7 +130,7 @@ async function saveFile(outPath, typeString) {
 import { program } from "commander";
 
 // package.json
-var version = "1.0.7";
+var version = "1.0.8";
 
 // src/index.ts
 async function main(options2) {

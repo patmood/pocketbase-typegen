@@ -39,25 +39,29 @@ URL example:
 The output is a typescript file `pocketbase-types.ts` which will contain an enum of all your collections, and the type of each record. For example:
 
 ```typescript
+// Enum of all pocketbase collections
 export enum Collections {
   Profiles = "profiles",
   Orders = "orders",
 }
 
+// Mapping of collection name to record type
 export type CollectionRecords = {
-  "profiles": ProfilesRecord
-  "orders" : OrdersRecord
+  profiles: ProfilesRecord
+  orders: OrdersRecord
 }
 
+// Actual type for the records in your collection
 export type ProfilesRecord = {
   userId: string
   name?: string
   avatar?: string
 }
 
+// One record type for each collection
 export type OrdersRecord = {
   id: string
-  amount:
+  amount: number
 }
 ```
 
