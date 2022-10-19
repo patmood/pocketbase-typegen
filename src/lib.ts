@@ -26,12 +26,13 @@ export function generate(results: Array<CollectionRecord>) {
     if (row.name) collectionNames.push(row.name)
     if (row.schema) recordTypes.push(createRecordType(row.name, row.schema))
   })
+  const sortedCollectionNames = collectionNames.sort()
 
   const fileParts = [
-    `// Generated using pocketbase-typegen`,
-    createCollectionEnum(collectionNames),
-    createCollectionRecord(collectionNames),
-    ...recordTypes,
+    `// This file was @generated using pocketbase-typegen`,
+    createCollectionEnum(sortedCollectionNames),
+    ...recordTypes.sort(),
+    createCollectionRecord(sortedCollectionNames),
   ]
 
   return fileParts.join("\n\n")

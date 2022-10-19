@@ -75,11 +75,12 @@ function generate(results) {
     if (row.schema)
       recordTypes.push(createRecordType(row.name, row.schema));
   });
+  const sortedCollectionNames = collectionNames.sort();
   const fileParts = [
-    `// Generated using pocketbase-typegen`,
-    createCollectionEnum(collectionNames),
-    createCollectionRecord(collectionNames),
-    ...recordTypes
+    `// This file was @generated using pocketbase-typegen`,
+    createCollectionEnum(sortedCollectionNames),
+    ...recordTypes.sort(),
+    createCollectionRecord(sortedCollectionNames)
   ];
   return fileParts.join("\n\n");
 }
@@ -130,7 +131,7 @@ async function saveFile(outPath, typeString) {
 import { program } from "commander";
 
 // package.json
-var version = "1.0.8";
+var version = "1.0.9";
 
 // src/index.ts
 async function main(options2) {

@@ -27,17 +27,17 @@ exports[`createRecordType handles file fields with multiple files 1`] = `
 `;
 
 exports[`generate generates correct output given db input 1`] = `
-"// Generated using pocketbase-typegen
+"// This file was @generated using pocketbase-typegen
 
 export enum Collections {
 	Books = "books",
 }
 
-export type CollectionRecords = {
-	books: BooksRecord
-}
-
 export type BooksRecord = {
 	title?: string
+}
+
+export type CollectionRecords = {
+	books: BooksRecord
 }"
 `;
