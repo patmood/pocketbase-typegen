@@ -7,6 +7,13 @@ exports[`createCollectionEnum creates enum of collection names 1`] = `
 }"
 `;
 
+exports[`createCollectionRecord creates mapping of collection name to record type 1`] = `
+"export type CollectionRecords = {
+	book: BookRecord
+	magazine: MagazineRecord
+}"
+`;
+
 exports[`createRecordType creates type definition for a record 1`] = `
 "export type BooksRecord = {
 	title?: string

@@ -1,6 +1,7 @@
 import { CollectionRecord, RecordSchema } from "../src/types"
 import {
   createCollectionEnum,
+  createCollectionRecord,
   createRecordType,
   createTypeField,
   generate,
@@ -40,6 +41,13 @@ describe("createCollectionEnum", () => {
   it("creates enum of collection names", () => {
     const names = ["book", "magazine"]
     expect(createCollectionEnum(names)).toMatchSnapshot()
+  })
+})
+
+describe("createCollectionRecord", () => {
+  it("creates mapping of collection name to record type", () => {
+    const names = ["book", "magazine"]
+    expect(createCollectionRecord(names)).toMatchSnapshot()
   })
 })
 
