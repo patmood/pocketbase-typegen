@@ -10,7 +10,8 @@ const pbSchemaTypescriptMap = {
   email: "string",
   url: "string",
   date: "string",
-  select: "string",
+  select: (opts: RecordOptions) =>
+    opts.values ? opts.values.map((val) => `"${val}"`).join(" | ") : "string",
   json: "null | unknown",
   file: (opts: RecordOptions) =>
     opts.maxSelect && opts.maxSelect > 1 ? "string[]" : "string",

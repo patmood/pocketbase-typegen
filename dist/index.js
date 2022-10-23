@@ -49,7 +49,6 @@ function toPascalCase(str) {
 }
 function sanitizeFieldName(name) {
   if (!isNaN(parseFloat(name.charAt(0)))) {
-    console.log({ found: name, return: `"${name}"` });
     return `"${name}"`;
   } else {
     return name;
@@ -65,7 +64,7 @@ var pbSchemaTypescriptMap = {
   email: "string",
   url: "string",
   date: "string",
-  select: "string",
+  select: (opts) => opts.values ? opts.values.map((val) => `"${val}"`).join(" | ") : "string",
   json: "null | unknown",
   file: (opts) => opts.maxSelect && opts.maxSelect > 1 ? "string[]" : "string",
   relation: "string",

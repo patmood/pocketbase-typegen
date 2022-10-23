@@ -14,7 +14,6 @@ export function toPascalCase(str: string) {
 export function sanitizeFieldName(name: string) {
   // If the first character is a number, wrap it in quotes to pass typecheck
   if (!isNaN(parseFloat(name.charAt(0)))) {
-    console.log({ found: name, return: `"${name}"` })
     return `"${name}"`
   } else {
     return name

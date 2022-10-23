@@ -35,4 +35,5 @@ export type RecordOptions = {
   min?: number | null
   max?: number | null
   pattern?: string
+  values?: string[]
 }

@@ -170,6 +170,16 @@ describe("createTypeField", () => {
     expect(
       createTypeField({
         ...defaultRecord,
+        name: "selectFieldWithOpts",
+        type: "select",
+        options: {
+          values: ["one", "two", "three"],
+        },
+      })
+    ).toEqual(`\tselectFieldWithOpts: "one" | "two" | "three"\n`)
+    expect(
+      createTypeField({
+        ...defaultRecord,
         name: "jsonField",
         type: "json",
       })
