@@ -1,3 +1,5 @@
+import { promises as fs } from "fs"
+
 export function toPascalCase(str: string) {
   if (/^[\p{L}\d]+$/iu.test(str)) {
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -14,4 +16,9 @@ export function toPascalCase(str: string) {
 export function sanitizeFieldName(name: string) {
   // If the first character is a number, wrap it in quotes to pass typecheck
   return !isNaN(parseFloat(name.charAt(0))) ? `"${name}"` : name
+}
+
+export async function saveFile(outPath: string, typeString: string) {
+  await fs.writeFile(outPath, typeString, "utf8")
+  console.log(`Created typescript definitions at ${outPath}`)
 }

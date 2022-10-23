@@ -37,7 +37,20 @@ async function fromURL(url, email = "", password = "") {
   return result.items;
 }
 
+// src/generics.ts
+function fieldNameToGeneric(name) {
+  return `T${name}`;
+}
+function getGenericArgString(schema) {
+  const jsonFields = schema.filter((field) => field.type === "json").map((field) => field.name).sort();
+  if (jsonFields.length === 0) {
+    return "";
+  }
+  return `<${jsonFields.map((name) => `${fieldNameToGeneric(name)} = unknown`).join(", ")}>`;
+}
+
 // src/utils.ts
+import { promises as fs2 } from "fs";
 function toPascalCase(str) {
   if (/^[\p{L}\d]+$/iu.test(str)) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -48,18 +61,11 @@ function toPascalCase(str) {
   ).replace(/[^\p{L}\d]/giu, "");
 }
 function sanitizeFieldName(name) {
-  if (!isNaN(parseFloat(name.charAt(0)))) {
-    return `"${name}"`;
-  } else {
-    return name;
-  }
+  return !isNaN(parseFloat(name.charAt(0))) ? `"${name}"` : name;
 }
-
-// src/lib.ts
-import { promises as fs2 } from "fs";
-
-// src/generics.ts
-function getGenericArgString(schema) {
+async function saveFile(outPath, typeString) {
+  await fs2.writeFile(outPath, typeString, "utf8");
+  console.log(`Created typescript definitions at ${outPath}`);
 }
 
 // src/lib.ts
@@ -70,9 +76,9 @@ var pbSchemaTypescriptMap = {
   email: "string",
   url: "string",
   date: "string",
-  select: (opts) => opts.values ? opts.values.map((val) => `"${val}"`).join(" | ") : "string",
-  json: "null | unknown",
-  file: (opts) => opts.maxSelect && opts.maxSelect > 1 ? "string[]" : "string",
+  select: (fieldSchema) => fieldSchema.options.values ? fieldSchema.options.values.map((val) => `"${val}"`).join(" | ") : "string",
+  json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
+  file: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? "string[]" : "string",
   relation: "string",
   user: "string"
 };
@@ -130,20 +136,16 @@ function createTypeField(fieldSchema) {
     throw new Error(`unknown type ${fieldSchema.type} found in schema`);
   }
   const typeStringOrFunc = pbSchemaTypescriptMap[fieldSchema.type];
-  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema.options) : typeStringOrFunc;
+  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema) : typeStringOrFunc;
   return `	${sanitizeFieldName(fieldSchema.name)}${fieldSchema.required ? "" : "?"}: ${typeString}
 `;
-}
-async function saveFile(outPath, typeString) {
-  await fs2.writeFile(outPath, typeString, "utf8");
-  console.log(`Created typescript definitions at ${outPath}`);
 }
 
 // src/index.ts
 import { program } from "commander";
 
 // package.json
-var version = "1.0.9";
+var version = "1.0.10";
 
 // src/index.ts
 async function main(options2) {

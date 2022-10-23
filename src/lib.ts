@@ -1,8 +1,6 @@
 import { CollectionRecord, FieldSchema, RecordOptions } from "./types"
+import { fieldNameToGeneric, getGenericArgString } from "./generics"
 import { sanitizeFieldName, toPascalCase } from "./utils"
-
-import { promises as fs } from "fs"
-import { getGenericArgString } from "./generics"
 
 const pbSchemaTypescriptMap = {
   text: "string",
@@ -11,11 +9,16 @@ const pbSchemaTypescriptMap = {
   email: "string",
   url: "string",
   date: "string",
-  select: (opts: RecordOptions) =>
-    opts.values ? opts.values.map((val) => `"${val}"`).join(" | ") : "string",
-  json: "null | unknown",
-  file: (opts: RecordOptions) =>
-    opts.maxSelect && opts.maxSelect > 1 ? "string[]" : "string",
+  select: (fieldSchema: FieldSchema) =>
+    fieldSchema.options.values
+      ? fieldSchema.options.values.map((val) => `"${val}"`).join(" | ")
+      : "string",
+  json: (fieldSchema: FieldSchema) =>
+    `null | ${fieldNameToGeneric(fieldSchema.name)}`,
+  file: (fieldSchema: FieldSchema) =>
+    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
+      ? "string[]"
+      : "string",
   relation: "string",
   user: "string",
 }
@@ -83,14 +86,9 @@ export function createTypeField(fieldSchema: FieldSchema) {
 
   const typeString =
     typeof typeStringOrFunc === "function"
-      ? typeStringOrFunc(fieldSchema.options)
+      ? typeStringOrFunc(fieldSchema)
       : typeStringOrFunc
   return `\t${sanitizeFieldName(fieldSchema.name)}${
     fieldSchema.required ? "" : "?"
   }: ${typeString}\n`
-}
-
-export async function saveFile(outPath: string, typeString: string) {
-  await fs.writeFile(outPath, typeString, "utf8")
-  console.log(`Created typescript definitions at ${outPath}`)
 }

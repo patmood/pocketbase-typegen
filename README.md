@@ -59,9 +59,11 @@ export type ProfilesRecord = {
 }
 
 // One record type for each collection
-export type OrdersRecord = {
+export type OrdersRecord<Tdata = unknown> = {
   id: string
   amount: number
+  data: null | Tdata // JSON type in pocketbase
+  payment_method: "credit_card" | "paypal" | "crypto" // Multiple choice in pocketbase
 }
 ```
 

@@ -2,9 +2,10 @@
 
 import type { CollectionRecord, Options } from "./types"
 import { fromDatabase, fromJSON, fromURL } from "./schema"
-import { generate, saveFile } from "./lib"
 
+import { generate } from "./lib"
 import { program } from "commander"
+import { saveFile } from "./utils"
 import { version } from "../package.json"
 
 async function main(options: Options) {

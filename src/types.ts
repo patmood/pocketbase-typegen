@@ -10,7 +10,19 @@ export type Options = {
 export type FieldSchema = {
   id: string
   name: string
-  type: string
+  type:
+    | "text"
+    | "file"
+    | "text"
+    | "number"
+    | "bool"
+    | "email"
+    | "url"
+    | "date"
+    | "select"
+    | "json"
+    | "relation"
+    | "user"
   system: boolean
   required: boolean
   unique: boolean
