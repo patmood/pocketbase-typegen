@@ -1,7 +1,7 @@
 import { CollectionRecord, RecordOptions, RecordSchema } from "./types"
+import { sanitizeFieldName, toPascalCase } from "./utils"
 
 import { promises as fs } from "fs"
-import { toPascalCase } from "./utils"
 
 const pbSchemaTypescriptMap = {
   text: "string",
@@ -81,7 +81,7 @@ export function createTypeField(recordSchema: RecordSchema) {
     typeof typeStringOrFunc === "function"
       ? typeStringOrFunc(recordSchema.options)
       : typeStringOrFunc
-  return `\t${recordSchema.name}${
+  return `\t${sanitizeFieldName(recordSchema.name)}${
     recordSchema.required ? "" : "?"
   }: ${typeString}\n`
 }

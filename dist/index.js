@@ -37,9 +37,6 @@ async function fromURL(url, email = "", password = "") {
   return result.items;
 }
 
-// src/lib.ts
-import { promises as fs2 } from "fs";
-
 // src/utils.ts
 function toPascalCase(str) {
   if (/^[\p{L}\d]+$/iu.test(str)) {
@@ -50,8 +47,17 @@ function toPascalCase(str) {
     (g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
   ).replace(/[^\p{L}\d]/giu, "");
 }
+function sanitizeFieldName(name) {
+  if (!isNaN(parseFloat(name.charAt(0)))) {
+    console.log({ found: name, return: `"${name}"` });
+    return `"${name}"`;
+  } else {
+    return name;
+  }
+}
 
 // src/lib.ts
+import { promises as fs2 } from "fs";
 var pbSchemaTypescriptMap = {
   text: "string",
   number: "number",
@@ -61,8 +67,7 @@ var pbSchemaTypescriptMap = {
   date: "string",
   select: "string",
   json: "null | unknown",
-  file: "string",
-  files: "string[]",
+  file: (opts) => opts.maxSelect && opts.maxSelect > 1 ? "string[]" : "string",
   relation: "string",
   user: "string"
 };
@@ -107,20 +112,20 @@ function createCollectionRecord(collectionNames) {
 function createRecordType(name, schema) {
   let typeString = `export type ${toPascalCase(name)}Record = {
 `;
-  schema.forEach((field) => {
-    const pbType = field.type === "file" && field.options.maxSelect && field.options.maxSelect > 1 ? "files" : field.type;
-    typeString += createTypeField(field.name, field.required, pbType);
+  schema.forEach((recordSchema) => {
+    typeString += createTypeField(recordSchema);
   });
   typeString += `}`;
   return typeString;
 }
-function createTypeField(name, required, pbType) {
-  if (pbType in pbSchemaTypescriptMap) {
-    return `	${name}${required ? "" : "?"}: ${pbSchemaTypescriptMap[pbType]}
-`;
-  } else {
-    throw new Error(`unknown type ${pbType} found in schema`);
+function createTypeField(recordSchema) {
+  if (!(recordSchema.type in pbSchemaTypescriptMap)) {
+    throw new Error(`unknown type ${recordSchema.type} found in schema`);
   }
+  const typeStringOrFunc = pbSchemaTypescriptMap[recordSchema.type];
+  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(recordSchema.options) : typeStringOrFunc;
+  return `	${sanitizeFieldName(recordSchema.name)}${recordSchema.required ? "" : "?"}: ${typeString}
+`;
 }
 async function saveFile(outPath, typeString) {
   await fs2.writeFile(outPath, typeString, "utf8");
