@@ -29,6 +29,7 @@ export type CollectionRecord = {
   schema: Array<RecordSchema>
 }
 
+// Every field is optional
 export type RecordOptions = {
   maxSelect?: number | null
   min?: number | null

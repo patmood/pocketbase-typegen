@@ -7,6 +7,16 @@ import {
   generate,
 } from "../src/lib"
 
+const defaultRecord = {
+  id: "abc",
+  system: false,
+  unique: false,
+  options: {},
+  name: "defaultName",
+  required: true,
+  type: "text",
+}
+
 describe("generate", () => {
   it("generates correct output given db input", () => {
     const collections: Array<CollectionRecord> = [
@@ -89,53 +99,117 @@ describe("createRecordType", () => {
 
 describe("createTypeField", () => {
   it("handles required and optional fields", () => {
-    expect(createTypeField("name", true, "text")).toEqual("\tname: string\n")
-    expect(createTypeField("name", false, "text")).toEqual("\tname?: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        required: false,
+      })
+    ).toEqual("\tdefaultName?: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        required: true,
+      })
+    ).toEqual("\tdefaultName: string\n")
   })
 
   it("converts pocketbase schema types to typescript", () => {
-    expect(createTypeField("name", true, "text")).toEqual("\tname: string\n")
-    expect(createTypeField("textField", true, "text")).toEqual(
-      "\ttextField: string\n"
-    )
-    expect(createTypeField("numberField", true, "number")).toEqual(
-      "\tnumberField: number\n"
-    )
-    expect(createTypeField("boolField", true, "bool")).toEqual(
-      "\tboolField: boolean\n"
-    )
-    expect(createTypeField("emailField", true, "email")).toEqual(
-      "\temailField: string\n"
-    )
-    expect(createTypeField("urlField", true, "url")).toEqual(
-      "\turlField: string\n"
-    )
-    expect(createTypeField("dateField", true, "date")).toEqual(
-      "\tdateField: string\n"
-    )
-    expect(createTypeField("selectField", true, "select")).toEqual(
-      "\tselectField: string\n"
-    )
-    expect(createTypeField("jsonField", true, "json")).toEqual(
-      "\tjsonField: null | unknown\n"
-    )
-    expect(createTypeField("fileField", true, "file")).toEqual(
-      "\tfileField: string\n"
-    )
-    expect(createTypeField("manyFiles", true, "files")).toEqual(
-      "\tmanyFiles: string[]\n"
-    )
-    expect(createTypeField("relationField", true, "relation")).toEqual(
-      "\trelationField: string\n"
-    )
-    expect(createTypeField("userField", true, "user")).toEqual(
-      "\tuserField: string\n"
-    )
+    expect(
+      createTypeField({
+        ...defaultRecord,
+      })
+    ).toEqual("\tdefaultName: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "textField",
+      })
+    ).toEqual("\ttextField: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "numberField",
+        type: "number",
+      })
+    ).toEqual("\tnumberField: number\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "boolField",
+        type: "bool",
+      })
+    ).toEqual("\tboolField: boolean\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "emailField",
+        type: "email",
+      })
+    ).toEqual("\temailField: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "urlField",
+        type: "url",
+      })
+    ).toEqual("\turlField: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "dateField",
+        type: "date",
+      })
+    ).toEqual("\tdateField: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "selectField",
+        type: "select",
+      })
+    ).toEqual("\tselectField: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "jsonField",
+        type: "json",
+      })
+    ).toEqual("\tjsonField: null | unknown\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "fileField",
+        type: "file",
+      })
+    ).toEqual("\tfileField: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "fileField",
+        type: "file",
+        options: {
+          maxSelect: 3,
+        },
+      })
+    ).toEqual("\tfileField: string[]\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "relationField",
+        type: "relation",
+      })
+    ).toEqual("\trelationField: string\n")
+    expect(
+      createTypeField({
+        ...defaultRecord,
+        name: "userField",
+        type: "user",
+      })
+    ).toEqual("\tuserField: string\n")
   })
 
   it("throws for unexpected types", () => {
-    expect(() => createTypeField("name", true, "unknowntype")).toThrowError(
-      "unknown type unknowntype found in schema"
-    )
+    expect(() =>
+      createTypeField({ ...defaultRecord, type: "unknowntype" })
+    ).toThrowError("unknown type unknowntype found in schema")
   })
 })

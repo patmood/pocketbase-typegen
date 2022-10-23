@@ -1,4 +1,4 @@
-import { CollectionRecord, RecordSchema } from "./types"
+import { CollectionRecord, RecordOptions, RecordSchema } from "./types"
 
 import { promises as fs } from "fs"
 import { toPascalCase } from "./utils"
@@ -12,8 +12,8 @@ const pbSchemaTypescriptMap = {
   date: "string",
   select: "string",
   json: "null | unknown",
-  file: "string",
-  files: "string[]",
+  file: (opts: RecordOptions) =>
+    opts.maxSelect && opts.maxSelect > 1 ? "string[]" : "string",
   relation: "string",
   user: "string",
 }
@@ -61,31 +61,29 @@ export function createRecordType(
   schema: Array<RecordSchema>
 ): string {
   let typeString = `export type ${toPascalCase(name)}Record = {\n`
-  schema.forEach((field: RecordSchema) => {
-    const pbType =
-      field.type === "file" &&
-      field.options.maxSelect &&
-      field.options.maxSelect > 1
-        ? "files"
-        : field.type
-    typeString += createTypeField(field.name, field.required, pbType)
+  schema.forEach((recordSchema: RecordSchema) => {
+    typeString += createTypeField(recordSchema)
   })
   typeString += `}`
   return typeString
 }
 
-export function createTypeField(
-  name: string,
-  required: boolean,
-  pbType: string
-) {
-  if (pbType in pbSchemaTypescriptMap) {
-    return `\t${name}${required ? "" : "?"}: ${
-      pbSchemaTypescriptMap[pbType as keyof typeof pbSchemaTypescriptMap]
-    }\n`
-  } else {
-    throw new Error(`unknown type ${pbType} found in schema`)
+export function createTypeField(recordSchema: RecordSchema) {
+  if (!(recordSchema.type in pbSchemaTypescriptMap)) {
+    throw new Error(`unknown type ${recordSchema.type} found in schema`)
   }
+  const typeStringOrFunc =
+    pbSchemaTypescriptMap[
+      recordSchema.type as keyof typeof pbSchemaTypescriptMap
+    ]
+
+  const typeString =
+    typeof typeStringOrFunc === "function"
+      ? typeStringOrFunc(recordSchema.options)
+      : typeStringOrFunc
+  return `\t${recordSchema.name}${
+    recordSchema.required ? "" : "?"
+  }: ${typeString}\n`
 }
 
 export async function saveFile(outPath: string, typeString: string) {
