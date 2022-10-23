@@ -7,7 +7,7 @@ export type Options = {
   password?: string
 }
 
-export type RecordSchema = {
+export type FieldSchema = {
   id: string
   name: string
   type: string
@@ -26,7 +26,7 @@ export type CollectionRecord = {
   createRule: string | null
   updateRule: string | null
   deleteRule: string | null
-  schema: Array<RecordSchema>
+  schema: Array<FieldSchema>
 }
 
 // Every field is optional

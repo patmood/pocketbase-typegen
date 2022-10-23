@@ -1,4 +1,4 @@
-import { CollectionRecord, RecordSchema } from "../src/types"
+import { CollectionRecord, FieldSchema } from "../src/types"
 import {
   createCollectionEnum,
   createCollectionRecord,

@@ -57,6 +57,12 @@ function sanitizeFieldName(name) {
 
 // src/lib.ts
 import { promises as fs2 } from "fs";
+
+// src/generics.ts
+function getGenericArgString(schema) {
+}
+
+// src/lib.ts
 var pbSchemaTypescriptMap = {
   text: "string",
   number: "number",
@@ -109,21 +115,23 @@ function createCollectionRecord(collectionNames) {
   return typeString;
 }
 function createRecordType(name, schema) {
-  let typeString = `export type ${toPascalCase(name)}Record = {
+  let typeString = `export type ${toPascalCase(
+    name
+  )}Record${getGenericArgString(schema)} = {
 `;
-  schema.forEach((recordSchema) => {
-    typeString += createTypeField(recordSchema);
+  schema.forEach((fieldSchema) => {
+    typeString += createTypeField(fieldSchema);
   });
   typeString += `}`;
   return typeString;
 }
-function createTypeField(recordSchema) {
-  if (!(recordSchema.type in pbSchemaTypescriptMap)) {
-    throw new Error(`unknown type ${recordSchema.type} found in schema`);
+function createTypeField(fieldSchema) {
+  if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
+    throw new Error(`unknown type ${fieldSchema.type} found in schema`);
   }
-  const typeStringOrFunc = pbSchemaTypescriptMap[recordSchema.type];
-  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(recordSchema.options) : typeStringOrFunc;
-  return `	${sanitizeFieldName(recordSchema.name)}${recordSchema.required ? "" : "?"}: ${typeString}
+  const typeStringOrFunc = pbSchemaTypescriptMap[fieldSchema.type];
+  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema.options) : typeStringOrFunc;
+  return `	${sanitizeFieldName(fieldSchema.name)}${fieldSchema.required ? "" : "?"}: ${typeString}
 `;
 }
 async function saveFile(outPath, typeString) {

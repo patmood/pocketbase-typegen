@@ -1,7 +1,8 @@
-import { CollectionRecord, RecordOptions, RecordSchema } from "./types"
+import { CollectionRecord, FieldSchema, RecordOptions } from "./types"
 import { sanitizeFieldName, toPascalCase } from "./utils"
 
 import { promises as fs } from "fs"
+import { getGenericArgString } from "./generics"
 
 const pbSchemaTypescriptMap = {
   text: "string",
@@ -59,31 +60,33 @@ export function createCollectionRecord(collectionNames: Array<string>) {
 
 export function createRecordType(
   name: string,
-  schema: Array<RecordSchema>
+  schema: Array<FieldSchema>
 ): string {
-  let typeString = `export type ${toPascalCase(name)}Record = {\n`
-  schema.forEach((recordSchema: RecordSchema) => {
-    typeString += createTypeField(recordSchema)
+  let typeString = `export type ${toPascalCase(
+    name
+  )}Record${getGenericArgString(schema)} = {\n`
+  schema.forEach((fieldSchema: FieldSchema) => {
+    typeString += createTypeField(fieldSchema)
   })
   typeString += `}`
   return typeString
 }
 
-export function createTypeField(recordSchema: RecordSchema) {
-  if (!(recordSchema.type in pbSchemaTypescriptMap)) {
-    throw new Error(`unknown type ${recordSchema.type} found in schema`)
+export function createTypeField(fieldSchema: FieldSchema) {
+  if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
+    throw new Error(`unknown type ${fieldSchema.type} found in schema`)
   }
   const typeStringOrFunc =
     pbSchemaTypescriptMap[
-      recordSchema.type as keyof typeof pbSchemaTypescriptMap
+      fieldSchema.type as keyof typeof pbSchemaTypescriptMap
     ]
 
   const typeString =
     typeof typeStringOrFunc === "function"
-      ? typeStringOrFunc(recordSchema.options)
+      ? typeStringOrFunc(fieldSchema.options)
       : typeStringOrFunc
-  return `\t${sanitizeFieldName(recordSchema.name)}${
-    recordSchema.required ? "" : "?"
+  return `\t${sanitizeFieldName(fieldSchema.name)}${
+    fieldSchema.required ? "" : "?"
   }: ${typeString}\n`
 }
 
