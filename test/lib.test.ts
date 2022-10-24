@@ -207,14 +207,14 @@ describe("createTypeField", () => {
         name: "relationField",
         type: "relation",
       })
-    ).toEqual("\trelationField: string\n")
+    ).toEqual("\trelationField: RecordIdString\n")
     expect(
       createTypeField({
         ...defaultFieldSchema,
         name: "userField",
         type: "user",
       })
-    ).toEqual("\tuserField: string\n")
+    ).toEqual("\tuserField: UserIdString\n")
   })
 
   it("throws for unexpected types", () => {

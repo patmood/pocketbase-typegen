@@ -1,9 +1,14 @@
-import { CollectionRecord, FieldSchema } from "./types"
 import {
+  BASE_RECORD_DEFINITION,
   DATE_STRING_TYPE_DEFINITION,
   DATE_STRING_TYPE_NAME,
   EXPORT_COMMENT,
+  RECORD_ID_STRING_DEFINITION,
+  RECORD_ID_STRING_NAME,
+  USER_ID_STRING_DEFINITION,
+  USER_ID_STRING_NAME,
 } from "./constants"
+import { CollectionRecord, FieldSchema } from "./types"
 import { fieldNameToGeneric, getGenericArgString } from "./generics"
 import { sanitizeFieldName, toPascalCase } from "./utils"
 
@@ -24,8 +29,8 @@ const pbSchemaTypescriptMap = {
     fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
       ? "string[]"
       : "string",
-  relation: "string",
-  user: "string",
+  relation: RECORD_ID_STRING_NAME,
+  user: USER_ID_STRING_NAME,
 }
 
 export function generate(results: Array<CollectionRecord>) {
@@ -41,6 +46,9 @@ export function generate(results: Array<CollectionRecord>) {
   const fileParts = [
     EXPORT_COMMENT,
     DATE_STRING_TYPE_DEFINITION,
+    RECORD_ID_STRING_DEFINITION,
+    USER_ID_STRING_DEFINITION,
+    BASE_RECORD_DEFINITION,
     createCollectionEnum(sortedCollectionNames),
     ...recordTypes.sort(),
     createCollectionRecord(sortedCollectionNames),

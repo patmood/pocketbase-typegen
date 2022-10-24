@@ -37,6 +37,22 @@ async function fromURL(url, email = "", password = "") {
   return result.items;
 }
 
+// src/constants.ts
+var EXPORT_COMMENT = `// This file was @generated using pocketbase-typegen`;
+var DATE_STRING_TYPE_NAME = `IsoDateString`;
+var DATE_STRING_TYPE_DEFINITION = `export type ${DATE_STRING_TYPE_NAME} = string`;
+var RECORD_ID_STRING_NAME = `RecordIdString`;
+var RECORD_ID_STRING_DEFINITION = `export type ${RECORD_ID_STRING_NAME} = string`;
+var USER_ID_STRING_NAME = `UserIdString`;
+var USER_ID_STRING_DEFINITION = `export type ${USER_ID_STRING_NAME} = string`;
+var BASE_RECORD_DEFINITION = `export type BaseRecord = {
+    id: ${RECORD_ID_STRING_NAME}
+    created: ${DATE_STRING_TYPE_NAME}
+    updated: ${DATE_STRING_TYPE_NAME}
+    "@collectionId": string
+    "@collectionName": string
+}`;
+
 // src/generics.ts
 function fieldNameToGeneric(name) {
   return `T${name}`;
@@ -75,12 +91,12 @@ var pbSchemaTypescriptMap = {
   bool: "boolean",
   email: "string",
   url: "string",
-  date: "string",
+  date: DATE_STRING_TYPE_NAME,
   select: (fieldSchema) => fieldSchema.options.values ? fieldSchema.options.values.map((val) => `"${val}"`).join(" | ") : "string",
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   file: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? "string[]" : "string",
-  relation: "string",
-  user: "string"
+  relation: RECORD_ID_STRING_NAME,
+  user: USER_ID_STRING_NAME
 };
 function generate(results) {
   const collectionNames = [];
@@ -93,7 +109,11 @@ function generate(results) {
   });
   const sortedCollectionNames = collectionNames.sort();
   const fileParts = [
-    `// This file was @generated using pocketbase-typegen`,
+    EXPORT_COMMENT,
+    DATE_STRING_TYPE_DEFINITION,
+    RECORD_ID_STRING_DEFINITION,
+    USER_ID_STRING_DEFINITION,
+    BASE_RECORD_DEFINITION,
     createCollectionEnum(sortedCollectionNames),
     ...recordTypes.sort(),
     createCollectionRecord(sortedCollectionNames)
