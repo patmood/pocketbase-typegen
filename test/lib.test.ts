@@ -159,7 +159,7 @@ describe("createTypeField", () => {
         name: "dateField",
         type: "date",
       })
-    ).toEqual("\tdateField: string\n")
+    ).toEqual("\tdateField: IsoDateString\n")
     expect(
       createTypeField({
         ...defaultFieldSchema,

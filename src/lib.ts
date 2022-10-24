@@ -1,4 +1,9 @@
-import { CollectionRecord, FieldSchema, RecordOptions } from "./types"
+import { CollectionRecord, FieldSchema } from "./types"
+import {
+  DATE_STRING_TYPE_DEFINITION,
+  DATE_STRING_TYPE_NAME,
+  EXPORT_COMMENT,
+} from "./constants"
 import { fieldNameToGeneric, getGenericArgString } from "./generics"
 import { sanitizeFieldName, toPascalCase } from "./utils"
 
@@ -8,7 +13,7 @@ const pbSchemaTypescriptMap = {
   bool: "boolean",
   email: "string",
   url: "string",
-  date: "string",
+  date: DATE_STRING_TYPE_NAME,
   select: (fieldSchema: FieldSchema) =>
     fieldSchema.options.values
       ? fieldSchema.options.values.map((val) => `"${val}"`).join(" | ")
@@ -34,7 +39,8 @@ export function generate(results: Array<CollectionRecord>) {
   const sortedCollectionNames = collectionNames.sort()
 
   const fileParts = [
-    `// This file was @generated using pocketbase-typegen`,
+    EXPORT_COMMENT,
+    DATE_STRING_TYPE_DEFINITION,
     createCollectionEnum(sortedCollectionNames),
     ...recordTypes.sort(),
     createCollectionRecord(sortedCollectionNames),
