@@ -6,9 +6,9 @@ export const RECORD_ID_STRING_DEFINITION = `export type ${RECORD_ID_STRING_NAME}
 export const USER_ID_STRING_NAME = `UserIdString`
 export const USER_ID_STRING_DEFINITION = `export type ${USER_ID_STRING_NAME} = string`
 export const BASE_RECORD_DEFINITION = `export type BaseRecord = {
-    id: ${RECORD_ID_STRING_NAME}
-    created: ${DATE_STRING_TYPE_NAME}
-    updated: ${DATE_STRING_TYPE_NAME}
-    "@collectionId": string
-    "@collectionName": string
+\tid: ${RECORD_ID_STRING_NAME}
+\tcreated: ${DATE_STRING_TYPE_NAME}
+\tupdated: ${DATE_STRING_TYPE_NAME}
+\t"@collectionId": string
+\t"@collectionName": string
 }`

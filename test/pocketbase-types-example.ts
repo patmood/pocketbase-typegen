@@ -7,11 +7,11 @@ export type RecordIdString = string
 export type UserIdString = string
 
 export type BaseRecord = {
-    id: RecordIdString
-    created: IsoDateString
-    updated: IsoDateString
-    "@collectionId": string
-    "@collectionName": string
+	id: RecordIdString
+	created: IsoDateString
+	updated: IsoDateString
+	"@collectionId": string
+	"@collectionName": string
 }
 
 export enum Collections {
