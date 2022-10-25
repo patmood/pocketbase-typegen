@@ -53,11 +53,7 @@ Using the [pocketbase SDK](https://github.com/pocketbase/js-sdk) (v0.8.x onwards
 
 ```typescript
 import type { Collections, ProfilesRecord } from "./path/to/pocketbase-types.ts"
-const result = (await client.records.getList)<ProfilesRecord>(
-  Collections.Profiles,
-  1,
-  50
-)
+await client.records.getList<ProfilesRecord>(Collections.Profiles, 1, 50)
 ```
 
 Now the `result` of the data fetch will be accurately typed throughout your codebase!
