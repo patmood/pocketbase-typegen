@@ -39,33 +39,22 @@ URL example:
 The output is a typescript file `pocketbase-types.ts` which will contain an enum of all your collections, and the type of each record. For example:
 
 ```typescript
-// Enum of all pocketbase collections
-export enum Collections {
-  Profiles = "profiles",
-  Orders = "orders",
-}
-
-// Mapping of collection name to record type
-export type CollectionRecords = {
-  profiles: ProfilesRecord
-  orders: OrdersRecord
-}
-
-// Actual type for the records in your collection
-export type ProfilesRecord = {
-  userId: string
-  name?: string
-  avatar?: string
-}
-
-// One record type for each collection
-export type OrdersRecord<Tdata = unknown> = {
-  id: string
-  amount: number
-  data: null | Tdata // JSON type in pocketbase
-  payment_method: "credit_card" | "paypal" | "crypto" // Multiple choice in pocketbase
+export type EveryTypeRecord<Tjson_field = unknown> = {
+  text_field: string
+  number_field: number
+  bool_field: boolean
+  email_field?: string
+  url_field?: string
+  date_field?: IsoDateString
+  select_field?: "optionA" | "optionB" | "optionC"
+  json_field?: null | Tjson_field
+  file_field?: string
+  relation_field?: RecordIdString
+  user_field?: UserIdString
 }
 ```
+
+[Complete example output](./test/pocketbase-types-example.ts)
 
 Using the [pocketbase SDK](https://github.com/pocketbase/js-sdk) (v0.8.x onwards), you can then type your responses like this:
 
