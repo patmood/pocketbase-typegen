@@ -38,7 +38,7 @@ URL example:
 
 The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketbase-types-example.ts)) which will contain one type for each collection and an enum of all collections.
 
-For example and "order" collection record might look like this:
+For example an "order" collection record might look like this:
 
 ```typescript
 export type OrdersRecord = {
