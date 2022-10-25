@@ -36,7 +36,9 @@ URL example:
 
 ## Example output
 
-The output is a typescript file `pocketbase-types.ts` which will contain an enum of all your collections, and the type of each record. For example:
+The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketbase-types-example.ts)) which will contain one type for each collection and an enum of all collections.
+
+For example and "order" collection record might look like this:
 
 ```typescript
 export type OrdersRecord = {
@@ -46,8 +48,6 @@ export type OrdersRecord = {
   product: string
 }
 ```
-
-[Complete example output](./test/pocketbase-types-example.ts)
 
 Using the [pocketbase SDK](https://github.com/pocketbase/js-sdk) (v0.8.x onwards), you can then type your responses like this:
 
