@@ -39,18 +39,11 @@ URL example:
 The output is a typescript file `pocketbase-types.ts` which will contain an enum of all your collections, and the type of each record. For example:
 
 ```typescript
-export type EveryTypeRecord<Tjson_field = unknown> = {
-  text_field: string
-  number_field: number
-  bool_field: boolean
-  email_field?: string
-  url_field?: string
-  date_field?: IsoDateString
-  select_field?: "optionA" | "optionB" | "optionC"
-  json_field?: null | Tjson_field
-  file_field?: string
-  relation_field?: RecordIdString
-  user_field?: UserIdString
+export type OrdersRecord = {
+  amount: number
+  payment_type: "credit card" | "paypal" | "crypto"
+  user: UserIdString
+  product: string
 }
 ```
 
