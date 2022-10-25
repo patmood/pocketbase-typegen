@@ -161,13 +161,7 @@ function createTypeField(fieldSchema) {
 `;
 }
 
-// src/index.ts
-import { program } from "commander";
-
-// package.json
-var version = "1.0.11";
-
-// src/index.ts
+// src/cli.ts
 async function main(options2) {
   let schema;
   if (options2.db) {
@@ -183,7 +177,16 @@ async function main(options2) {
   }
   const typeString = generate(schema);
   await saveFile(options2.out, typeString);
+  return typeString;
 }
+
+// src/index.ts
+import { program } from "commander";
+
+// package.json
+var version = "1.0.11";
+
+// src/index.ts
 program.name("Pocketbase Typegen").version(version).description(
   "CLI to create typescript typings for your pocketbase.io records"
 ).option("-d, --db <char>", "path to the pocketbase SQLite database").option(

@@ -1,29 +1,9 @@
 #!/usr/bin/env node
 
-import type { CollectionRecord, Options } from "./types"
-import { fromDatabase, fromJSON, fromURL } from "./schema"
-
-import { generate } from "./lib"
+import type { Options } from "./types"
+import { main } from "./cli"
 import { program } from "commander"
-import { saveFile } from "./utils"
 import { version } from "../package.json"
-
-async function main(options: Options) {
-  let schema: Array<CollectionRecord>
-  if (options.db) {
-    schema = await fromDatabase(options.db)
-  } else if (options.json) {
-    schema = await fromJSON(options.json)
-  } else if (options.url) {
-    schema = await fromURL(options.url, options.email, options.password)
-  } else {
-    return console.error(
-      "Missing schema path. Check options: pocketbase-typegen --help"
-    )
-  }
-  const typeString = generate(schema)
-  await saveFile(options.out, typeString)
-}
 
 program
   .name("Pocketbase Typegen")
