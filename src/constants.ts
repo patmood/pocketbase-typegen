@@ -11,4 +11,5 @@ export const BASE_RECORD_DEFINITION = `export type BaseRecord = {
 \tupdated: ${DATE_STRING_TYPE_NAME}
 \t"@collectionId": string
 \t"@collectionName": string
+\t"@expand"?: { [key: string]: any }
 }`

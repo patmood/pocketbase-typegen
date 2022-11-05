@@ -6,7 +6,7 @@ Generate typescript definitions from your [pocketbase.io](https://pocketbase.io/
 
 `npx pocketbase-typegen --db ./pb_data/data.db --out pocketbase-types.ts`
 
-This will produce types for all your pocketbase collections to use in your frontend typescript codebase.
+This will produce types for all your PocketBase collections to use in your frontend typescript codebase.
 
 ## Usage
 
@@ -36,24 +36,12 @@ URL example:
 
 ## Example output
 
-The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketbase-types-example.ts)) which will contain one type for each collection and an enum of all collections.
+The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketbase-types-example.ts)) which will contain:
 
-For example an "order" collection record might look like this:
+- An enum of all collections
+- One type for each collection (eg `ProfilesRecord`)
+- One response type for each collection (eg `ProfilesResponse`) which includes base fields like id, updated, created
+- A type `CollectionRecords` mapping each collection name to the record type
 
-```typescript
-export type OrdersRecord = {
-  amount: number
-  payment_type: "credit card" | "paypal" | "crypto"
-  user: UserIdString
-  product: string
-}
-```
-
-Using the [pocketbase SDK](https://github.com/pocketbase/js-sdk) (v0.8.x onwards), you can then type your responses like this:
-
-```typescript
-import type { Collections, ProfilesRecord } from "./path/to/pocketbase-types.ts"
-await client.records.getList<ProfilesRecord>(Collections.Profiles, 1, 50)
-```
-
-Now the `result` of the data fetch will be accurately typed throughout your codebase!
+In the upcoming [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.8 you will be able to use generic types when fetching records, eg:
+`pb.collection('tasks').getOne<Task>("RECORD_ID") // -> results in Promise<Task>`

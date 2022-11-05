@@ -3,6 +3,7 @@ import {
   createCollectionEnum,
   createCollectionRecord,
   createRecordType,
+  createResponseType,
   createTypeField,
   generate,
 } from "../src/lib"
@@ -76,6 +77,42 @@ describe("createRecordType", () => {
       },
     ]
     const result = createRecordType(name, schema)
+    expect(result).toMatchSnapshot()
+  })
+
+  it("handles file fields with multiple files", () => {
+    const name = "books"
+    const schema: FieldSchema[] = [
+      {
+        system: false,
+        id: "hhnwjkke",
+        name: "avatars",
+        type: "file",
+        required: false,
+        unique: false,
+        options: { maxSelect: 2 },
+      },
+    ]
+    const result = createRecordType(name, schema)
+    expect(result).toMatchSnapshot()
+  })
+})
+
+describe("createResponseType", () => {
+  it("creates type definition for a response", () => {
+    const name = "books"
+    const schema: FieldSchema[] = [
+      {
+        system: false,
+        id: "hhnwjkke",
+        name: "title",
+        type: "text",
+        required: false,
+        unique: false,
+        options: { min: null, max: null, pattern: "" },
+      },
+    ]
+    const result = createResponseType(name, schema)
     expect(result).toMatchSnapshot()
   })
 

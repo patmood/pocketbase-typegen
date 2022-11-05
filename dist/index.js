@@ -46,23 +46,33 @@ var RECORD_ID_STRING_DEFINITION = `export type ${RECORD_ID_STRING_NAME} = string
 var USER_ID_STRING_NAME = `UserIdString`;
 var USER_ID_STRING_DEFINITION = `export type ${USER_ID_STRING_NAME} = string`;
 var BASE_RECORD_DEFINITION = `export type BaseRecord = {
-    id: ${RECORD_ID_STRING_NAME}
-    created: ${DATE_STRING_TYPE_NAME}
-    updated: ${DATE_STRING_TYPE_NAME}
-    "@collectionId": string
-    "@collectionName": string
+	id: ${RECORD_ID_STRING_NAME}
+	created: ${DATE_STRING_TYPE_NAME}
+	updated: ${DATE_STRING_TYPE_NAME}
+	"@collectionId": string
+	"@collectionName": string
+	"@expand"?: { [key: string]: any }
 }`;
 
 // src/generics.ts
 function fieldNameToGeneric(name) {
   return `T${name}`;
 }
+function getGenericArgList(schema) {
+  const jsonFields = schema.filter((field) => field.type === "json").map((field) => fieldNameToGeneric(field.name)).sort();
+  return jsonFields;
+}
 function getGenericArgString(schema) {
-  const jsonFields = schema.filter((field) => field.type === "json").map((field) => field.name).sort();
-  if (jsonFields.length === 0) {
+  const argList = getGenericArgList(schema);
+  if (argList.length === 0)
     return "";
-  }
-  return `<${jsonFields.map((name) => `${fieldNameToGeneric(name)} = unknown`).join(", ")}>`;
+  return `<${argList.map((name) => `${name}`).join(", ")}>`;
+}
+function getGenericArgStringWithDefault(schema) {
+  const argList = getGenericArgList(schema);
+  if (argList.length === 0)
+    return "";
+  return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`;
 }
 
 // src/utils.ts
@@ -104,8 +114,10 @@ function generate(results) {
   results.forEach((row) => {
     if (row.name)
       collectionNames.push(row.name);
-    if (row.schema)
+    if (row.schema) {
       recordTypes.push(createRecordType(row.name, row.schema));
+      recordTypes.push(createResponseType(row.name, row.schema));
+    }
   });
   const sortedCollectionNames = collectionNames.sort();
   const fileParts = [
@@ -143,12 +155,19 @@ function createCollectionRecord(collectionNames) {
 function createRecordType(name, schema) {
   let typeString = `export type ${toPascalCase(
     name
-  )}Record${getGenericArgString(schema)} = {
+  )}Record${getGenericArgStringWithDefault(schema)} = {
 `;
   schema.forEach((fieldSchema) => {
     typeString += createTypeField(fieldSchema);
   });
   typeString += `}`;
+  return typeString;
+}
+function createResponseType(name, schema) {
+  const pascaleName = toPascalCase(name);
+  let typeString = `export type ${pascaleName}Response${getGenericArgStringWithDefault(
+    schema
+  )} = ${pascaleName}Record${getGenericArgString(schema)} & BaseRecord`;
   return typeString;
 }
 function createTypeField(fieldSchema) {
@@ -184,7 +203,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.0.11";
+var version = "1.0.12";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(

@@ -4,15 +4,22 @@ export function fieldNameToGeneric(name: string) {
   return `T${name}`
 }
 
-export function getGenericArgString(schema: FieldSchema[]) {
+export function getGenericArgList(schema: FieldSchema[]): string[] {
   const jsonFields = schema
     .filter((field) => field.type === "json")
-    .map((field) => field.name)
+    .map((field) => fieldNameToGeneric(field.name))
     .sort()
-  if (jsonFields.length === 0) {
-    return ""
-  }
-  return `<${jsonFields
-    .map((name) => `${fieldNameToGeneric(name)} = unknown`)
-    .join(", ")}>`
+  return jsonFields
+}
+
+export function getGenericArgString(schema: FieldSchema[]): string {
+  const argList = getGenericArgList(schema)
+  if (argList.length === 0) return ""
+  return `<${argList.map((name) => `${name}`).join(", ")}>`
+}
+
+export function getGenericArgStringWithDefault(schema: FieldSchema[]): string {
+  const argList = getGenericArgList(schema)
+  if (argList.length === 0) return ""
+  return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`
 }

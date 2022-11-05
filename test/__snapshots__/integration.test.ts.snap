@@ -15,6 +15,7 @@ export type BaseRecord = {
 	updated: IsoDateString
 	"@collectionId": string
 	"@collectionName": string
+	"@expand"?: { [key: string]: any }
 }
 
 export enum Collections {
@@ -37,6 +38,8 @@ export type EveryTypeRecord<Tjson_field = unknown> = {
 	user_field?: UserIdString
 }
 
+export type EveryTypeResponse<Tjson_field = unknown> = EveryTypeRecord<Tjson_field> & BaseRecord
+
 export type OrdersRecord = {
 	amount: number
 	payment_type: "credit card" | "paypal" | "crypto"
@@ -44,11 +47,15 @@ export type OrdersRecord = {
 	product: string
 }
 
+export type OrdersResponse = OrdersRecord & BaseRecord
+
 export type ProfilesRecord = {
 	userId: UserIdString
 	name?: string
 	avatar?: string
 }
+
+export type ProfilesResponse = ProfilesRecord & BaseRecord
 
 export type CollectionRecords = {
 	every_type: EveryTypeRecord

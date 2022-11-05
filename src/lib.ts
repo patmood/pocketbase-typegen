@@ -9,7 +9,11 @@ import {
   USER_ID_STRING_NAME,
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
-import { fieldNameToGeneric, getGenericArgString } from "./generics"
+import {
+  fieldNameToGeneric,
+  getGenericArgString,
+  getGenericArgStringWithDefault,
+} from "./generics"
 import { sanitizeFieldName, toPascalCase } from "./utils"
 
 const pbSchemaTypescriptMap = {
@@ -39,7 +43,10 @@ export function generate(results: Array<CollectionRecord>) {
 
   results.forEach((row) => {
     if (row.name) collectionNames.push(row.name)
-    if (row.schema) recordTypes.push(createRecordType(row.name, row.schema))
+    if (row.schema) {
+      recordTypes.push(createRecordType(row.name, row.schema))
+      recordTypes.push(createResponseType(row.name, row.schema))
+    }
   })
   const sortedCollectionNames = collectionNames.sort()
 
@@ -81,11 +88,19 @@ export function createRecordType(
 ): string {
   let typeString = `export type ${toPascalCase(
     name
-  )}Record${getGenericArgString(schema)} = {\n`
+  )}Record${getGenericArgStringWithDefault(schema)} = {\n`
   schema.forEach((fieldSchema: FieldSchema) => {
     typeString += createTypeField(fieldSchema)
   })
   typeString += `}`
+  return typeString
+}
+
+export function createResponseType(name: string, schema: Array<FieldSchema>) {
+  const pascaleName = toPascalCase(name)
+  let typeString = `export type ${pascaleName}Response${getGenericArgStringWithDefault(
+    schema
+  )} = ${pascaleName}Record${getGenericArgString(schema)} & BaseRecord`
   return typeString
 }
 
