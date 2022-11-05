@@ -44,4 +44,5 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
 - A type `CollectionRecords` mapping each collection name to the record type
 
 In the upcoming [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.8 you will be able to use generic types when fetching records, eg:
+
 `pb.collection('tasks').getOne<Task>("RECORD_ID") // -> results in Promise<Task>`
