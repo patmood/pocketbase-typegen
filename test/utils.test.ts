@@ -38,5 +38,8 @@ describe("getSystemFields", () => {
 describe("getOptionEnumName", () => {
   it("returns the enum name for select field options", () => {
     expect(getOptionEnumName("orders", "type")).toBe("OrdersTypeOptions")
+    expect(getOptionEnumName("orders_with_underscore", "type_underscore")).toBe(
+      "OrdersWithUnderscoreTypeUnderscoreOptions"
+    )
   })
 })

@@ -294,7 +294,7 @@ describe("createTypeField", () => {
     ).toEqual("\trelationField: RecordIdString\n")
   })
 
-  it("converts relation type", () => {
+  it("converts relation type with multiple options", () => {
     expect(
       createTypeField("test_collection", {
         ...defaultFieldSchema,
@@ -305,6 +305,17 @@ describe("createTypeField", () => {
         },
       })
     ).toEqual("\trelationFieldMany: RecordIdString[]\n")
+  })
+
+  // DEPRECATED: This was removed in PocketBase v0.8
+  it("converts user relation type", () => {
+    expect(
+      createTypeField("test_collection", {
+        ...defaultFieldSchema,
+        name: "userRelationField",
+        type: "user",
+      })
+    ).toEqual("\tuserRelationField: RecordIdString\n")
   })
 
   it("throws for unexpected types", () => {

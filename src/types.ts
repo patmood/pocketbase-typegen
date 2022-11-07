@@ -22,6 +22,7 @@ export type FieldSchema = {
     | "select"
     | "json"
     | "relation"
+    | "user"
   system: boolean
   required: boolean
   unique: boolean

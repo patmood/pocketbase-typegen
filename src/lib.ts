@@ -41,6 +41,11 @@ const pbSchemaTypescriptMap = {
     fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
       ? `${RECORD_ID_STRING_NAME}[]`
       : RECORD_ID_STRING_NAME,
+  // DEPRECATED: PocketBase v0.8 does not have a dedicated user relation
+  user: (fieldSchema: FieldSchema) =>
+    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
+      ? `${RECORD_ID_STRING_NAME}[]`
+      : RECORD_ID_STRING_NAME,
 }
 
 export function generate(results: Array<CollectionRecord>) {
