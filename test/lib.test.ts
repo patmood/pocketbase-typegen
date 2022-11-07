@@ -1,7 +1,7 @@
 import { CollectionRecord, FieldSchema } from "../src/types"
 import {
   createCollectionEnum,
-  createCollectionRecord,
+  createCollectionRecords,
   createRecordType,
   createResponseType,
   createTypeField,
@@ -59,7 +59,7 @@ describe("createCollectionEnum", () => {
 describe("createCollectionRecord", () => {
   it("creates mapping of collection name to record type", () => {
     const names = ["book", "magazine"]
-    expect(createCollectionRecord(names)).toMatchSnapshot()
+    expect(createCollectionRecords(names)).toMatchSnapshot()
   })
 })
 
@@ -153,13 +153,13 @@ describe("createTypeField", () => {
         ...defaultFieldSchema,
         required: false,
       })
-    ).toEqual("\tdefaultName?: string\n")
+    ).toEqual("\tdefaultName?: string")
     expect(
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         required: true,
       })
-    ).toEqual("\tdefaultName: string\n")
+    ).toEqual("\tdefaultName: string")
   })
 
   it("converts default types to typescript", () => {
@@ -167,13 +167,13 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
       })
-    ).toEqual("\tdefaultName: string\n")
+    ).toEqual("\tdefaultName: string")
     expect(
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "textField",
       })
-    ).toEqual("\ttextField: string\n")
+    ).toEqual("\ttextField: string")
   })
 
   it("converts number type", () => {
@@ -183,7 +183,7 @@ describe("createTypeField", () => {
         name: "numberField",
         type: "number",
       })
-    ).toEqual("\tnumberField: number\n")
+    ).toEqual("\tnumberField: number")
   })
 
   it("converts bool type", () => {
@@ -193,7 +193,7 @@ describe("createTypeField", () => {
         name: "boolField",
         type: "bool",
       })
-    ).toEqual("\tboolField: boolean\n")
+    ).toEqual("\tboolField: boolean")
   })
 
   it("converts email type", () => {
@@ -203,7 +203,7 @@ describe("createTypeField", () => {
         name: "emailField",
         type: "email",
       })
-    ).toEqual("\temailField: string\n")
+    ).toEqual("\temailField: string")
   })
 
   it("converts url type", () => {
@@ -213,7 +213,7 @@ describe("createTypeField", () => {
         name: "urlField",
         type: "url",
       })
-    ).toEqual("\turlField: string\n")
+    ).toEqual("\turlField: string")
   })
 
   it("converts date type", () => {
@@ -223,7 +223,7 @@ describe("createTypeField", () => {
         name: "dateField",
         type: "date",
       })
-    ).toEqual("\tdateField: IsoDateString\n")
+    ).toEqual("\tdateField: IsoDateString")
   })
 
   it("converts select type", () => {
@@ -233,7 +233,7 @@ describe("createTypeField", () => {
         name: "selectField",
         type: "select",
       })
-    ).toEqual("\tselectField: string\n")
+    ).toEqual("\tselectField: string")
   })
 
   it("converts select type with value", () => {
@@ -246,9 +246,7 @@ describe("createTypeField", () => {
           values: ["one", "two", "three"],
         },
       })
-    ).toEqual(
-      `\tselectFieldWithOpts: TestCollectionSelectFieldWithOptsOptions\n`
-    )
+    ).toEqual(`\tselectFieldWithOpts: TestCollectionSelectFieldWithOptsOptions`)
   })
 
   it("converts json type", () => {
@@ -258,7 +256,7 @@ describe("createTypeField", () => {
         name: "jsonField",
         type: "json",
       })
-    ).toEqual("\tjsonField: null | TjsonField\n")
+    ).toEqual("\tjsonField: null | TjsonField")
   })
 
   it("converts file type", () => {
@@ -268,7 +266,7 @@ describe("createTypeField", () => {
         name: "fileField",
         type: "file",
       })
-    ).toEqual("\tfileField: string\n")
+    ).toEqual("\tfileField: string")
   })
 
   it("converts file type with multiple files", () => {
@@ -281,7 +279,7 @@ describe("createTypeField", () => {
           maxSelect: 3,
         },
       })
-    ).toEqual("\tfileField: string[]\n")
+    ).toEqual("\tfileField: string[]")
   })
 
   it("converts relation type", () => {
@@ -291,7 +289,7 @@ describe("createTypeField", () => {
         name: "relationField",
         type: "relation",
       })
-    ).toEqual("\trelationField: RecordIdString\n")
+    ).toEqual("\trelationField: RecordIdString")
   })
 
   it("converts relation type with multiple options", () => {
@@ -304,7 +302,7 @@ describe("createTypeField", () => {
           maxSelect: 3,
         },
       })
-    ).toEqual("\trelationFieldMany: RecordIdString[]\n")
+    ).toEqual("\trelationFieldMany: RecordIdString[]")
   })
 
   // DEPRECATED: This was removed in PocketBase v0.8
@@ -315,7 +313,7 @@ describe("createTypeField", () => {
         name: "userRelationField",
         type: "user",
       })
-    ).toEqual("\tuserRelationField: RecordIdString\n")
+    ).toEqual("\tuserRelationField: RecordIdString")
   })
 
   it("throws for unexpected types", () => {

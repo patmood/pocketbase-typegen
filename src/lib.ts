@@ -80,28 +80,29 @@ export function generate(results: Array<CollectionRecord>) {
     BASE_SYSTEM_FIELDS_DEFINITION,
     ...recordTypes,
     responseTypes.join("\n"),
-    createCollectionRecord(sortedCollectionNames),
+    createCollectionRecords(sortedCollectionNames),
   ]
 
   return fileParts.join("\n\n")
 }
 
 export function createCollectionEnum(collectionNames: Array<string>) {
-  let typeString = `export enum Collections {\n`
-  collectionNames.forEach((name) => {
-    typeString += `\t${toPascalCase(name)} = "${name}",\n`
-  })
-  typeString += `}`
+  const collections = collectionNames
+    .map((name) => `\t${toPascalCase(name)} = "${name}",`)
+    .join("\n")
+  let typeString = `export enum Collections {
+${collections}
+}`
   return typeString
 }
 
-export function createCollectionRecord(collectionNames: Array<string>) {
-  let typeString = `export type CollectionRecords = {\n`
-  collectionNames.forEach((name) => {
-    typeString += `\t${name}: ${toPascalCase(name)}Record\n`
-  })
-  typeString += `}`
-  return typeString
+export function createCollectionRecords(collectionNames: Array<string>) {
+  const nameRecordMap = collectionNames
+    .map((name) => `\t${name}: ${toPascalCase(name)}Record`)
+    .join("\n")
+  return `export type CollectionRecords = {
+${nameRecordMap}
+}`
 }
 
 export function createRecordType(
@@ -109,25 +110,25 @@ export function createRecordType(
   schema: Array<FieldSchema>
 ): string {
   const selectOptionEnums = createSelectOptions(name, schema)
-  let typeString = `${selectOptionEnums}export type ${toPascalCase(
-    name
-  )}Record${getGenericArgStringWithDefault(schema)} = {\n`
-  schema.forEach((fieldSchema: FieldSchema) => {
-    typeString += createTypeField(name, fieldSchema)
-  })
-  typeString += `}`
-  return typeString
+  const typeName = toPascalCase(name)
+  const genericArgs = getGenericArgStringWithDefault(schema)
+  const fields = schema
+    .map((fieldSchema: FieldSchema) => createTypeField(name, fieldSchema))
+    .join("\n")
+
+  return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = {
+${fields}
+}`
 }
 
 export function createResponseType(collectionSchemaEntry: CollectionRecord) {
   const { name, schema, type } = collectionSchemaEntry
   const pascaleName = toPascalCase(name)
-  let typeString = `export type ${pascaleName}Response${getGenericArgStringWithDefault(
-    schema
-  )} = ${pascaleName}Record${getGenericArgString(schema)} & ${getSystemFields(
-    type
-  )}`
-  return typeString
+  const genericArgsWithDefaults = getGenericArgStringWithDefault(schema)
+  const genericArgs = getGenericArgString(schema)
+  const systemFields = getSystemFields(type)
+
+  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgs} & ${systemFields}`
 }
 
 export function createTypeField(
@@ -146,9 +147,11 @@ export function createTypeField(
     typeof typeStringOrFunc === "function"
       ? typeStringOrFunc(fieldSchema, collectionName)
       : typeStringOrFunc
-  return `\t${sanitizeFieldName(fieldSchema.name)}${
-    fieldSchema.required ? "" : "?"
-  }: ${typeString}\n`
+
+  const fieldName = sanitizeFieldName(fieldSchema.name)
+  const required = fieldSchema.required ? "" : "?"
+
+  return `\t${fieldName}${required}: ${typeString}`
 }
 
 export function createSelectOptions(
