@@ -1,4 +1,6 @@
-// This file was @generated using pocketbase-typegen
+/**
+* This file was @generated using pocketbase-typegen
+*/
 
 export enum Collections {
 	Base = "base",
@@ -12,19 +14,7 @@ export enum Collections {
 export type IsoDateString = string
 export type RecordIdString = string
 
-export type AuthSystemFields = {
-	collectionId: string
-	collectionName: Collections,
-	created: IsoDateString
-	email: string
-	emailVisibility: boolean
-	id: RecordIdString,
-	updated: IsoDateString
-	username: string
-	verified: boolean
-	expand?: { [key: string]: any }
-}
-
+// System fields
 export type BaseSystemFields = {
 	id: RecordIdString
 	created: IsoDateString
@@ -33,6 +23,15 @@ export type BaseSystemFields = {
 	collectionName: Collections
 	expand?: { [key: string]: any }
 }
+
+export type AuthSystemFields = {
+	email: string
+	emailVisibility: boolean
+	username: string
+	verified: boolean
+} & BaseSystemFields
+
+// Record types for each collection
 
 export type BaseRecord = {
 	field?: string

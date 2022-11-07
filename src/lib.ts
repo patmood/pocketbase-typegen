@@ -5,6 +5,7 @@ import {
   DATE_STRING_TYPE_NAME,
   EXPORT_COMMENT,
   RECORD_ID_STRING_NAME,
+  RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
@@ -76,8 +77,9 @@ export function generate(results: Array<CollectionRecord>) {
     EXPORT_COMMENT,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
-    AUTH_SYSTEM_FIELDS_DEFINITION,
     BASE_SYSTEM_FIELDS_DEFINITION,
+    AUTH_SYSTEM_FIELDS_DEFINITION,
+    RECORD_TYPE_COMMENT,
     ...recordTypes,
     responseTypes.join("\n"),
     createCollectionRecords(sortedCollectionNames),
