@@ -257,6 +257,16 @@ describe("createTypeField", () => {
         type: "relation",
       })
     ).toEqual("\trelationField: RecordIdString\n")
+    expect(
+      createTypeField({
+        ...defaultFieldSchema,
+        name: "relationFieldMany",
+        type: "relation",
+        options: {
+          maxSelect: 3,
+        },
+      })
+    ).toEqual("\trelationFieldMany: RecordIdString[]\n")
   })
 
   it("throws for unexpected types", () => {

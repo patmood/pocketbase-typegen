@@ -62,7 +62,7 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	file_field?: string
 	three_files_field?: string[]
 	user_relation_field?: RecordIdString
-	custom_relation_field?: RecordIdString
+	custom_relation_field?: RecordIdString[]
 }
 
 export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown> = EverythingRecord<Tanother_json_field, Tjson_field> & BaseSystemFields

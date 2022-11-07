@@ -31,7 +31,10 @@ const pbSchemaTypescriptMap = {
     fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
       ? "string[]"
       : "string",
-  relation: RECORD_ID_STRING_NAME,
+  relation: (fieldSchema: FieldSchema) =>
+    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
+      ? `${RECORD_ID_STRING_NAME}[]`
+      : RECORD_ID_STRING_NAME,
 }
 
 export function generate(results: Array<CollectionRecord>) {
