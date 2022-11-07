@@ -1,6 +1,6 @@
 {
   "name": "pocketbase-typegen",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "description": "Generate pocketbase record types from your database",
   "main": "dist/index.js",
   "bin": {
@@ -45,6 +45,10 @@
   },
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "modulePathIgnorePatterns": [
+      "dist",
+      "test/pocketbase-types-examples.ts"
+    ]
   }
 }

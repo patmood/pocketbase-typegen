@@ -24,6 +24,7 @@ describe("generate", () => {
       {
         name: "books",
         id: "123",
+        type: "base",
         system: false,
         listRule: null,
         viewRule: null,
@@ -100,19 +101,30 @@ describe("createRecordType", () => {
 
 describe("createResponseType", () => {
   it("creates type definition for a response", () => {
-    const name = "books"
-    const schema: FieldSchema[] = [
-      {
-        system: false,
-        id: "hhnwjkke",
-        name: "title",
-        type: "text",
-        required: false,
-        unique: false,
-        options: { min: null, max: null, pattern: "" },
-      },
-    ]
-    const result = createResponseType(name, schema)
+    const row: CollectionRecord = {
+      type: "base",
+      id: "123",
+      system: false,
+      listRule: null,
+      viewRule: null,
+      createRule: null,
+      updateRule: null,
+      deleteRule: null,
+      name: "books",
+      schema: [
+        {
+          system: false,
+          id: "hhnwjkke",
+          name: "title",
+          type: "text",
+          required: false,
+          unique: false,
+          options: { min: null, max: null, pattern: "" },
+        },
+      ],
+    }
+
+    const result = createResponseType(row)
     expect(result).toMatchSnapshot()
   })
 
@@ -245,13 +257,6 @@ describe("createTypeField", () => {
         type: "relation",
       })
     ).toEqual("\trelationField: RecordIdString\n")
-    expect(
-      createTypeField({
-        ...defaultFieldSchema,
-        name: "userField",
-        type: "user",
-      })
-    ).toEqual("\tuserField: UserIdString\n")
   })
 
   it("throws for unexpected types", () => {

@@ -26,7 +26,7 @@ exports[`createRecordType handles file fields with multiple files 1`] = `
 }"
 `;
 
-exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse = BooksRecord & BaseRecord"`;
+exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse = BooksRecord & BaseSystemFields"`;
 
 exports[`createResponseType handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
@@ -37,30 +37,41 @@ exports[`createResponseType handles file fields with multiple files 1`] = `
 exports[`generate generates correct output given db input 1`] = `
 "// This file was @generated using pocketbase-typegen
 
-export type IsoDateString = string
+export enum Collections {
+	Books = "books",
+}
 
+// Alias types for improved usability
+export type IsoDateString = string
 export type RecordIdString = string
 
-export type UserIdString = string
+export type AuthSystemFields = {
+	collectionId: string
+	collectionName: Collections,
+	created: IsoDateString
+	email: string
+	emailVisibility: boolean
+	id: RecordIdString,
+	updated: IsoDateString
+	username: string
+	verified: boolean
+	expand?: { [key: string]: any }
+}
 
-export type BaseRecord = {
+export type BaseSystemFields = {
 	id: RecordIdString
 	created: IsoDateString
 	updated: IsoDateString
-	"@collectionId": string
-	"@collectionName": string
-	"@expand"?: { [key: string]: any }
-}
-
-export enum Collections {
-	Books = "books",
+	collectionId: string
+	collectionName: Collections
+	expand?: { [key: string]: any }
 }
 
 export type BooksRecord = {
 	title?: string
 }
 
-export type BooksResponse = BooksRecord & BaseRecord
+export type BooksResponse = BooksRecord & BaseSystemFields
 
 export type CollectionRecords = {
 	books: BooksRecord

@@ -31,6 +31,7 @@ export type FieldSchema = {
 
 export type CollectionRecord = {
   id: string
+  type: "base" | "auth"
   name: string
   system: boolean
   listRule: string | null

@@ -1,3 +1,4 @@
+import { CollectionRecord } from "./types"
 import { promises as fs } from "fs"
 
 export function toPascalCase(str: string) {
@@ -21,4 +22,8 @@ export function sanitizeFieldName(name: string) {
 export async function saveFile(outPath: string, typeString: string) {
   await fs.writeFile(outPath, typeString, "utf8")
   console.log(`Created typescript definitions at ${outPath}`)
+}
+
+export function getSystemFields(type: CollectionRecord["type"]) {
+  return type === "auth" ? "AuthSystemFields" : "BaseSystemFields"
 }

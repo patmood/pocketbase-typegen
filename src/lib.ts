@@ -1,12 +1,10 @@
 import {
-  BASE_RECORD_DEFINITION,
-  DATE_STRING_TYPE_DEFINITION,
+  ALIAS_TYPE_DEFINITIONS,
+  AUTH_SYSTEM_FIELDS_DEFINITION,
+  BASE_SYSTEM_FIELDS_DEFINITION,
   DATE_STRING_TYPE_NAME,
   EXPORT_COMMENT,
-  RECORD_ID_STRING_DEFINITION,
   RECORD_ID_STRING_NAME,
-  USER_ID_STRING_DEFINITION,
-  USER_ID_STRING_NAME,
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
 import {
@@ -14,7 +12,7 @@ import {
   getGenericArgString,
   getGenericArgStringWithDefault,
 } from "./generics"
-import { sanitizeFieldName, toPascalCase } from "./utils"
+import { getSystemFields, sanitizeFieldName, toPascalCase } from "./utils"
 
 const pbSchemaTypescriptMap = {
   text: "string",
@@ -34,7 +32,6 @@ const pbSchemaTypescriptMap = {
       ? "string[]"
       : "string",
   relation: RECORD_ID_STRING_NAME,
-  user: USER_ID_STRING_NAME,
 }
 
 export function generate(results: Array<CollectionRecord>) {
@@ -45,18 +42,17 @@ export function generate(results: Array<CollectionRecord>) {
     if (row.name) collectionNames.push(row.name)
     if (row.schema) {
       recordTypes.push(createRecordType(row.name, row.schema))
-      recordTypes.push(createResponseType(row.name, row.schema))
+      recordTypes.push(createResponseType(row))
     }
   })
   const sortedCollectionNames = collectionNames.sort()
 
   const fileParts = [
     EXPORT_COMMENT,
-    DATE_STRING_TYPE_DEFINITION,
-    RECORD_ID_STRING_DEFINITION,
-    USER_ID_STRING_DEFINITION,
-    BASE_RECORD_DEFINITION,
     createCollectionEnum(sortedCollectionNames),
+    ALIAS_TYPE_DEFINITIONS,
+    AUTH_SYSTEM_FIELDS_DEFINITION,
+    BASE_SYSTEM_FIELDS_DEFINITION,
     ...recordTypes.sort(),
     createCollectionRecord(sortedCollectionNames),
   ]
@@ -96,11 +92,14 @@ export function createRecordType(
   return typeString
 }
 
-export function createResponseType(name: string, schema: Array<FieldSchema>) {
+export function createResponseType(collectionSchemaEntry: CollectionRecord) {
+  const { name, schema, type } = collectionSchemaEntry
   const pascaleName = toPascalCase(name)
   let typeString = `export type ${pascaleName}Response${getGenericArgStringWithDefault(
     schema
-  )} = ${pascaleName}Record${getGenericArgString(schema)} & BaseRecord`
+  )} = ${pascaleName}Record${getGenericArgString(schema)} & ${getSystemFields(
+    type
+  )}`
   return typeString
 }
 

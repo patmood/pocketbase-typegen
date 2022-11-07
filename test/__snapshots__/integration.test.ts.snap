@@ -3,21 +3,6 @@
 exports[`creates a type file from json schema 1`] = `
 "// This file was @generated using pocketbase-typegen
 
-export type IsoDateString = string
-
-export type RecordIdString = string
-
-export type UserIdString = string
-
-export type BaseRecord = {
-	id: RecordIdString
-	created: IsoDateString
-	updated: IsoDateString
-	"@collectionId": string
-	"@collectionName": string
-	"@expand"?: { [key: string]: any }
-}
-
 export enum Collections {
 	Base = "base",
 	CustomAuth = "custom_auth",
@@ -26,17 +11,43 @@ export enum Collections {
 	Users = "users",
 }
 
+// Alias types for improved usability
+export type IsoDateString = string
+export type RecordIdString = string
+
+export type AuthSystemFields = {
+	collectionId: string
+	collectionName: Collections,
+	created: IsoDateString
+	email: string
+	emailVisibility: boolean
+	id: RecordIdString,
+	updated: IsoDateString
+	username: string
+	verified: boolean
+	expand?: { [key: string]: any }
+}
+
+export type BaseSystemFields = {
+	id: RecordIdString
+	created: IsoDateString
+	updated: IsoDateString
+	collectionId: string
+	collectionName: Collections
+	expand?: { [key: string]: any }
+}
+
 export type BaseRecord = {
 	field?: string
 }
 
-export type BaseResponse = BaseRecord & BaseRecord
+export type BaseResponse = BaseRecord & BaseSystemFields
 
 export type CustomAuthRecord = {
 	custom_field?: string
 }
 
-export type CustomAuthResponse = CustomAuthRecord & BaseRecord
+export type CustomAuthResponse = CustomAuthRecord & AuthSystemFields
 
 export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknown> = {
 	text_field?: string
@@ -54,7 +65,7 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	custom_relation_field?: RecordIdString
 }
 
-export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown> = EverythingRecord<Tanother_json_field, Tjson_field> & BaseRecord
+export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown> = EverythingRecord<Tanother_json_field, Tjson_field> & BaseSystemFields
 
 export type PostsRecord = {
 	field?: string
@@ -63,14 +74,14 @@ export type PostsRecord = {
 	field1?: number
 }
 
-export type PostsResponse = PostsRecord & BaseRecord
+export type PostsResponse = PostsRecord & BaseSystemFields
 
 export type UsersRecord = {
 	name?: string
 	avatar?: string
 }
 
-export type UsersResponse = UsersRecord & BaseRecord
+export type UsersResponse = UsersRecord & AuthSystemFields
 
 export type CollectionRecords = {
 	base: BaseRecord

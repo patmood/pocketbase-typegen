@@ -1,4 +1,4 @@
-import { sanitizeFieldName, toPascalCase } from "../src/utils"
+import { getSystemFields, sanitizeFieldName, toPascalCase } from "../src/utils"
 
 describe("toPascalCase", () => {
   it("return pascal case string", () => {
@@ -20,5 +20,12 @@ describe("sanitizeFieldName", () => {
   it("returns valid typescript fields", () => {
     expect(sanitizeFieldName("foo_bar")).toEqual("foo_bar")
     expect(sanitizeFieldName("4number")).toEqual('"4number"')
+  })
+})
+
+describe("getSystemFields", () => {
+  it("returns the system field type name for a given collection type", () => {
+    expect(getSystemFields("base")).toBe("BaseSystemFields")
+    expect(getSystemFields("auth")).toBe("AuthSystemFields")
   })
 })
