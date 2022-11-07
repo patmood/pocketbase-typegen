@@ -112,7 +112,7 @@
         "name": "url_field",
         "type": "url",
         "system": false,
-        "required": true,
+        "required": false,
         "unique": false,
         "options": {
           "exceptDomains": null,
@@ -213,6 +213,32 @@
           "maxSelect": 5,
           "collectionId": "rs7hepu8zl6kr8e",
           "cascadeDelete": false
+        }
+      },
+      {
+        "id": "iwh5jvyg",
+        "name": "post_relation_field",
+        "type": "relation",
+        "system": false,
+        "required": false,
+        "unique": false,
+        "options": {
+          "maxSelect": 1,
+          "collectionId": "z6b9mssubo9megi",
+          "cascadeDelete": false
+        }
+      },
+      {
+        "id": "tccaq6g6",
+        "name": "select_field_no_values",
+        "type": "text",
+        "system": false,
+        "required": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
         }
       }
     ],

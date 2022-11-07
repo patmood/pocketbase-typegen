@@ -6,6 +6,7 @@ import {
   CollectionRecords,
   Collections,
   EverythingRecord,
+  EverythingSelectFieldOptions,
 } from "./pocketbase-types-example"
 
 // Utility function can to infer collection type
@@ -22,8 +23,6 @@ let thing = getOne(Collections.Everything, "a")
 // Works when passing in JSON generic
 const everythingRecordWithGeneric: EverythingRecord<{ a: "some string" }> = {
   json_field: { a: "some string" },
-  text_field: "string",
-  url_field: "string",
   number_field: 1,
   bool_field: true,
 }
@@ -31,10 +30,20 @@ const everythingRecordWithGeneric: EverythingRecord<{ a: "some string" }> = {
 // Works without passing in JSON generic
 const everythingRecordWithoutGeneric: EverythingRecord = {
   json_field: { a: "some string" },
-  text_field: "string",
-  url_field: "string",
   number_field: 1,
   bool_field: true,
 }
 
-console.log(thing, everythingRecordWithGeneric, everythingRecordWithoutGeneric)
+// Test select option enums
+const selectOptions: EverythingRecord = {
+  select_field: EverythingSelectFieldOptions.optionA,
+  select_field_no_values: "foo",
+}
+
+// Reference the created variables
+console.log(
+  thing,
+  everythingRecordWithGeneric,
+  everythingRecordWithoutGeneric,
+  selectOptions
+)

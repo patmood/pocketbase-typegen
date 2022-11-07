@@ -55,7 +55,7 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	number_field?: number
 	bool_field?: boolean
 	email_field?: string
-	url_field: string
+	url_field?: string
 	date_field?: IsoDateString
 	select_field?: EverythingSelectFieldOptions
 	json_field?: null | Tjson_field
@@ -64,6 +64,8 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	three_files_field?: string[]
 	user_relation_field?: RecordIdString
 	custom_relation_field?: RecordIdString[]
+	post_relation_field?: RecordIdString
+	select_field_no_values?: string
 }
 
 export type PostsRecord = {
