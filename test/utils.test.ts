@@ -1,4 +1,9 @@
-import { getSystemFields, sanitizeFieldName, toPascalCase } from "../src/utils"
+import {
+  getOptionEnumName,
+  getSystemFields,
+  sanitizeFieldName,
+  toPascalCase,
+} from "../src/utils"
 
 describe("toPascalCase", () => {
   it("return pascal case string", () => {
@@ -27,5 +32,11 @@ describe("getSystemFields", () => {
   it("returns the system field type name for a given collection type", () => {
     expect(getSystemFields("base")).toBe("BaseSystemFields")
     expect(getSystemFields("auth")).toBe("AuthSystemFields")
+  })
+})
+
+describe("getOptionEnumName", () => {
+  it("returns the enum name for select field options", () => {
+    expect(getOptionEnumName("orders", "type")).toBe("OrdersTypeOptions")
   })
 })

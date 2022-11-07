@@ -5,6 +5,7 @@ import {
   DATE_STRING_TYPE_NAME,
   EXPORT_COMMENT,
   RECORD_ID_STRING_NAME,
+  RESPONSE_TYPE_COMMENT,
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
 import {
@@ -12,7 +13,12 @@ import {
   getGenericArgString,
   getGenericArgStringWithDefault,
 } from "./generics"
-import { getSystemFields, sanitizeFieldName, toPascalCase } from "./utils"
+import {
+  getOptionEnumName,
+  getSystemFields,
+  sanitizeFieldName,
+  toPascalCase,
+} from "./utils"
 
 const pbSchemaTypescriptMap = {
   text: "string",
@@ -21,9 +27,9 @@ const pbSchemaTypescriptMap = {
   email: "string",
   url: "string",
   date: DATE_STRING_TYPE_NAME,
-  select: (fieldSchema: FieldSchema) =>
+  select: (fieldSchema: FieldSchema, collectionName: string) =>
     fieldSchema.options.values
-      ? fieldSchema.options.values.map((val) => `"${val}"`).join(" | ")
+      ? getOptionEnumName(collectionName, fieldSchema.name)
       : "string",
   json: (fieldSchema: FieldSchema) =>
     `null | ${fieldNameToGeneric(fieldSchema.name)}`,
@@ -40,15 +46,26 @@ const pbSchemaTypescriptMap = {
 export function generate(results: Array<CollectionRecord>) {
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
+  const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
 
-  results.forEach((row) => {
-    if (row.name) collectionNames.push(row.name)
-    if (row.schema) {
-      recordTypes.push(createRecordType(row.name, row.schema))
-      recordTypes.push(createResponseType(row))
-    }
-  })
-  const sortedCollectionNames = collectionNames.sort()
+  results
+    .sort((a, b) => {
+      if (a.name < b.name) {
+        return -1
+      }
+      if (a.name > b.name) {
+        return 1
+      }
+      return 0
+    })
+    .forEach((row) => {
+      if (row.name) collectionNames.push(row.name)
+      if (row.schema) {
+        recordTypes.push(createRecordType(row.name, row.schema))
+        responseTypes.push(createResponseType(row))
+      }
+    })
+  const sortedCollectionNames = collectionNames
 
   const fileParts = [
     EXPORT_COMMENT,
@@ -56,7 +73,8 @@ export function generate(results: Array<CollectionRecord>) {
     ALIAS_TYPE_DEFINITIONS,
     AUTH_SYSTEM_FIELDS_DEFINITION,
     BASE_SYSTEM_FIELDS_DEFINITION,
-    ...recordTypes.sort(),
+    ...recordTypes,
+    responseTypes.join("\n"),
     createCollectionRecord(sortedCollectionNames),
   ]
 
@@ -85,11 +103,12 @@ export function createRecordType(
   name: string,
   schema: Array<FieldSchema>
 ): string {
-  let typeString = `export type ${toPascalCase(
+  const selectOptionEnums = createSelectOptions(name, schema)
+  let typeString = `${selectOptionEnums}export type ${toPascalCase(
     name
   )}Record${getGenericArgStringWithDefault(schema)} = {\n`
   schema.forEach((fieldSchema: FieldSchema) => {
-    typeString += createTypeField(fieldSchema)
+    typeString += createTypeField(name, fieldSchema)
   })
   typeString += `}`
   return typeString
@@ -106,7 +125,10 @@ export function createResponseType(collectionSchemaEntry: CollectionRecord) {
   return typeString
 }
 
-export function createTypeField(fieldSchema: FieldSchema) {
+export function createTypeField(
+  collectionName: string,
+  fieldSchema: FieldSchema
+) {
   if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
     throw new Error(`unknown type ${fieldSchema.type} found in schema`)
   }
@@ -117,9 +139,24 @@ export function createTypeField(fieldSchema: FieldSchema) {
 
   const typeString =
     typeof typeStringOrFunc === "function"
-      ? typeStringOrFunc(fieldSchema)
+      ? typeStringOrFunc(fieldSchema, collectionName)
       : typeStringOrFunc
   return `\t${sanitizeFieldName(fieldSchema.name)}${
     fieldSchema.required ? "" : "?"
   }: ${typeString}\n`
+}
+
+export function createSelectOptions(
+  recordName: string,
+  schema: Array<FieldSchema>
+) {
+  const selectFields = schema.filter((field) => field.type === "select")
+  const typestring = selectFields
+    .map(
+      (field) => `export enum ${getOptionEnumName(recordName, field.name)} {
+${field.options.values?.map((val) => `\t${val} = "${val}",`).join("\n")}
+}\n`
+    )
+    .join("\n")
+  return typestring
 }

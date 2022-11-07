@@ -1,4 +1,5 @@
 export const EXPORT_COMMENT = `// This file was @generated using pocketbase-typegen`
+export const RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`
 export const DATE_STRING_TYPE_NAME = `IsoDateString`
 export const RECORD_ID_STRING_NAME = `RecordIdString`
 export const ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability

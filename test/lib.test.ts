@@ -149,75 +149,96 @@ describe("createResponseType", () => {
 describe("createTypeField", () => {
   it("handles required and optional fields", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         required: false,
       })
     ).toEqual("\tdefaultName?: string\n")
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         required: true,
       })
     ).toEqual("\tdefaultName: string\n")
   })
 
-  it("converts pocketbase schema types to typescript", () => {
+  it("converts default types to typescript", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
       })
     ).toEqual("\tdefaultName: string\n")
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "textField",
       })
     ).toEqual("\ttextField: string\n")
+  })
+
+  it("converts number type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "numberField",
         type: "number",
       })
     ).toEqual("\tnumberField: number\n")
+  })
+
+  it("converts bool type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "boolField",
         type: "bool",
       })
     ).toEqual("\tboolField: boolean\n")
+  })
+
+  it("converts email type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "emailField",
         type: "email",
       })
     ).toEqual("\temailField: string\n")
+  })
+
+  it("converts url type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "urlField",
         type: "url",
       })
     ).toEqual("\turlField: string\n")
+  })
+
+  it("converts date type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "dateField",
         type: "date",
       })
     ).toEqual("\tdateField: IsoDateString\n")
+  })
+
+  it("converts select type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "selectField",
         type: "select",
       })
     ).toEqual("\tselectField: string\n")
+  })
+
+  it("converts select type with value", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "selectFieldWithOpts",
         type: "select",
@@ -225,23 +246,34 @@ describe("createTypeField", () => {
           values: ["one", "two", "three"],
         },
       })
-    ).toEqual(`\tselectFieldWithOpts: "one" | "two" | "three"\n`)
+    ).toEqual(
+      `\tselectFieldWithOpts: TestCollectionSelectFieldWithOptsOptions\n`
+    )
+  })
+
+  it("converts json type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "jsonField",
         type: "json",
       })
     ).toEqual("\tjsonField: null | TjsonField\n")
+  })
+
+  it("converts file type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "fileField",
         type: "file",
       })
     ).toEqual("\tfileField: string\n")
+  })
+
+  it("converts file type with multiple files", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "fileField",
         type: "file",
@@ -250,15 +282,21 @@ describe("createTypeField", () => {
         },
       })
     ).toEqual("\tfileField: string[]\n")
+  })
+
+  it("converts relation type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "relationField",
         type: "relation",
       })
     ).toEqual("\trelationField: RecordIdString\n")
+  })
+
+  it("converts relation type", () => {
     expect(
-      createTypeField({
+      createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "relationFieldMany",
         type: "relation",
@@ -271,8 +309,11 @@ describe("createTypeField", () => {
 
   it("throws for unexpected types", () => {
     expect(() =>
-      // @ts-ignore
-      createTypeField({ ...defaultFieldSchema, type: "unknowntype" })
+      createTypeField("test_collection", {
+        ...defaultFieldSchema,
+        // @ts-ignore
+        type: "unknowntype",
+      })
     ).toThrowError("unknown type unknowntype found in schema")
   })
 })

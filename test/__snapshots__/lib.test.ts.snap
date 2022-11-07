@@ -71,6 +71,7 @@ export type BooksRecord = {
 	title?: string
 }
 
+// Response types include system fields and match responses from the PocketBase API
 export type BooksResponse = BooksRecord & BaseSystemFields
 
 export type CollectionRecords = {

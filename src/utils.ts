@@ -27,3 +27,7 @@ export async function saveFile(outPath: string, typeString: string) {
 export function getSystemFields(type: CollectionRecord["type"]) {
   return type === "auth" ? "AuthSystemFields" : "BaseSystemFields"
 }
+
+export function getOptionEnumName(recordName: string, fieldName: string) {
+  return `${toPascalCase(recordName)}${toPascalCase(fieldName)}Options`
+}

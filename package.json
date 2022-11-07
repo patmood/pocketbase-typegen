@@ -47,8 +47,8 @@
     "preset": "ts-jest",
     "testEnvironment": "node",
     "modulePathIgnorePatterns": [
-      "dist",
-      "test/pocketbase-types-examples.ts"
+      "<rootDir>/dist/",
+      "<rootDir>/test/pocketbase-types-examples.ts"
     ]
   }
 }
