@@ -1,6 +1,10 @@
 name: Test
 
-on: [pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: "**"
 
 jobs:
   test:
@@ -21,5 +25,3 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
-      - run: npm run lint
-      - run: npm run prettier
