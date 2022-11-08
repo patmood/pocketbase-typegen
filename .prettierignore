@@ -1,0 +1,4 @@
+dist
+coverage
+test/pocketbase-types-example.ts
+pocketbase-types.ts

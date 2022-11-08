@@ -14,11 +14,12 @@ function getOne<T extends keyof CollectionRecords>(
   collection: T,
   id: string
 ): CollectionRecords[T] {
+  console.log(collection, id)
   return JSON.parse("id") as CollectionRecords[T]
 }
 
 // Return type is correctly inferred
-let thing = getOne(Collections.Everything, "a")
+const thing = getOne(Collections.Everything, "a")
 
 // Works when passing in JSON generic
 const everythingRecordWithGeneric: EverythingRecord<{ a: "some string" }> = {

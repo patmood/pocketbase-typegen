@@ -26,8 +26,8 @@ export async function fromJSON(path: string): Promise<Array<CollectionRecord>> {
 
 export async function fromURL(
   url: string,
-  email: string = "",
-  password: string = ""
+  email = "",
+  password = ""
 ): Promise<Array<CollectionRecord>> {
   const formData = new FormData()
   formData.append("email", email)

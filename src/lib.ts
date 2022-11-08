@@ -92,7 +92,7 @@ export function createCollectionEnum(collectionNames: Array<string>) {
   const collections = collectionNames
     .map((name) => `\t${toPascalCase(name)} = "${name}",`)
     .join("\n")
-  let typeString = `export enum Collections {
+  const typeString = `export enum Collections {
 ${collections}
 }`
   return typeString
