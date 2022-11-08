@@ -23,7 +23,12 @@
     "test:update": "jest -u",
     "build": "rm -rf dist && node build.js",
     "prepublishOnly": "tsc && npm run test && npm run build",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "lint": "eslint src test",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "prettier src test --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix"
   },
   "author": "@patmood",
   "license": "ISC",
@@ -37,10 +42,16 @@
   "devDependencies": {
     "@types/jest": "^29.1.2",
     "@types/node": "^18.8.3",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
     "esbuild": "^0.15.11",
     "esbuild-node-externals": "^1.5.0",
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
     "jest": "^29.1.2",
+    "prettier": "^2.7.1",
     "ts-jest": "^29.0.3",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.8.4"
   },
   "jest": {
