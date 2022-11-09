@@ -22,5 +22,3 @@ async function testCreateFromDb() {
 
 await testCreateFromUrl()
 await testCreateFromDb()
-
-console.log("Integration tests pass")

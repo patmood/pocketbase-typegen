@@ -1,5 +1,4 @@
 #!/bin/sh
-
 echo "Starting integration test."
 
 # Start pocketbase server
@@ -12,3 +11,4 @@ node ./dist/index.js --url http://0.0.0.0:8090 --email test@test.com --password 
 node ./dist/index.js --db pb_data/data.db --out pocketbase-types-db.ts
 
 node test.js
+echo "Integration tests pass"
