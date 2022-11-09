@@ -22,6 +22,7 @@ RUN npm ci
 
 # Copy test files
 COPY test/integration ./
+COPY test/pocketbase-types-example.ts ./
 COPY dist/index.js ./dist/index.js
 
 RUN chmod +x ./pocketbase
