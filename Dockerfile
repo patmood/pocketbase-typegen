@@ -17,16 +17,15 @@ RUN apk add --no-cache \
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip /tmp/pocketbase.zip
 RUN unzip /tmp/pocketbase.zip -d /app/
 
-COPY test/integration/ .
-COPY dist/index.js ./dist/index.js
-COPY package.json ./package.json
-COPY package-lock.json ./package-lock.json
-
+COPY package.json package-lock.json ./
 RUN npm ci
+
+# Copy test files
+COPY test/integration ./
+COPY dist/index.js ./dist/index.js
 
 RUN chmod +x ./pocketbase
 RUN chmod +x ./run.sh
-
 EXPOSE 8090
 
 CMD [ "./run.sh" ]
