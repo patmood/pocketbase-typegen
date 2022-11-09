@@ -20,4 +20,12 @@ jobs:
       - name: Run in docker
         run: |
           docker build . -t pocketbase-typegen:latest
-          docker run pocketbase-typegen:latest
+          docker run --name integration_test pocketbase-typegen:latest
+          docker cp integration_test:/app/output /output
+
+      - name: Archive generated type results
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-types
+          path: output/
+          retention-days: 5
