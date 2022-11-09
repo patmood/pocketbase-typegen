@@ -1,4 +1,4 @@
-name: Integration Tests
+name: Integration Test
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     env:
       CI: true

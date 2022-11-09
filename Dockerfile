@@ -1,7 +1,8 @@
 # Dockerfile to run e2e integration tests against a test PocketBase server
 FROM node:16-alpine3.16
 
-ARG POCKETBASE_VERSION=0.8.0-rc2
+# ARG POCKETBASE_VERSION=0.8.0-rc2
+ARG POCKETBASE_VERSION=0.7.10
 
 WORKDIR /app/
 
