@@ -19,4 +19,4 @@ jobs:
       - name: Run in docker
         run: |
           docker build . -t pocketbase-typegen:latest
-          docker run --rm -it pocketbase-typegen:latest
+          docker run pocketbase-typegen:latest
