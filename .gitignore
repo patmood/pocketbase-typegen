@@ -5,3 +5,4 @@ coverage
 *.db-wal
 .DS_Store
 fixtures
+examples
