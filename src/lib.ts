@@ -1,12 +1,12 @@
 import {
-  BASE_RECORD_DEFINITION,
-  DATE_STRING_TYPE_DEFINITION,
+  ALIAS_TYPE_DEFINITIONS,
+  AUTH_SYSTEM_FIELDS_DEFINITION,
+  BASE_SYSTEM_FIELDS_DEFINITION,
   DATE_STRING_TYPE_NAME,
   EXPORT_COMMENT,
-  RECORD_ID_STRING_DEFINITION,
   RECORD_ID_STRING_NAME,
-  USER_ID_STRING_DEFINITION,
-  USER_ID_STRING_NAME,
+  RECORD_TYPE_COMMENT,
+  RESPONSE_TYPE_COMMENT,
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
 import {
@@ -14,7 +14,12 @@ import {
   getGenericArgString,
   getGenericArgStringWithDefault,
 } from "./generics"
-import { sanitizeFieldName, toPascalCase } from "./utils"
+import {
+  getOptionEnumName,
+  getSystemFields,
+  sanitizeFieldName,
+  toPascalCase,
+} from "./utils"
 
 const pbSchemaTypescriptMap = {
   text: "string",
@@ -23,9 +28,9 @@ const pbSchemaTypescriptMap = {
   email: "string",
   url: "string",
   date: DATE_STRING_TYPE_NAME,
-  select: (fieldSchema: FieldSchema) =>
+  select: (fieldSchema: FieldSchema, collectionName: string) =>
     fieldSchema.options.values
-      ? fieldSchema.options.values.map((val) => `"${val}"`).join(" | ")
+      ? getOptionEnumName(collectionName, fieldSchema.name)
       : "string",
   json: (fieldSchema: FieldSchema) =>
     `null | ${fieldNameToGeneric(fieldSchema.name)}`,
@@ -33,78 +38,105 @@ const pbSchemaTypescriptMap = {
     fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
       ? "string[]"
       : "string",
-  relation: RECORD_ID_STRING_NAME,
-  user: USER_ID_STRING_NAME,
+  relation: (fieldSchema: FieldSchema) =>
+    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
+      ? `${RECORD_ID_STRING_NAME}[]`
+      : RECORD_ID_STRING_NAME,
+  // DEPRECATED: PocketBase v0.8 does not have a dedicated user relation
+  user: (fieldSchema: FieldSchema) =>
+    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
+      ? `${RECORD_ID_STRING_NAME}[]`
+      : RECORD_ID_STRING_NAME,
 }
 
 export function generate(results: Array<CollectionRecord>) {
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
+  const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
 
-  results.forEach((row) => {
-    if (row.name) collectionNames.push(row.name)
-    if (row.schema) {
-      recordTypes.push(createRecordType(row.name, row.schema))
-      recordTypes.push(createResponseType(row.name, row.schema))
-    }
-  })
-  const sortedCollectionNames = collectionNames.sort()
+  results
+    .sort((a, b) => {
+      if (a.name < b.name) {
+        return -1
+      }
+      if (a.name > b.name) {
+        return 1
+      }
+      return 0
+    })
+    .forEach((row) => {
+      if (row.name) collectionNames.push(row.name)
+      if (row.schema) {
+        recordTypes.push(createRecordType(row.name, row.schema))
+        responseTypes.push(createResponseType(row))
+      }
+    })
+  const sortedCollectionNames = collectionNames
 
   const fileParts = [
     EXPORT_COMMENT,
-    DATE_STRING_TYPE_DEFINITION,
-    RECORD_ID_STRING_DEFINITION,
-    USER_ID_STRING_DEFINITION,
-    BASE_RECORD_DEFINITION,
     createCollectionEnum(sortedCollectionNames),
-    ...recordTypes.sort(),
-    createCollectionRecord(sortedCollectionNames),
+    ALIAS_TYPE_DEFINITIONS,
+    BASE_SYSTEM_FIELDS_DEFINITION,
+    AUTH_SYSTEM_FIELDS_DEFINITION,
+    RECORD_TYPE_COMMENT,
+    ...recordTypes,
+    responseTypes.join("\n"),
+    createCollectionRecords(sortedCollectionNames),
   ]
 
   return fileParts.join("\n\n")
 }
 
 export function createCollectionEnum(collectionNames: Array<string>) {
-  let typeString = `export enum Collections {\n`
-  collectionNames.forEach((name) => {
-    typeString += `\t${toPascalCase(name)} = "${name}",\n`
-  })
-  typeString += `}`
+  const collections = collectionNames
+    .map((name) => `\t${toPascalCase(name)} = "${name}",`)
+    .join("\n")
+  const typeString = `export enum Collections {
+${collections}
+}`
   return typeString
 }
 
-export function createCollectionRecord(collectionNames: Array<string>) {
-  let typeString = `export type CollectionRecords = {\n`
-  collectionNames.forEach((name) => {
-    typeString += `\t${name}: ${toPascalCase(name)}Record\n`
-  })
-  typeString += `}`
-  return typeString
+export function createCollectionRecords(collectionNames: Array<string>) {
+  const nameRecordMap = collectionNames
+    .map((name) => `\t${name}: ${toPascalCase(name)}Record`)
+    .join("\n")
+  return `export type CollectionRecords = {
+${nameRecordMap}
+}`
 }
 
 export function createRecordType(
   name: string,
   schema: Array<FieldSchema>
 ): string {
-  let typeString = `export type ${toPascalCase(
-    name
-  )}Record${getGenericArgStringWithDefault(schema)} = {\n`
-  schema.forEach((fieldSchema: FieldSchema) => {
-    typeString += createTypeField(fieldSchema)
-  })
-  typeString += `}`
-  return typeString
+  const selectOptionEnums = createSelectOptions(name, schema)
+  const typeName = toPascalCase(name)
+  const genericArgs = getGenericArgStringWithDefault(schema)
+  const fields = schema
+    .map((fieldSchema: FieldSchema) => createTypeField(name, fieldSchema))
+    .join("\n")
+
+  return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = {
+${fields}
+}`
 }
 
-export function createResponseType(name: string, schema: Array<FieldSchema>) {
+export function createResponseType(collectionSchemaEntry: CollectionRecord) {
+  const { name, schema, type } = collectionSchemaEntry
   const pascaleName = toPascalCase(name)
-  let typeString = `export type ${pascaleName}Response${getGenericArgStringWithDefault(
-    schema
-  )} = ${pascaleName}Record${getGenericArgString(schema)} & BaseRecord`
-  return typeString
+  const genericArgsWithDefaults = getGenericArgStringWithDefault(schema)
+  const genericArgs = getGenericArgString(schema)
+  const systemFields = getSystemFields(type)
+
+  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgs} & ${systemFields}`
 }
 
-export function createTypeField(fieldSchema: FieldSchema) {
+export function createTypeField(
+  collectionName: string,
+  fieldSchema: FieldSchema
+) {
   if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
     throw new Error(`unknown type ${fieldSchema.type} found in schema`)
   }
@@ -115,9 +147,26 @@ export function createTypeField(fieldSchema: FieldSchema) {
 
   const typeString =
     typeof typeStringOrFunc === "function"
-      ? typeStringOrFunc(fieldSchema)
+      ? typeStringOrFunc(fieldSchema, collectionName)
       : typeStringOrFunc
-  return `\t${sanitizeFieldName(fieldSchema.name)}${
-    fieldSchema.required ? "" : "?"
-  }: ${typeString}\n`
+
+  const fieldName = sanitizeFieldName(fieldSchema.name)
+  const required = fieldSchema.required ? "" : "?"
+
+  return `\t${fieldName}${required}: ${typeString}`
+}
+
+export function createSelectOptions(
+  recordName: string,
+  schema: Array<FieldSchema>
+) {
+  const selectFields = schema.filter((field) => field.type === "select")
+  const typestring = selectFields
+    .map(
+      (field) => `export enum ${getOptionEnumName(recordName, field.name)} {
+${field.options.values?.map((val) => `\t${val} = "${val}",`).join("\n")}
+}\n`
+    )
+    .join("\n")
+  return typestring
 }

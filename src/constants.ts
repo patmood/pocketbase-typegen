@@ -1,15 +1,27 @@
-export const EXPORT_COMMENT = `// This file was @generated using pocketbase-typegen`
+export const EXPORT_COMMENT = `/**
+* This file was @generated using pocketbase-typegen
+*/`
+export const RECORD_TYPE_COMMENT = `// Record types for each collection`
+export const RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`
 export const DATE_STRING_TYPE_NAME = `IsoDateString`
-export const DATE_STRING_TYPE_DEFINITION = `export type ${DATE_STRING_TYPE_NAME} = string`
 export const RECORD_ID_STRING_NAME = `RecordIdString`
-export const RECORD_ID_STRING_DEFINITION = `export type ${RECORD_ID_STRING_NAME} = string`
-export const USER_ID_STRING_NAME = `UserIdString`
-export const USER_ID_STRING_DEFINITION = `export type ${USER_ID_STRING_NAME} = string`
-export const BASE_RECORD_DEFINITION = `export type BaseRecord = {
+export const ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
+export type ${DATE_STRING_TYPE_NAME} = string
+export type ${RECORD_ID_STRING_NAME} = string`
+
+export const BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
+export type BaseSystemFields = {
 \tid: ${RECORD_ID_STRING_NAME}
 \tcreated: ${DATE_STRING_TYPE_NAME}
 \tupdated: ${DATE_STRING_TYPE_NAME}
-\t"@collectionId": string
-\t"@collectionName": string
-\t"@expand"?: { [key: string]: any }
+\tcollectionId: string
+\tcollectionName: Collections
+\texpand?: { [key: string]: any }
 }`
+
+export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields = {
+\temail: string
+\temailVisibility: boolean
+\tusername: string
+\tverified: boolean
+} & BaseSystemFields`

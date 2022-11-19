@@ -1,0 +1,32 @@
+name: Integration Test
+
+on:
+  push:
+    branches: [main, rc]
+  pull_request:
+    branches: "**"
+
+jobs:
+  test:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run in docker
+        run: |
+          docker build . -t pocketbase-typegen:latest
+          docker run --name integration_test pocketbase-typegen:latest
+          mkdir -p output
+          docker cp integration_test:/app/output output
+
+      - name: Archive generated type results
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-types
+          path: output/*
+          retention-days: 5

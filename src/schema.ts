@@ -26,15 +26,15 @@ export async function fromJSON(path: string): Promise<Array<CollectionRecord>> {
 
 export async function fromURL(
   url: string,
-  email: string = "",
-  password: string = ""
+  email = "",
+  password = ""
 ): Promise<Array<CollectionRecord>> {
   const formData = new FormData()
-  formData.append("email", email)
+  formData.append("identity", email)
   formData.append("password", password)
 
   // Login
-  const { token } = await fetch(`${url}/api/admins/auth-via-email`, {
+  const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
     method: "post",
     // @ts-ignore
     body: formData,
@@ -43,7 +43,7 @@ export async function fromURL(
   // Get the collection
   const result = await fetch(`${url}/api/collections?perPage=200`, {
     headers: {
-      Authorization: `Admin ${token}`,
+      Authorization: token,
     },
   }).then((res) => res.json())
 

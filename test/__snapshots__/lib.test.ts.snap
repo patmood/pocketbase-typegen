@@ -26,7 +26,7 @@ exports[`createRecordType handles file fields with multiple files 1`] = `
 }"
 `;
 
-exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse = BooksRecord & BaseRecord"`;
+exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse = BooksRecord & BaseSystemFields"`;
 
 exports[`createResponseType handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
@@ -35,32 +35,43 @@ exports[`createResponseType handles file fields with multiple files 1`] = `
 `;
 
 exports[`generate generates correct output given db input 1`] = `
-"// This file was @generated using pocketbase-typegen
-
-export type IsoDateString = string
-
-export type RecordIdString = string
-
-export type UserIdString = string
-
-export type BaseRecord = {
-	id: RecordIdString
-	created: IsoDateString
-	updated: IsoDateString
-	"@collectionId": string
-	"@collectionName": string
-	"@expand"?: { [key: string]: any }
-}
+"/**
+* This file was @generated using pocketbase-typegen
+*/
 
 export enum Collections {
 	Books = "books",
 }
 
+// Alias types for improved usability
+export type IsoDateString = string
+export type RecordIdString = string
+
+// System fields
+export type BaseSystemFields = {
+	id: RecordIdString
+	created: IsoDateString
+	updated: IsoDateString
+	collectionId: string
+	collectionName: Collections
+	expand?: { [key: string]: any }
+}
+
+export type AuthSystemFields = {
+	email: string
+	emailVisibility: boolean
+	username: string
+	verified: boolean
+} & BaseSystemFields
+
+// Record types for each collection
+
 export type BooksRecord = {
 	title?: string
 }
 
-export type BooksResponse = BooksRecord & BaseRecord
+// Response types include system fields and match responses from the PocketBase API
+export type BooksResponse = BooksRecord & BaseSystemFields
 
 export type CollectionRecords = {
 	books: BooksRecord

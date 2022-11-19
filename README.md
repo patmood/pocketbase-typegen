@@ -8,6 +8,12 @@ Generate typescript definitions from your [pocketbase.io](https://pocketbase.io/
 
 This will produce types for all your PocketBase collections to use in your frontend typescript codebase.
 
+## Versions
+
+When using PocketBase v0.8.x, use `pocketbase-typegen` v1.1.x
+
+Users of PocketBase v0.7.x should use `pocketbase-typegen` v1.0.x
+
 ## Usage
 
 ```
@@ -38,11 +44,18 @@ URL example:
 
 The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketbase-types-example.ts)) which will contain:
 
-- An enum of all collections
-- One type for each collection (eg `ProfilesRecord`)
-- One response type for each collection (eg `ProfilesResponse`) which includes base fields like id, updated, created
-- A type `CollectionRecords` mapping each collection name to the record type
+- `Collections` An enum of all collections/
+- `[CollectionName]Record` One type for each collection (eg ProfilesRecord)/
+- `[CollectionName]Response` One response type for each collection (eg ProfilesResponse) which includes system fields. This is what is returned from the PocketBase API.
+  - `[CollectionName][FieldName]Options` If the collection contains a select field with set values, an enum of the options will be generated.
+- `CollectionRecords` A type mapping each collection name to the record type.
+
+## Example usage
 
 In the upcoming [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.8 you will be able to use generic types when fetching records, eg:
 
-`pb.collection('tasks').getOne<Task>("RECORD_ID") // -> results in Promise<Task>`
+```typescript
+import { Collections, TasksResponse } from "./pocketbase-types"
+
+pb.collection(Collections.Tasks).getOne<TasksResponse>("RECORD_ID") // -> results in Promise<TaskResponse>
+```
