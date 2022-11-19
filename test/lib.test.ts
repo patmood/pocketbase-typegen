@@ -4,6 +4,7 @@ import {
   createCollectionRecords,
   createRecordType,
   createResponseType,
+  createSelectOptions,
   createTypeField,
   generate,
 } from "../src/lib"
@@ -324,5 +325,24 @@ describe("createTypeField", () => {
         type: "unknowntype",
       })
     ).toThrowError("unknown type unknowntype found in schema")
+  })
+})
+
+describe("createSelectOptions", () => {
+  it("creates enum types for select options", () => {
+    const name = "choose"
+    const schema: FieldSchema[] = [
+      {
+        system: false,
+        id: "hhnwjkke",
+        name: "title",
+        type: "select",
+        required: false,
+        unique: false,
+        options: { values: ["one", "one", "two", "space space", "$@#*(&#%"] },
+      },
+    ]
+    const result = createSelectOptions(name, schema)
+    expect(result).toMatchSnapshot()
   })
 })

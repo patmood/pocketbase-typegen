@@ -1,9 +1,12 @@
 import {
   getOptionEnumName,
+  getOptionValues,
   getSystemFields,
   sanitizeFieldName,
   toPascalCase,
 } from "../src/utils"
+
+import { FieldSchema } from "../src/types"
 
 describe("toPascalCase", () => {
   it("return pascal case string", () => {
@@ -41,5 +44,35 @@ describe("getOptionEnumName", () => {
     expect(getOptionEnumName("orders_with_underscore", "type_underscore")).toBe(
       "OrdersWithUnderscoreTypeUnderscoreOptions"
     )
+  })
+})
+
+describe("getOptionValues", () => {
+  it("returns empty array when no select field values", () => {
+    const fieldWithoutValues: FieldSchema = {
+      id: "1",
+      name: "myfield",
+      type: "text",
+      system: false,
+      required: false,
+      unique: false,
+      options: {},
+    }
+    expect(getOptionValues(fieldWithoutValues)).toEqual([])
+  })
+
+  it("returns deduped select field values", () => {
+    const fieldWithValues: FieldSchema = {
+      id: "1",
+      name: "myfield",
+      type: "text",
+      system: false,
+      required: false,
+      unique: false,
+      options: {
+        values: ["one", "one", "one", "two"],
+      },
+    }
+    expect(getOptionValues(fieldWithValues)).toEqual(["one", "two"])
   })
 })
