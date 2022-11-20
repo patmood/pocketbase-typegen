@@ -1,4 +1,5 @@
-import { CollectionRecord } from "./types"
+import { CollectionRecord, FieldSchema } from "./types"
+
 import { promises as fs } from "fs"
 
 export function toPascalCase(str: string) {
@@ -30,4 +31,10 @@ export function getSystemFields(type: CollectionRecord["type"]) {
 
 export function getOptionEnumName(recordName: string, fieldName: string) {
   return `${toPascalCase(recordName)}${toPascalCase(fieldName)}Options`
+}
+
+export function getOptionValues(field: FieldSchema) {
+  const values = field.options.values
+  if (!values) return []
+  return values.filter((val, i) => values.indexOf(val) === i)
 }

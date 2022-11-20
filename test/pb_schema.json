@@ -140,7 +140,15 @@
         "unique": false,
         "options": {
           "maxSelect": 1,
-          "values": ["optionA", "optionB", "optionC"]
+          "values": [
+            "optionA",
+            "optionA",
+            "OptionA",
+            "optionB",
+            "optionC",
+            "option with space",
+            "sy?mb@!$"
+          ]
         }
       },
       {
@@ -242,11 +250,11 @@
         }
       }
     ],
-    "listRule": null,
-    "viewRule": null,
-    "createRule": null,
-    "updateRule": null,
-    "deleteRule": null,
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "",
+    "updateRule": "",
+    "deleteRule": "",
     "options": {}
   },
   {

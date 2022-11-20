@@ -16,6 +16,7 @@ import {
 } from "./generics"
 import {
   getOptionEnumName,
+  getOptionValues,
   getSystemFields,
   sanitizeFieldName,
   toPascalCase,
@@ -164,7 +165,9 @@ export function createSelectOptions(
   const typestring = selectFields
     .map(
       (field) => `export enum ${getOptionEnumName(recordName, field.name)} {
-${field.options.values?.map((val) => `\t${val} = "${val}",`).join("\n")}
+${getOptionValues(field)
+  .map((val) => `\t"${val}" = "${val}",`)
+  .join("\n")}
 }\n`
     )
     .join("\n")

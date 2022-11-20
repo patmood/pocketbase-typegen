@@ -109,6 +109,12 @@ function getSystemFields(type) {
 function getOptionEnumName(recordName, fieldName) {
   return `${toPascalCase(recordName)}${toPascalCase(fieldName)}Options`;
 }
+function getOptionValues(field) {
+  const values = field.options.values;
+  if (!values)
+    return [];
+  return values.filter((val, i) => values.indexOf(val) === i);
+}
 
 // src/lib.ts
 var pbSchemaTypescriptMap = {
@@ -201,13 +207,10 @@ function createTypeField(collectionName, fieldSchema) {
 function createSelectOptions(recordName, schema) {
   const selectFields = schema.filter((field) => field.type === "select");
   const typestring = selectFields.map(
-    (field) => {
-      var _a;
-      return `export enum ${getOptionEnumName(recordName, field.name)} {
-${(_a = field.options.values) == null ? void 0 : _a.map((val) => `	${val} = "${val}",`).join("\n")}
+    (field) => `export enum ${getOptionEnumName(recordName, field.name)} {
+${getOptionValues(field).map((val) => `	"${val}" = "${val}",`).join("\n")}
 }
-`;
-    }
+`
   ).join("\n");
   return typestring;
 }
@@ -235,7 +238,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.0";
+var version = "1.1.1";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(

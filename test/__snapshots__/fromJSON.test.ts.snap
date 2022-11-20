@@ -45,9 +45,12 @@ export type CustomAuthRecord = {
 }
 
 export enum EverythingSelectFieldOptions {
-	optionA = "optionA",
-	optionB = "optionB",
-	optionC = "optionC",
+	"optionA" = "optionA",
+	"OptionA" = "OptionA",
+	"optionB" = "optionB",
+	"optionC" = "optionC",
+	"option with space" = "option with space",
+	"sy?mb@!$" = "sy?mb@!$",
 }
 export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknown> = {
 	text_field?: string
