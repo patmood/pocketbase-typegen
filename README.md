@@ -52,7 +52,7 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
 
 ## Example usage
 
-In the upcoming [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.8 you will be able to use generic types when fetching records, eg:
+In [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.8 you can use generic types when fetching records, eg:
 
 ```typescript
 import { Collections, TasksResponse } from "./pocketbase-types"
