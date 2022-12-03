@@ -250,6 +250,35 @@ describe("createTypeField", () => {
     ).toEqual(`\tselectFieldWithOpts: TestCollectionSelectFieldWithOptsOptions`)
   })
 
+  it("converts multi-select type", () => {
+    expect(
+      createTypeField("test_collection", {
+        ...defaultFieldSchema,
+        name: "selectField",
+        type: "select",
+        options: {
+          maxSelect: 2,
+        },
+      })
+    ).toEqual("\tselectField: string[]")
+  })
+
+  it("converts multi-select type with values", () => {
+    expect(
+      createTypeField("test_collection", {
+        ...defaultFieldSchema,
+        name: "selectFieldWithOpts",
+        type: "select",
+        options: {
+          values: ["one", "two", "three"],
+          maxSelect: 2,
+        },
+      })
+    ).toEqual(
+      `\tselectFieldWithOpts: TestCollectionSelectFieldWithOptsOptions[]`
+    )
+  })
+
   it("converts json type", () => {
     expect(
       createTypeField("test_collection", {

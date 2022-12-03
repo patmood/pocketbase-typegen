@@ -29,10 +29,15 @@ const pbSchemaTypescriptMap = {
   email: "string",
   url: "string",
   date: DATE_STRING_TYPE_NAME,
-  select: (fieldSchema: FieldSchema, collectionName: string) =>
-    fieldSchema.options.values
+  select: (fieldSchema: FieldSchema, collectionName: string) => {
+    // pocketbase v0.8+ values are required
+    const valueType = fieldSchema.options.values
       ? getOptionEnumName(collectionName, fieldSchema.name)
-      : "string",
+      : "string"
+    return fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
+      ? `${valueType}[]`
+      : valueType
+  },
   json: (fieldSchema: FieldSchema) =>
     `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   file: (fieldSchema: FieldSchema) =>
