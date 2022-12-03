@@ -124,7 +124,10 @@ var pbSchemaTypescriptMap = {
   email: "string",
   url: "string",
   date: DATE_STRING_TYPE_NAME,
-  select: (fieldSchema, collectionName) => fieldSchema.options.values ? getOptionEnumName(collectionName, fieldSchema.name) : "string",
+  select: (fieldSchema, collectionName) => {
+    const valueType = fieldSchema.options.values ? getOptionEnumName(collectionName, fieldSchema.name) : "string";
+    return fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${valueType}[]` : valueType;
+  },
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   file: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? "string[]" : "string",
   relation: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${RECORD_ID_STRING_NAME}[]` : RECORD_ID_STRING_NAME,
