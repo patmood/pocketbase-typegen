@@ -241,7 +241,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.1";
+var version = "1.1.2";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(
