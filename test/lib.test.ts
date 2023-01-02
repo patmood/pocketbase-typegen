@@ -319,7 +319,7 @@ describe("createTypeField", () => {
         name: "relationField",
         type: "relation",
       })
-    ).toEqual("\trelationField: RecordIdString")
+    ).toEqual("\trelationField: RecordIdString[]")
   })
 
   it("converts relation type with multiple options", () => {
@@ -330,6 +330,19 @@ describe("createTypeField", () => {
         type: "relation",
         options: {
           maxSelect: 3,
+        },
+      })
+    ).toEqual("\trelationFieldMany: RecordIdString[]")
+  })
+
+  it("converts relation type with unset maxSelect", () => {
+    expect(
+      createTypeField("test_collection", {
+        ...defaultFieldSchema,
+        name: "relationFieldMany",
+        type: "relation",
+        options: {
+          maxSelect: null,
         },
       })
     ).toEqual("\trelationFieldMany: RecordIdString[]")
