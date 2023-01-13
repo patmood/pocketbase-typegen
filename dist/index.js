@@ -213,7 +213,7 @@ function createExpandType(allRecords, targetRecord) {
   const expandTypesString = `type ${pascaleName}ExpandType = {
 ${hasExpandTypes ? expandTypes.join("\n") : "	// Doesn't have any relation"}
 }`;
-  const expandConstString = hasExpandTypes && `export const ${pascaleName}Expand = {
+  const expandConstString = hasExpandTypes && `export const ${pascaleName}ExpandKeys = {
   ${expandConsts.join(",\n")}
 }`;
   return [expandTypesString, expandConstString].filter(Boolean).join("\n");
