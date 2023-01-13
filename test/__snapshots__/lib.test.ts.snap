@@ -14,6 +14,62 @@ exports[`createCollectionRecord creates mapping of collection name to record typ
 }"
 `;
 
+exports[`createDirectExpand createDirectExpand create expand type for direct relation 1`] = `
+[
+  [
+    "	user: UsersResponse",
+  ],
+  [
+    "	user: "user"",
+  ],
+]
+`;
+
+exports[`createDirectExpand createDirectExpand create expand type for direct relation with two or more maxSelect 1`] = `
+[
+  [
+    "	authors: AuthorsResponse[]",
+  ],
+  [
+    "	authors: "authors"",
+  ],
+]
+`;
+
+exports[`createDirectExpand createDirectExpand not create expand type for unexist direct relation 1`] = `
+[
+  [],
+  [],
+]
+`;
+
+exports[`createDirectExpand createExpand create expand type 1`] = `
+"type UsersExpandType = {
+	"authors(user)": AuthorsResponse[]
+}
+export const UsersExpandKeys = {
+  	authors: "authors(user)"
+}"
+`;
+
+exports[`createDirectExpand createIndirectExpand create expand type for indirect relation 1`] = `
+[
+  [
+    "	"authors(user)": AuthorsResponse[]",
+  ],
+  [
+    "	authors: "authors(user)"",
+  ],
+]
+`;
+
+exports[`createDirectExpand createIndirectExpand not create expand type for indirect relation with two or more maxSelect 1`] = `
+[
+  [],
+  [],
+]
+`;
+
 exports[`createRecordType creates type definition for a record 1`] = `
 "export type BooksRecord = {
 	title?: string
@@ -26,7 +82,7 @@ exports[`createRecordType handles file fields with multiple files 1`] = `
 }"
 `;
 
-exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse = BooksRecord & BaseSystemFields"`;
+exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse = BooksRecord & BaseSystemFields<BooksExpandType>"`;
 
 exports[`createResponseType handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
@@ -58,13 +114,13 @@ export type IsoDateString = string
 export type RecordIdString = string
 
 // System fields
-export type BaseSystemFields = {
+export type BaseSystemFields<T> = {
 	id: RecordIdString
 	created: IsoDateString
 	updated: IsoDateString
 	collectionId: string
 	collectionName: Collections
-	expand?: { [key: string]: any }
+	expand?: T extends object ? T : never
 }
 
 export type AuthSystemFields = {
@@ -72,7 +128,7 @@ export type AuthSystemFields = {
 	emailVisibility: boolean
 	username: string
 	verified: boolean
-} & BaseSystemFields
+}
 
 // Record types for each collection
 
@@ -80,8 +136,13 @@ export type BooksRecord = {
 	title?: string
 }
 
+// Expand types are used to define the expand object in the PocketBase API
+type BooksExpandType = {
+	// Doesn't have any relation
+}
+
 // Response types include system fields and match responses from the PocketBase API
-export type BooksResponse = BooksRecord & BaseSystemFields
+export type BooksResponse = BooksRecord & BaseSystemFields<BooksExpandType>
 
 export type CollectionRecords = {
 	books: BooksRecord

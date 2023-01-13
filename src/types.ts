@@ -45,6 +45,8 @@ export type CollectionRecord = {
 // Every field is optional
 export type RecordOptions = {
   maxSelect?: number | null
+  collectionId?: string | null
+  cascadeDelete?: boolean | null
   min?: number | null
   max?: number | null
   pattern?: string

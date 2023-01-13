@@ -1,7 +1,6 @@
 import {
   getOptionEnumName,
   getOptionValues,
-  getSystemFields,
   sanitizeFieldName,
   toPascalCase,
 } from "../src/utils"
@@ -28,13 +27,6 @@ describe("sanitizeFieldName", () => {
   it("returns valid typescript fields", () => {
     expect(sanitizeFieldName("foo_bar")).toEqual("foo_bar")
     expect(sanitizeFieldName("4number")).toEqual('"4number"')
-  })
-})
-
-describe("getSystemFields", () => {
-  it("returns the system field type name for a given collection type", () => {
-    expect(getSystemFields("base")).toBe("BaseSystemFields")
-    expect(getSystemFields("auth")).toBe("AuthSystemFields")
   })
 })
 

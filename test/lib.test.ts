@@ -2,6 +2,9 @@ import { CollectionRecord, FieldSchema } from "../src/types"
 import {
   createCollectionEnum,
   createCollectionRecords,
+  createDirectExpand,
+  createExpandType,
+  createIndirectExpand,
   createRecordType,
   createResponseType,
   createSelectOptions,
@@ -386,5 +389,160 @@ describe("createSelectOptions", () => {
     ]
     const result = createSelectOptions(name, schema)
     expect(result).toMatchSnapshot()
+  })
+})
+
+describe("createDirectExpand", () => {
+  const collections: Array<CollectionRecord> = [
+    {
+      name: "users",
+      id: "123",
+      type: "auth",
+      system: false,
+      listRule: null,
+      viewRule: null,
+      createRule: null,
+      updateRule: null,
+      deleteRule: null,
+      schema: [
+        {
+          name: "name",
+          type: "text",
+          required: false,
+          id: "xyz",
+          system: false,
+          unique: false,
+          options: {},
+        },
+      ],
+    },
+    {
+      name: "authors",
+      id: "456",
+      type: "base",
+      system: false,
+      listRule: null,
+      viewRule: null,
+      createRule: null,
+      updateRule: null,
+      deleteRule: null,
+      schema: [
+        {
+          name: "user",
+          type: "relation",
+          required: false,
+          id: "xyz",
+          system: false,
+          unique: false,
+          options: {
+            collectionId: "123",
+            cascadeDelete: false,
+            maxSelect: 1,
+          },
+        },
+      ],
+    },
+    {
+      name: "books",
+      id: "789",
+      type: "base",
+      system: false,
+      listRule: null,
+      viewRule: null,
+      createRule: null,
+      updateRule: null,
+      deleteRule: null,
+      schema: [
+        {
+          name: "title",
+          type: "text",
+          required: false,
+          id: "xyz",
+          system: false,
+          unique: false,
+          options: {},
+        },
+        {
+          name: "authors",
+          type: "relation",
+          required: false,
+          id: "xyz",
+          system: false,
+          unique: false,
+          options: {
+            collectionId: "456",
+            cascadeDelete: false,
+            maxSelect: 2,
+          },
+        },
+      ],
+    },
+    {
+      name: "publishers",
+      id: "abc",
+      type: "base",
+      system: false,
+      listRule: null,
+      viewRule: null,
+      createRule: null,
+      updateRule: null,
+      deleteRule: null,
+      schema: [
+        {
+          name: "company",
+          type: "relation",
+          required: false,
+          id: "xyz",
+          system: false,
+          unique: false,
+          options: {
+            collectionId: "xxx",
+            cascadeDelete: false,
+            maxSelect: 1,
+          },
+        },
+      ],
+    },
+  ]
+
+  describe("createDirectExpand", () => {
+    it("create expand type for direct relation", () => {
+      const authorsCollection = collections[1]
+      const result = createDirectExpand(collections, authorsCollection)
+      expect(result).toMatchSnapshot()
+    })
+
+    it("create expand type for direct relation with two or more maxSelect", () => {
+      const booksCollection = collections[2]
+      const result = createDirectExpand(collections, booksCollection)
+      expect(result).toMatchSnapshot()
+    })
+
+    it("not create expand type for unexist direct relation", () => {
+      const publishersCollection = collections[3]
+      const result = createDirectExpand(collections, publishersCollection)
+      expect(result).toMatchSnapshot()
+    })
+  })
+
+  describe("createIndirectExpand", () => {
+    it("create expand type for indirect relation", () => {
+      const usersCollection = collections[0]
+      const result = createIndirectExpand(collections, usersCollection)
+      expect(result).toMatchSnapshot()
+    })
+
+    it("not create expand type for indirect relation with two or more maxSelect", () => {
+      const authorsCollection = collections[1]
+      const result = createIndirectExpand(collections, authorsCollection)
+      expect(result).toMatchSnapshot()
+    })
+  })
+
+  describe("createExpand", () => {
+    it("create expand type", () => {
+      const result = createExpandType(collections, collections[0])
+      expect(result).toMatchSnapshot()
+    })
   })
 })

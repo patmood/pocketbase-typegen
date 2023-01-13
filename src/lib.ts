@@ -3,6 +3,7 @@ import {
   AUTH_SYSTEM_FIELDS_DEFINITION,
   BASE_SYSTEM_FIELDS_DEFINITION,
   DATE_STRING_TYPE_NAME,
+  EXPAND_TYPE_COMMENT,
   EXPORT_COMMENT,
   RECORD_ID_STRING_NAME,
   RECORD_TYPE_COMMENT,
@@ -17,7 +18,6 @@ import {
 import {
   getOptionEnumName,
   getOptionValues,
-  getSystemFields,
   sanitizeFieldName,
   toPascalCase,
 } from "./utils"
@@ -58,6 +58,7 @@ const pbSchemaTypescriptMap = {
 export function generate(results: Array<CollectionRecord>) {
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
+  const expandTypes: Array<string> = [EXPAND_TYPE_COMMENT]
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
 
   results
@@ -75,6 +76,7 @@ export function generate(results: Array<CollectionRecord>) {
       if (row.schema) {
         recordTypes.push(createRecordType(row.name, row.schema))
         responseTypes.push(createResponseType(row))
+        expandTypes.push(createExpandType(results, row))
       }
     })
   const sortedCollectionNames = collectionNames
@@ -87,6 +89,7 @@ export function generate(results: Array<CollectionRecord>) {
     AUTH_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
+    expandTypes.join("\n"),
     responseTypes.join("\n"),
     createCollectionRecords(sortedCollectionNames),
   ]
@@ -134,9 +137,96 @@ export function createResponseType(collectionSchemaEntry: CollectionRecord) {
   const pascaleName = toPascalCase(name)
   const genericArgsWithDefaults = getGenericArgStringWithDefault(schema)
   const genericArgs = getGenericArgString(schema)
-  const systemFields = getSystemFields(type)
+  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgs} & BaseSystemFields<${pascaleName}ExpandType>${
+    type === "auth" ? " & AuthSystemFields" : ""
+  }`
+}
 
-  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgs} & ${systemFields}`
+export function createExpandType(
+  allRecords: CollectionRecord[],
+  targetRecord: CollectionRecord
+) {
+  const [directExpandTypes, directExpandConsts] = createDirectExpand(
+    allRecords,
+    targetRecord
+  )
+  const [indirectExpandTypes, indirectExpandConsts] = createIndirectExpand(
+    allRecords,
+    targetRecord
+  )
+
+  const expandTypes = [...directExpandTypes, ...indirectExpandTypes]
+  const expandConsts = [...directExpandConsts, ...indirectExpandConsts]
+
+  const hasExpandTypes = expandTypes.length > 0
+  const pascaleName = toPascalCase(targetRecord.name)
+
+  const expandTypesString = `type ${pascaleName}ExpandType = {
+${hasExpandTypes ? expandTypes.join("\n") : "\t// Doesn't have any relation"}
+}`
+
+  const expandConstString =
+    hasExpandTypes &&
+    `export const ${pascaleName}ExpandKeys = {
+  ${expandConsts.join(",\n")}
+}`
+
+  return [expandTypesString, expandConstString].filter(Boolean).join("\n")
+}
+
+export function createDirectExpand(
+  allRecords: CollectionRecord[],
+  targetRecord: CollectionRecord
+) {
+  const expandTypes: string[] = []
+  const expandConsts: string[] = []
+
+  targetRecord.schema
+    .filter(({ type }) => type === "relation")
+    .forEach(({ name, options }) => {
+      const expandedRecord = allRecords.find(
+        (record) => record.id === options?.collectionId
+      )
+      if (!expandedRecord) {
+        return
+      }
+      const expandType =
+        options.maxSelect && options.maxSelect > 1
+          ? `${toPascalCase(expandedRecord.name)}Response[]`
+          : `${toPascalCase(expandedRecord.name)}Response`
+      expandTypes.push(`\t${name}: ${expandType}`)
+
+      const expandConst = `\t${name}: "${name}"`
+      expandConsts.push(expandConst)
+    })
+  return [expandTypes, expandConsts]
+}
+
+export function createIndirectExpand(
+  allRecords: CollectionRecord[],
+  targetRecord: CollectionRecord
+) {
+  const expandTypes: string[] = []
+  const expandConsts: string[] = []
+
+  allRecords.forEach((record) => {
+    record.schema
+      .filter((field) => field.type === "relation")
+      .forEach((field) => {
+        if (field.options?.collectionId !== targetRecord.id) {
+          return
+        }
+        if (field.options.maxSelect && field.options.maxSelect > 1) {
+          return
+        }
+        const expandKeyName = `${record.name}(${field.name})`
+        expandTypes.push(
+          `\t"${expandKeyName}": ${toPascalCase(record.name)}Response[]`
+        )
+        expandConsts.push(`\t${record.name}: "${expandKeyName}"`)
+      })
+  })
+  return [expandTypes, expandConsts]
 }
 
 export function createTypeField(

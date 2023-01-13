@@ -18,13 +18,13 @@ export type IsoDateString = string
 export type RecordIdString = string
 
 // System fields
-export type BaseSystemFields = {
+export type BaseSystemFields\<T\> = {
 	id: RecordIdString
 	created: IsoDateString
 	updated: IsoDateString
 	collectionId: string
 	collectionName: Collections
-	expand?: { [key: string]: any }
+	expand?: T extends object ? T : never
 }
 
 export type AuthSystemFields = {
@@ -32,7 +32,7 @@ export type AuthSystemFields = {
 	emailVisibility: boolean
 	username: string
 	verified: boolean
-} & BaseSystemFields
+}
 
 // Record types for each collection
 
@@ -82,12 +82,42 @@ export type UsersRecord = {
 	avatar?: string
 }
 
+// Expand types are used to define the expand object in the PocketBase API
+type BaseExpandType = {
+	// Doesn't have any relation
+}
+type CustomAuthExpandType = {
+	// Doesn't have any relation
+}
+type EverythingExpandType = {
+	user_relation_field: UsersResponse
+	custom_relation_field: CustomAuthResponse[]
+	post_relation_field: PostsResponse
+}
+export const EverythingExpandKeys = {
+  	user_relation_field: "user_relation_field",
+	custom_relation_field: "custom_relation_field",
+	post_relation_field: "post_relation_field"
+}
+type PostsExpandType = {
+	"everything(post_relation_field)": EverythingResponse[]
+}
+export const PostsExpandKeys = {
+  	everything: "everything(post_relation_field)"
+}
+type UsersExpandType = {
+	"everything(user_relation_field)": EverythingResponse[]
+}
+export const UsersExpandKeys = {
+  	everything: "everything(user_relation_field)"
+}
+
 // Response types include system fields and match responses from the PocketBase API
-export type BaseResponse = BaseRecord & BaseSystemFields
-export type CustomAuthResponse = CustomAuthRecord & AuthSystemFields
-export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown> = EverythingRecord<Tanother_json_field, Tjson_field> & BaseSystemFields
-export type PostsResponse = PostsRecord & BaseSystemFields
-export type UsersResponse = UsersRecord & AuthSystemFields
+export type BaseResponse = BaseRecord & BaseSystemFields\<BaseExpandType\>
+export type CustomAuthResponse = CustomAuthRecord & BaseSystemFields\<CustomAuthExpandType\> & AuthSystemFields
+export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown> = EverythingRecord<Tanother_json_field, Tjson_field> & BaseSystemFields\<EverythingExpandType\>
+export type PostsResponse = PostsRecord & BaseSystemFields\<PostsExpandType\>
+export type UsersResponse = UsersRecord & BaseSystemFields\<UsersExpandType\> & AuthSystemFields
 
 export type CollectionRecords = {
 	base: BaseRecord
