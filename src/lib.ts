@@ -3,6 +3,7 @@ import {
   AUTH_SYSTEM_FIELDS_DEFINITION,
   BASE_SYSTEM_FIELDS_DEFINITION,
   DATE_STRING_TYPE_NAME,
+  EXPAND_GENERIC_NAME,
   EXPORT_COMMENT,
   RECORD_ID_STRING_NAME,
   RECORD_TYPE_COMMENT,
@@ -10,8 +11,9 @@ import {
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
 import {
+  canExpand,
   fieldNameToGeneric,
-  getGenericArgString,
+  getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
 } from "./generics"
 import {
@@ -119,7 +121,9 @@ export function createRecordType(
 ): string {
   const selectOptionEnums = createSelectOptions(name, schema)
   const typeName = toPascalCase(name)
-  const genericArgs = getGenericArgStringWithDefault(schema)
+  const genericArgs = getGenericArgStringWithDefault(schema, {
+    includeExpand: false,
+  })
   const fields = schema
     .map((fieldSchema: FieldSchema) => createTypeField(name, fieldSchema))
     .join("\n")
@@ -132,11 +136,14 @@ ${fields}
 export function createResponseType(collectionSchemaEntry: CollectionRecord) {
   const { name, schema, type } = collectionSchemaEntry
   const pascaleName = toPascalCase(name)
-  const genericArgsWithDefaults = getGenericArgStringWithDefault(schema)
-  const genericArgs = getGenericArgString(schema)
+  const genericArgsWithDefaults = getGenericArgStringWithDefault(schema, {
+    includeExpand: true,
+  })
+  const genericArgsForRecord = getGenericArgStringForRecord(schema)
   const systemFields = getSystemFields(type)
+  const expandArgString = canExpand(schema) ? `<T${EXPAND_GENERIC_NAME}>` : ""
 
-  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgs} & ${systemFields}`
+  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgsForRecord} & ${systemFields}${expandArgString}`
 }
 
 export function createTypeField(

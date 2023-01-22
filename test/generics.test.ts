@@ -1,6 +1,7 @@
 import {
+  canExpand,
   getGenericArgList,
-  getGenericArgString,
+  getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
 } from "../src/generics"
 
@@ -33,6 +34,15 @@ const jsonField2: FieldSchema = {
   required: true,
   type: "json",
 }
+const expandField: FieldSchema = {
+  id: "4",
+  system: false,
+  unique: false,
+  options: {},
+  name: "post_relation_field",
+  required: true,
+  type: "relation",
+}
 
 describe("getGenericArgList", () => {
   it("returns a list of generic args", () => {
@@ -53,46 +63,76 @@ describe("getGenericArgList", () => {
 
 describe("getGenericArgStringWithDefault", () => {
   it("empty string when no generic fields", () => {
-    expect(getGenericArgStringWithDefault([textField])).toEqual("")
+    expect(
+      getGenericArgStringWithDefault([textField], { includeExpand: false })
+    ).toEqual("")
   })
 
   it("returns a single generic string", () => {
-    expect(getGenericArgStringWithDefault([textField, jsonField1])).toEqual(
-      "<Tdata1 = unknown>"
-    )
+    expect(
+      getGenericArgStringWithDefault([textField, jsonField1], {
+        includeExpand: false,
+      })
+    ).toEqual("<Tdata1 = unknown>")
   })
 
   it("multiple generics with a record", () => {
     expect(
-      getGenericArgStringWithDefault([textField, jsonField1, jsonField2])
+      getGenericArgStringWithDefault([textField, jsonField1, jsonField2], {
+        includeExpand: false,
+      })
     ).toEqual("<Tdata1 = unknown, Tdata2 = unknown>")
   })
 
   it("sorts the arguments", () => {
     expect(
-      getGenericArgStringWithDefault([textField, jsonField2, jsonField1])
+      getGenericArgStringWithDefault([textField, jsonField2, jsonField1], {
+        includeExpand: false,
+      })
     ).toEqual("<Tdata1 = unknown, Tdata2 = unknown>")
+  })
+
+  it("includes generic arg for expand fields", () => {
+    expect(
+      getGenericArgStringWithDefault(
+        [textField, jsonField2, jsonField1, expandField],
+        {
+          includeExpand: true,
+        }
+      )
+    ).toEqual("<Tdata1 = unknown, Tdata2 = unknown, Texpand = unknown>")
   })
 })
 
-describe("getGenericArgString", () => {
+describe("getGenericArgStringForRecord", () => {
   it("empty string when no generic fields", () => {
-    expect(getGenericArgString([textField])).toEqual("")
+    expect(getGenericArgStringForRecord([textField])).toEqual("")
   })
 
   it("returns a single generic string", () => {
-    expect(getGenericArgString([textField, jsonField1])).toEqual("<Tdata1>")
+    expect(getGenericArgStringForRecord([textField, jsonField1])).toEqual(
+      "<Tdata1>"
+    )
   })
 
   it("multiple generics with a record", () => {
-    expect(getGenericArgString([textField, jsonField1, jsonField2])).toEqual(
-      "<Tdata1, Tdata2>"
-    )
+    expect(
+      getGenericArgStringForRecord([textField, jsonField1, jsonField2])
+    ).toEqual("<Tdata1, Tdata2>")
   })
 
   it("sorts the arguments", () => {
-    expect(getGenericArgString([textField, jsonField2, jsonField1])).toEqual(
-      "<Tdata1, Tdata2>"
-    )
+    expect(
+      getGenericArgStringForRecord([textField, jsonField2, jsonField1])
+    ).toEqual("<Tdata1, Tdata2>")
+  })
+})
+
+describe("canExpand", () => {
+  it("detects collections that can be expanded", () => {
+    expect(canExpand([textField, jsonField1, expandField])).toEqual(true)
+  })
+  it("detects collections that cannot be expanded", () => {
+    expect(canExpand([textField, jsonField1])).toEqual(false)
   })
 })

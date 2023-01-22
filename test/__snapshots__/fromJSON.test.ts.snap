@@ -18,21 +18,21 @@ export type IsoDateString = string
 export type RecordIdString = string
 
 // System fields
-export type BaseSystemFields = {
+export type BaseSystemFields<T = never> = {
 	id: RecordIdString
 	created: IsoDateString
 	updated: IsoDateString
 	collectionId: string
 	collectionName: Collections
-	expand?: { [key: string]: any }
+	expand?: T
 }
 
-export type AuthSystemFields = {
+export type AuthSystemFields<T = never> = {
 	email: string
 	emailVisibility: boolean
 	username: string
 	verified: boolean
-} & BaseSystemFields
+} & BaseSystemFields<T>
 
 // Record types for each collection
 
@@ -85,7 +85,7 @@ export type UsersRecord = {
 // Response types include system fields and match responses from the PocketBase API
 export type BaseResponse = BaseRecord & BaseSystemFields
 export type CustomAuthResponse = CustomAuthRecord & AuthSystemFields
-export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown> = EverythingRecord<Tanother_json_field, Tjson_field> & BaseSystemFields
+export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, Texpand = unknown> = EverythingRecord<Tanother_json_field, Tjson_field> & BaseSystemFields<Texpand>
 export type PostsResponse = PostsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 

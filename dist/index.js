@@ -43,26 +43,27 @@ var EXPORT_COMMENT = `/**
 */`;
 var RECORD_TYPE_COMMENT = `// Record types for each collection`;
 var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
+var EXPAND_GENERIC_NAME = "expand";
 var DATE_STRING_TYPE_NAME = `IsoDateString`;
 var RECORD_ID_STRING_NAME = `RecordIdString`;
 var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
 export type ${RECORD_ID_STRING_NAME} = string`;
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
-export type BaseSystemFields = {
+export type BaseSystemFields<T = never> = {
 	id: ${RECORD_ID_STRING_NAME}
 	created: ${DATE_STRING_TYPE_NAME}
 	updated: ${DATE_STRING_TYPE_NAME}
 	collectionId: string
 	collectionName: Collections
-	expand?: { [key: string]: any }
+	expand?: T
 }`;
-var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields = {
+var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
 	email: string
 	emailVisibility: boolean
 	username: string
 	verified: boolean
-} & BaseSystemFields`;
+} & BaseSystemFields<T>`;
 
 // src/generics.ts
 function fieldNameToGeneric(name) {
@@ -72,17 +73,23 @@ function getGenericArgList(schema) {
   const jsonFields = schema.filter((field) => field.type === "json").map((field) => fieldNameToGeneric(field.name)).sort();
   return jsonFields;
 }
-function getGenericArgString(schema) {
+function getGenericArgStringForRecord(schema) {
   const argList = getGenericArgList(schema);
   if (argList.length === 0)
     return "";
   return `<${argList.map((name) => `${name}`).join(", ")}>`;
 }
-function getGenericArgStringWithDefault(schema) {
+function getGenericArgStringWithDefault(schema, opts) {
   const argList = getGenericArgList(schema);
+  if (opts.includeExpand && canExpand(schema)) {
+    argList.push(fieldNameToGeneric(EXPAND_GENERIC_NAME));
+  }
   if (argList.length === 0)
     return "";
   return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`;
+}
+function canExpand(schema) {
+  return !!schema.find((field) => field.type === "relation");
 }
 
 // src/utils.ts
@@ -130,7 +137,7 @@ var pbSchemaTypescriptMap = {
   },
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   file: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? "string[]" : "string",
-  relation: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${RECORD_ID_STRING_NAME}[]` : RECORD_ID_STRING_NAME,
+  relation: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
   user: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${RECORD_ID_STRING_NAME}[]` : RECORD_ID_STRING_NAME
 };
 function generate(results) {
@@ -183,7 +190,9 @@ ${nameRecordMap}
 function createRecordType(name, schema) {
   const selectOptionEnums = createSelectOptions(name, schema);
   const typeName = toPascalCase(name);
-  const genericArgs = getGenericArgStringWithDefault(schema);
+  const genericArgs = getGenericArgStringWithDefault(schema, {
+    includeExpand: false
+  });
   const fields = schema.map((fieldSchema) => createTypeField(name, fieldSchema)).join("\n");
   return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = {
 ${fields}
@@ -192,10 +201,13 @@ ${fields}
 function createResponseType(collectionSchemaEntry) {
   const { name, schema, type } = collectionSchemaEntry;
   const pascaleName = toPascalCase(name);
-  const genericArgsWithDefaults = getGenericArgStringWithDefault(schema);
-  const genericArgs = getGenericArgString(schema);
+  const genericArgsWithDefaults = getGenericArgStringWithDefault(schema, {
+    includeExpand: true
+  });
+  const genericArgsForRecord = getGenericArgStringForRecord(schema);
   const systemFields = getSystemFields(type);
-  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgs} & ${systemFields}`;
+  const expandArgString = canExpand(schema) ? `<T${EXPAND_GENERIC_NAME}>` : "";
+  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgsForRecord} & ${systemFields}${expandArgString}`;
 }
 function createTypeField(collectionName, fieldSchema) {
   if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
@@ -241,7 +253,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.2";
+var version = "1.1.3";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(
