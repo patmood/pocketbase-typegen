@@ -1,3 +1,4 @@
+import { EXPAND_GENERIC_NAME } from "./constants"
 import { FieldSchema } from "./types"
 
 export function fieldNameToGeneric(name: string) {
@@ -12,14 +13,27 @@ export function getGenericArgList(schema: FieldSchema[]): string[] {
   return jsonFields
 }
 
-export function getGenericArgString(schema: FieldSchema[]): string {
+export function getGenericArgStringForRecord(schema: FieldSchema[]): string {
   const argList = getGenericArgList(schema)
   if (argList.length === 0) return ""
   return `<${argList.map((name) => `${name}`).join(", ")}>`
 }
 
-export function getGenericArgStringWithDefault(schema: FieldSchema[]): string {
+export function getGenericArgStringWithDefault(
+  schema: FieldSchema[],
+  opts: { includeExpand: boolean }
+): string {
   const argList = getGenericArgList(schema)
+
+  if (opts.includeExpand && canExpand(schema)) {
+    argList.push(fieldNameToGeneric(EXPAND_GENERIC_NAME))
+  }
+
   if (argList.length === 0) return ""
   return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`
+}
+
+// Does the collection have relation fields that can be expanded
+export function canExpand(schema: FieldSchema[]) {
+  return !!schema.find((field) => field.type === "relation")
 }

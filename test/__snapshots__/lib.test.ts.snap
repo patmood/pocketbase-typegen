@@ -58,13 +58,13 @@ export type IsoDateString = string
 export type RecordIdString = string
 
 // System fields
-export type BaseSystemFields = {
+export type BaseSystemFields<Texpand = never> = {
 	id: RecordIdString
 	created: IsoDateString
 	updated: IsoDateString
 	collectionId: string
 	collectionName: Collections
-	expand?: { [key: string]: any }
+	expand?: Texpand
 }
 
 export type AuthSystemFields = {

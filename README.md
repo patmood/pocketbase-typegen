@@ -10,9 +10,9 @@ This will produce types for all your PocketBase collections to use in your front
 
 ## Versions
 
-When using PocketBase v0.8.x, use `pocketbase-typegen` v1.1.x
+When using PocketBase > v0.8.x, use `pocketbase-typegen` v1.1.x
 
-Users of PocketBase v0.7.x should use `pocketbase-typegen` v1.0.x
+Users of PocketBase < v0.7.x should use `pocketbase-typegen` v1.0.x
 
 ## Usage
 
@@ -40,7 +40,7 @@ URL example:
 
 `npx pocketbase-typegen --url https://myproject.pockethost.io --email admin@myproject.com --password 'secr3tp@ssword!'`
 
-## Example output
+## Example Output
 
 The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketbase-types-example.ts)) which will contain:
 
@@ -50,12 +50,40 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
   - `[CollectionName][FieldName]Options` If the collection contains a select field with set values, an enum of the options will be generated.
 - `CollectionRecords` A type mapping each collection name to the record type.
 
-## Example usage
+## Example Usage
 
-In [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.8 you can use generic types when fetching records, eg:
+In [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.8+ you can use generic types when fetching records, eg:
 
 ```typescript
 import { Collections, TasksResponse } from "./pocketbase-types"
 
 pb.collection(Collections.Tasks).getOne<TasksResponse>("RECORD_ID") // -> results in Promise<TaskResponse>
+```
+
+## Example Advanced Usage
+
+You can provide types for JSON fields and [expanded relations](https://pocketbase.io/docs/expanding-relations/) by passing generic arguments to the Response types:
+
+```typescript
+import { Collections, CommentsResponse, UserResponse } from "./pocketbase-types"
+
+/**
+  type CommentsRecord<Tmetadata = unknown> = {
+    text: string
+    metadata: null | Tmetadata
+    user: RecordIdString
+  }
+*/
+type Tmetadata = {
+  likes: number
+}
+type Texpand = {
+  user: UsersResponse
+}
+const result = await pb
+  .collection(Collections.Comments)
+  .getOne<CommentsResponse<Tmetadata, Texpand>>("RECORD_ID", { expand: "user" })
+
+// Now you can access the expanded relation with type safety and hints in your IDE
+result.expand?.user.username
 ```
