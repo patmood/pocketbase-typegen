@@ -50,20 +50,20 @@ var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
 export type ${RECORD_ID_STRING_NAME} = string`;
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
-export type BaseSystemFields<T${EXPAND_GENERIC_NAME} = never> = {
+export type BaseSystemFields<T = never> = {
 	id: ${RECORD_ID_STRING_NAME}
 	created: ${DATE_STRING_TYPE_NAME}
 	updated: ${DATE_STRING_TYPE_NAME}
 	collectionId: string
 	collectionName: Collections
-	expand?: T${EXPAND_GENERIC_NAME}
+	expand?: T
 }`;
-var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields = {
+var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
 	email: string
 	emailVisibility: boolean
 	username: string
 	verified: boolean
-} & BaseSystemFields`;
+} & BaseSystemFields<T>`;
 
 // src/generics.ts
 function fieldNameToGeneric(name) {

@@ -40,6 +40,14 @@ URL example:
 
 `npx pocketbase-typegen --url https://myproject.pockethost.io --email admin@myproject.com --password 'secr3tp@ssword!'`
 
+Add it to your projects `package.json`:
+
+```
+"scripts": {
+  "typegen": "pocketbase-typegen --db ./pb_data/data.db",
+},
+```
+
 ## Example Output
 
 The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketbase-types-example.ts)) which will contain:
