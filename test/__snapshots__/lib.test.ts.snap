@@ -56,6 +56,7 @@ export enum Collections {
 // Alias types for improved usability
 export type IsoDateString = string
 export type RecordIdString = string
+export type HTMLString = string
 
 // System fields
 export type BaseSystemFields<T = never> = {

@@ -289,6 +289,16 @@ describe("createTypeField", () => {
     ).toEqual("\tjsonField: null | TjsonField")
   })
 
+  it("converts editor type", () => {
+    expect(
+      createTypeField("test_collection", {
+        ...defaultFieldSchema,
+        name: "editorField",
+        type: "editor",
+      })
+    ).toEqual("\teditorField: HTMLString")
+  })
+
   it("converts file type", () => {
     expect(
       createTypeField("test_collection", {

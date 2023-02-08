@@ -6,9 +6,11 @@ export const RESPONSE_TYPE_COMMENT = `// Response types include system fields an
 export const EXPAND_GENERIC_NAME = "expand"
 export const DATE_STRING_TYPE_NAME = `IsoDateString`
 export const RECORD_ID_STRING_NAME = `RecordIdString`
+export const HTML_STRING_NAME = `HTMLString`
 export const ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
-export type ${RECORD_ID_STRING_NAME} = string`
+export type ${RECORD_ID_STRING_NAME} = string
+export type ${HTML_STRING_NAME} = string`
 
 export const BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = never> = {

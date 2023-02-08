@@ -5,6 +5,7 @@ import {
   DATE_STRING_TYPE_NAME,
   EXPAND_GENERIC_NAME,
   EXPORT_COMMENT,
+  HTML_STRING_NAME,
   RECORD_ID_STRING_NAME,
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
@@ -27,7 +28,7 @@ import {
 const pbSchemaTypescriptMap = {
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
-  editor: "string",
+  editor: HTML_STRING_NAME,
   email: "string",
   file: (fieldSchema: FieldSchema) =>
     fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
