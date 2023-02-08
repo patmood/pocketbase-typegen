@@ -46,9 +46,11 @@ var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match r
 var EXPAND_GENERIC_NAME = "expand";
 var DATE_STRING_TYPE_NAME = `IsoDateString`;
 var RECORD_ID_STRING_NAME = `RecordIdString`;
+var HTML_STRING_NAME = `HTMLString`;
 var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
-export type ${RECORD_ID_STRING_NAME} = string`;
+export type ${RECORD_ID_STRING_NAME} = string
+export type ${HTML_STRING_NAME} = string`;
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = never> = {
 	id: ${RECORD_ID_STRING_NAME}
@@ -127,7 +129,7 @@ function getOptionValues(field) {
 var pbSchemaTypescriptMap = {
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
-  editor: "string",
+  editor: HTML_STRING_NAME,
   email: "string",
   file: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? "string[]" : "string",
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
@@ -211,10 +213,13 @@ function createResponseType(collectionSchemaEntry) {
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgsForRecord} & ${systemFields}${expandArgString}`;
 }
 function createTypeField(collectionName, fieldSchema) {
+  let typeStringOrFunc;
   if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
-    throw new Error(`unknown type ${fieldSchema.type} found in schema`);
+    console.log(`WARNING: unknown type "${fieldSchema.type}" found in schema`);
+    typeStringOrFunc = "unknown";
+  } else {
+    typeStringOrFunc = pbSchemaTypescriptMap[fieldSchema.type];
   }
-  const typeStringOrFunc = pbSchemaTypescriptMap[fieldSchema.type];
   const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
   const fieldName = sanitizeFieldName(fieldSchema.name);
   const required = fieldSchema.required ? "" : "?";
@@ -254,7 +259,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.3";
+var version = "1.1.4";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(
