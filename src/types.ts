@@ -23,6 +23,7 @@ export type FieldSchema = {
     | "json"
     | "relation"
     | "user"
+    | "editor"
   system: boolean
   required: boolean
   unique: boolean

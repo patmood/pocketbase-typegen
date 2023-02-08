@@ -55,6 +55,7 @@ const pbSchemaTypescriptMap = {
     fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
       ? `${RECORD_ID_STRING_NAME}[]`
       : RECORD_ID_STRING_NAME,
+  editor: "string"
 }
 
 export function generate(results: Array<CollectionRecord>) {
