@@ -153,13 +153,19 @@ export function createTypeField(
   collectionName: string,
   fieldSchema: FieldSchema
 ) {
+  let typeStringOrFunc:
+    | string
+    | ((fieldSchema: FieldSchema, collectionName: string) => string)
+
   if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
-    throw new Error(`unknown type ${fieldSchema.type} found in schema`)
+    console.log(`WARNING: unknown type "${fieldSchema.type}" found in schema`)
+    typeStringOrFunc = "unknown"
+  } else {
+    typeStringOrFunc =
+      pbSchemaTypescriptMap[
+        fieldSchema.type as keyof typeof pbSchemaTypescriptMap
+      ]
   }
-  const typeStringOrFunc =
-    pbSchemaTypescriptMap[
-      fieldSchema.type as keyof typeof pbSchemaTypescriptMap
-    ]
 
   const typeString =
     typeof typeStringOrFunc === "function"
