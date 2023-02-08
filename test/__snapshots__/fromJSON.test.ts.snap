@@ -69,6 +69,7 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	custom_relation_field?: RecordIdString[]
 	post_relation_field?: RecordIdString
 	select_field_no_values?: string
+	rich_editor_field?: HTMLString
 }
 
 export type PostsRecord = {
