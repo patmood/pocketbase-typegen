@@ -8,8 +8,8 @@ import { open } from "sqlite";
 import sqlite3 from "sqlite3";
 async function fromDatabase(dbPath) {
   const db = await open({
-    filename: dbPath,
-    driver: sqlite3.Database
+    driver: sqlite3.Database,
+    filename: dbPath
   });
   const result = await db.all("SELECT * FROM _collections");
   return result.map((collection) => ({
@@ -26,8 +26,8 @@ async function fromURL(url, email = "", password = "") {
   formData.append("identity", email);
   formData.append("password", password);
   const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
-    method: "post",
-    body: formData
+    body: formData,
+    method: "post"
   }).then((res) => res.json());
   const result = await fetch(`${url}/api/collections?perPage=200`, {
     headers: {
@@ -46,9 +46,11 @@ var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match r
 var EXPAND_GENERIC_NAME = "expand";
 var DATE_STRING_TYPE_NAME = `IsoDateString`;
 var RECORD_ID_STRING_NAME = `RecordIdString`;
+var HTML_STRING_NAME = `HTMLString`;
 var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
-export type ${RECORD_ID_STRING_NAME} = string`;
+export type ${RECORD_ID_STRING_NAME} = string
+export type ${HTML_STRING_NAME} = string`;
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = never> = {
 	id: ${RECORD_ID_STRING_NAME}
@@ -125,19 +127,20 @@ function getOptionValues(field) {
 
 // src/lib.ts
 var pbSchemaTypescriptMap = {
-  text: "string",
-  number: "number",
   bool: "boolean",
-  email: "string",
-  url: "string",
   date: DATE_STRING_TYPE_NAME,
+  editor: HTML_STRING_NAME,
+  email: "string",
+  file: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? "string[]" : "string",
+  json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
+  number: "number",
+  relation: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema, collectionName) => {
     const valueType = fieldSchema.options.values ? getOptionEnumName(collectionName, fieldSchema.name) : "string";
     return fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${valueType}[]` : valueType;
   },
-  json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
-  file: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? "string[]" : "string",
-  relation: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
+  text: "string",
+  url: "string",
   user: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${RECORD_ID_STRING_NAME}[]` : RECORD_ID_STRING_NAME
 };
 function generate(results) {
@@ -210,10 +213,13 @@ function createResponseType(collectionSchemaEntry) {
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgsForRecord} & ${systemFields}${expandArgString}`;
 }
 function createTypeField(collectionName, fieldSchema) {
+  let typeStringOrFunc;
   if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
-    throw new Error(`unknown type ${fieldSchema.type} found in schema`);
+    console.log(`WARNING: unknown type "${fieldSchema.type}" found in schema`);
+    typeStringOrFunc = "unknown";
+  } else {
+    typeStringOrFunc = pbSchemaTypescriptMap[fieldSchema.type];
   }
-  const typeStringOrFunc = pbSchemaTypescriptMap[fieldSchema.type];
   const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
   const fieldName = sanitizeFieldName(fieldSchema.name);
   const required = fieldSchema.required ? "" : "?";
@@ -253,7 +259,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.3";
+var version = "1.1.4";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(

@@ -205,9 +205,10 @@
         "required": false,
         "unique": false,
         "options": {
-          "maxSelect": 1,
           "collectionId": "_pb_users_auth_",
-          "cascadeDelete": false
+          "cascadeDelete": false,
+          "maxSelect": 1,
+          "displayFields": null
         }
       },
       {
@@ -218,9 +219,10 @@
         "required": false,
         "unique": false,
         "options": {
-          "maxSelect": 5,
           "collectionId": "rs7hepu8zl6kr8e",
-          "cascadeDelete": false
+          "cascadeDelete": false,
+          "maxSelect": 5,
+          "displayFields": null
         }
       },
       {
@@ -231,9 +233,10 @@
         "required": false,
         "unique": false,
         "options": {
-          "maxSelect": 1,
           "collectionId": "z6b9mssubo9megi",
-          "cascadeDelete": false
+          "cascadeDelete": false,
+          "maxSelect": 1,
+          "displayFields": null
         }
       },
       {
@@ -248,6 +251,15 @@
           "max": null,
           "pattern": ""
         }
+      },
+      {
+        "id": "g5vchf7e",
+        "name": "rich_editor_field",
+        "type": "editor",
+        "system": false,
+        "required": false,
+        "unique": false,
+        "options": {}
       }
     ],
     "listRule": "",

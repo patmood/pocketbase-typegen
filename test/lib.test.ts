@@ -289,6 +289,16 @@ describe("createTypeField", () => {
     ).toEqual("\tjsonField: null | TjsonField")
   })
 
+  it("converts editor type", () => {
+    expect(
+      createTypeField("test_collection", {
+        ...defaultFieldSchema,
+        name: "editorField",
+        type: "editor",
+      })
+    ).toEqual("\teditorField: HTMLString")
+  })
+
   it("converts file type", () => {
     expect(
       createTypeField("test_collection", {
@@ -359,14 +369,16 @@ describe("createTypeField", () => {
     ).toEqual("\tuserRelationField: RecordIdString")
   })
 
-  it("throws for unexpected types", () => {
-    expect(() =>
-      createTypeField("test_collection", {
-        ...defaultFieldSchema,
-        // @ts-ignore
-        type: "unknowntype",
-      })
-    ).toThrowError("unknown type unknowntype found in schema")
+  it("warns when encountering unexpected types", () => {
+    const logSpy = jest.spyOn(console, "log")
+    createTypeField("test_collection", {
+      ...defaultFieldSchema,
+      // @ts-ignore
+      type: "unknowntype",
+    })
+    expect(logSpy).toHaveBeenCalledWith(
+      'WARNING: unknown type "unknowntype" found in schema'
+    )
   })
 })
 
