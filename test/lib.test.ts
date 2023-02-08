@@ -11,38 +11,38 @@ import {
 
 const defaultFieldSchema: FieldSchema = {
   id: "abc",
-  system: false,
-  unique: false,
-  options: {},
   name: "defaultName",
+  options: {},
   required: true,
+  system: false,
   type: "text",
+  unique: false,
 }
 
 describe("generate", () => {
   it("generates correct output given db input", () => {
     const collections: Array<CollectionRecord> = [
       {
-        name: "books",
-        id: "123",
-        type: "base",
-        system: false,
-        listRule: null,
-        viewRule: null,
         createRule: null,
-        updateRule: null,
         deleteRule: null,
+        id: "123",
+        listRule: null,
+        name: "books",
         schema: [
           {
-            name: "title",
-            type: "text",
-            required: false,
             id: "xyz",
-            system: false,
-            unique: false,
+            name: "title",
             options: {},
+            required: false,
+            system: false,
+            type: "text",
+            unique: false,
           },
         ],
+        system: false,
+        type: "base",
+        updateRule: null,
+        viewRule: null,
       },
     ]
     const result = generate(collections)
@@ -69,13 +69,13 @@ describe("createRecordType", () => {
     const name = "books"
     const schema: FieldSchema[] = [
       {
-        system: false,
         id: "hhnwjkke",
         name: "title",
-        type: "text",
+        options: { max: null, min: null, pattern: "" },
         required: false,
+        system: false,
+        type: "text",
         unique: false,
-        options: { min: null, max: null, pattern: "" },
       },
     ]
     const result = createRecordType(name, schema)
@@ -86,13 +86,13 @@ describe("createRecordType", () => {
     const name = "books"
     const schema: FieldSchema[] = [
       {
-        system: false,
         id: "hhnwjkke",
         name: "avatars",
-        type: "file",
-        required: false,
-        unique: false,
         options: { maxSelect: 2 },
+        required: false,
+        system: false,
+        type: "file",
+        unique: false,
       },
     ]
     const result = createRecordType(name, schema)
@@ -103,26 +103,26 @@ describe("createRecordType", () => {
 describe("createResponseType", () => {
   it("creates type definition for a response", () => {
     const row: CollectionRecord = {
-      type: "base",
-      id: "123",
-      system: false,
-      listRule: null,
-      viewRule: null,
       createRule: null,
-      updateRule: null,
       deleteRule: null,
+      id: "123",
+      listRule: null,
       name: "books",
       schema: [
         {
-          system: false,
           id: "hhnwjkke",
           name: "title",
-          type: "text",
+          options: { max: null, min: null, pattern: "" },
           required: false,
+          system: false,
+          type: "text",
           unique: false,
-          options: { min: null, max: null, pattern: "" },
         },
       ],
+      system: false,
+      type: "base",
+      updateRule: null,
+      viewRule: null,
     }
 
     const result = createResponseType(row)
@@ -133,13 +133,13 @@ describe("createResponseType", () => {
     const name = "books"
     const schema: FieldSchema[] = [
       {
-        system: false,
         id: "hhnwjkke",
         name: "avatars",
-        type: "file",
-        required: false,
-        unique: false,
         options: { maxSelect: 2 },
+        required: false,
+        system: false,
+        type: "file",
+        unique: false,
       },
     ]
     const result = createRecordType(name, schema)
@@ -242,10 +242,10 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "selectFieldWithOpts",
-        type: "select",
         options: {
           values: ["one", "two", "three"],
         },
+        type: "select",
       })
     ).toEqual(`\tselectFieldWithOpts: TestCollectionSelectFieldWithOptsOptions`)
   })
@@ -255,10 +255,10 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "selectField",
-        type: "select",
         options: {
           maxSelect: 2,
         },
+        type: "select",
       })
     ).toEqual("\tselectField: string[]")
   })
@@ -268,11 +268,11 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "selectFieldWithOpts",
-        type: "select",
         options: {
-          values: ["one", "two", "three"],
           maxSelect: 2,
+          values: ["one", "two", "three"],
         },
+        type: "select",
       })
     ).toEqual(
       `\tselectFieldWithOpts: TestCollectionSelectFieldWithOptsOptions[]`
@@ -304,10 +304,10 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "fileField",
-        type: "file",
         options: {
           maxSelect: 3,
         },
+        type: "file",
       })
     ).toEqual("\tfileField: string[]")
   })
@@ -327,10 +327,10 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "relationFieldMany",
-        type: "relation",
         options: {
           maxSelect: 3,
         },
+        type: "relation",
       })
     ).toEqual("\trelationFieldMany: RecordIdString[]")
   })
@@ -340,10 +340,10 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "relationFieldMany",
-        type: "relation",
         options: {
           maxSelect: null,
         },
+        type: "relation",
       })
     ).toEqual("\trelationFieldMany: RecordIdString[]")
   })
@@ -375,13 +375,13 @@ describe("createSelectOptions", () => {
     const name = "choose"
     const schema: FieldSchema[] = [
       {
-        system: false,
         id: "hhnwjkke",
         name: "title",
-        type: "select",
-        required: false,
-        unique: false,
         options: { values: ["one", "one", "two", "space space", "$@#*(&#%"] },
+        required: false,
+        system: false,
+        type: "select",
+        unique: false,
       },
     ]
     const result = createSelectOptions(name, schema)
