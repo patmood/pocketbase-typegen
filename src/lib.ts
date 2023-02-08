@@ -25,12 +25,21 @@ import {
 } from "./utils"
 
 const pbSchemaTypescriptMap = {
-  text: "string",
-  number: "number",
   bool: "boolean",
-  email: "string",
-  url: "string",
   date: DATE_STRING_TYPE_NAME,
+  editor: "string",
+  email: "string",
+  file: (fieldSchema: FieldSchema) =>
+    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
+      ? "string[]"
+      : "string",
+  json: (fieldSchema: FieldSchema) =>
+    `null | ${fieldNameToGeneric(fieldSchema.name)}`,
+  number: "number",
+  relation: (fieldSchema: FieldSchema) =>
+    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect === 1
+      ? RECORD_ID_STRING_NAME
+      : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema: FieldSchema, collectionName: string) => {
     // pocketbase v0.8+ values are required
     const valueType = fieldSchema.options.values
@@ -40,22 +49,14 @@ const pbSchemaTypescriptMap = {
       ? `${valueType}[]`
       : valueType
   },
-  json: (fieldSchema: FieldSchema) =>
-    `null | ${fieldNameToGeneric(fieldSchema.name)}`,
-  file: (fieldSchema: FieldSchema) =>
-    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
-      ? "string[]"
-      : "string",
-  relation: (fieldSchema: FieldSchema) =>
-    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect === 1
-      ? RECORD_ID_STRING_NAME
-      : `${RECORD_ID_STRING_NAME}[]`,
+  text: "string",
+
+  url: "string",
   // DEPRECATED: PocketBase v0.8 does not have a dedicated user relation
   user: (fieldSchema: FieldSchema) =>
     fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
       ? `${RECORD_ID_STRING_NAME}[]`
       : RECORD_ID_STRING_NAME,
-  editor: "string"
 }
 
 export function generate(results: Array<CollectionRecord>) {

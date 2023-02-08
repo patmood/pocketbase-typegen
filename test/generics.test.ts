@@ -9,39 +9,39 @@ import { FieldSchema } from "../src/types"
 
 const textField: FieldSchema = {
   id: "1",
-  system: false,
-  unique: false,
-  options: {},
   name: "field1",
+  options: {},
   required: true,
+  system: false,
   type: "text",
+  unique: false,
 }
 const jsonField1: FieldSchema = {
   id: "2",
-  system: false,
-  unique: false,
-  options: {},
   name: "data1",
+  options: {},
   required: true,
+  system: false,
   type: "json",
+  unique: false,
 }
 const jsonField2: FieldSchema = {
   id: "3",
-  system: false,
-  unique: false,
-  options: {},
   name: "data2",
+  options: {},
   required: true,
+  system: false,
   type: "json",
+  unique: false,
 }
 const expandField: FieldSchema = {
   id: "4",
-  system: false,
-  unique: false,
-  options: {},
   name: "post_relation_field",
+  options: {},
   required: true,
+  system: false,
   type: "relation",
+  unique: false,
 }
 
 describe("getGenericArgList", () => {

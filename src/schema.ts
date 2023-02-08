@@ -9,8 +9,8 @@ export async function fromDatabase(
   dbPath: string
 ): Promise<Array<CollectionRecord>> {
   const db = await open({
-    filename: dbPath,
     driver: sqlite3.Database,
+    filename: dbPath,
   })
   const result = await db.all("SELECT * FROM _collections")
   return result.map((collection) => ({
@@ -35,9 +35,10 @@ export async function fromURL(
 
   // Login
   const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
-    method: "post",
     // @ts-ignore
-    body: formData,
+body: formData,
+    
+    method: "post",
   }).then((res) => res.json())
 
   // Get the collection
