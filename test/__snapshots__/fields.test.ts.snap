@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createSelectOptions creates enum types for select options 1`] = `
+"export enum ChooseTitleOptions {
+	"one" = "one",
+	"two" = "two",
+	"space space" = "space space",
+	"$@#*(&#%" = "$@#*(&#%",
+}
+"
+`;
