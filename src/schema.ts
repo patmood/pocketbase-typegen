@@ -36,8 +36,7 @@ export async function fromURL(
   // Login
   const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
     // @ts-ignore
-body: formData,
-    
+    body: formData,
     method: "post",
   }).then((res) => res.json())
 

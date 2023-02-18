@@ -18,6 +18,10 @@
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/ban-ts-comment": "off",
-    "sort-keys-fix/sort-keys-fix": "warn"
+    "sort-keys-fix/sort-keys-fix": [
+      "warn",
+      "asc",
+      { "allowLineSeparatedGroups": true }
+    ]
   }
 }

@@ -34,16 +34,6 @@ exports[`createResponseType handles file fields with multiple files 1`] = `
 }"
 `;
 
-exports[`createSelectOptions creates enum types for select options 1`] = `
-"export enum ChooseTitleOptions {
-	"one" = "one",
-	"two" = "two",
-	"space space" = "space space",
-	"$@#*(&#%" = "$@#*(&#%",
-}
-"
-`;
-
 exports[`generate generates correct output given db input 1`] = `
 "/**
 * This file was @generated using pocketbase-typegen
