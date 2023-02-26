@@ -66,6 +66,12 @@ var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
 	username: string
 	verified: boolean
 } & BaseSystemFields<T>`;
+var VIEW_SYSTEM_FIELDS_DEFINITION = `export type ViewSystemFields<T = never> = {
+  	id: ${RECORD_ID_STRING_NAME}
+  	collectionId: string
+  	collectionName: Collections
+  	expand?: T
+}`;
 
 // src/generics.ts
 function fieldNameToGeneric(name) {
@@ -113,7 +119,14 @@ async function saveFile(outPath, typeString) {
   console.log(`Created typescript definitions at ${outPath}`);
 }
 function getSystemFields(type) {
-  return type === "auth" ? "AuthSystemFields" : "BaseSystemFields";
+  switch (type) {
+    case "auth":
+      return "AuthSystemFields";
+    case "view":
+      return "ViewSystemFields";
+    default:
+      return "BaseSystemFields";
+  }
 }
 function getOptionEnumName(recordName, fieldName) {
   return `${toPascalCase(recordName)}${toPascalCase(fieldName)}Options`;
@@ -125,37 +138,54 @@ function getOptionValues(field) {
   return values.filter((val, i) => values.indexOf(val) === i);
 }
 
-// src/lib.ts
+// src/fields.ts
 var pbSchemaTypescriptMap = {
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
   editor: HTML_STRING_NAME,
   email: "string",
+  text: "string",
+  url: "string",
+  number: "number",
   file: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? "string[]" : "string",
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
-  number: "number",
   relation: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema, collectionName) => {
     const valueType = fieldSchema.options.values ? getOptionEnumName(collectionName, fieldSchema.name) : "string";
     return fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${valueType}[]` : valueType;
   },
-  text: "string",
-  url: "string",
   user: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${RECORD_ID_STRING_NAME}[]` : RECORD_ID_STRING_NAME
 };
+function createTypeField(collectionName, fieldSchema) {
+  let typeStringOrFunc;
+  if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
+    console.log(`WARNING: unknown type "${fieldSchema.type}" found in schema`);
+    typeStringOrFunc = "unknown";
+  } else {
+    typeStringOrFunc = pbSchemaTypescriptMap[fieldSchema.type];
+  }
+  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
+  const fieldName = sanitizeFieldName(fieldSchema.name);
+  const required = fieldSchema.required ? "" : "?";
+  return `	${fieldName}${required}: ${typeString}`;
+}
+function createSelectOptions(recordName, schema) {
+  const selectFields = schema.filter((field) => field.type === "select");
+  const typestring = selectFields.map(
+    (field) => `export enum ${getOptionEnumName(recordName, field.name)} {
+${getOptionValues(field).map((val) => `	"${val}" = "${val}",`).join("\n")}
+}
+`
+  ).join("\n");
+  return typestring;
+}
+
+// src/lib.ts
 function generate(results) {
   const collectionNames = [];
   const recordTypes = [];
   const responseTypes = [RESPONSE_TYPE_COMMENT];
-  results.sort((a, b) => {
-    if (a.name < b.name) {
-      return -1;
-    }
-    if (a.name > b.name) {
-      return 1;
-    }
-    return 0;
-  }).forEach((row) => {
+  results.sort((a, b) => a.name <= b.name ? -1 : 1).forEach((row) => {
     if (row.name)
       collectionNames.push(row.name);
     if (row.schema) {
@@ -170,6 +200,7 @@ function generate(results) {
     ALIAS_TYPE_DEFINITIONS,
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
+    VIEW_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
     responseTypes.join("\n"),
@@ -212,29 +243,6 @@ function createResponseType(collectionSchemaEntry) {
   const expandArgString = canExpand(schema) ? `<T${EXPAND_GENERIC_NAME}>` : "";
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgsForRecord} & ${systemFields}${expandArgString}`;
 }
-function createTypeField(collectionName, fieldSchema) {
-  let typeStringOrFunc;
-  if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
-    console.log(`WARNING: unknown type "${fieldSchema.type}" found in schema`);
-    typeStringOrFunc = "unknown";
-  } else {
-    typeStringOrFunc = pbSchemaTypescriptMap[fieldSchema.type];
-  }
-  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
-  const fieldName = sanitizeFieldName(fieldSchema.name);
-  const required = fieldSchema.required ? "" : "?";
-  return `	${fieldName}${required}: ${typeString}`;
-}
-function createSelectOptions(recordName, schema) {
-  const selectFields = schema.filter((field) => field.type === "select");
-  const typestring = selectFields.map(
-    (field) => `export enum ${getOptionEnumName(recordName, field.name)} {
-${getOptionValues(field).map((val) => `	"${val}" = "${val}",`).join("\n")}
-}
-`
-  ).join("\n");
-  return typestring;
-}
 
 // src/cli.ts
 async function main(options2) {
@@ -259,7 +267,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.4";
+var version = "1.1.5";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(
