@@ -32,7 +32,7 @@ export type FieldSchema = {
 
 export type CollectionRecord = {
   id: string
-  type: "base" | "auth"
+  type: "base" | "auth" | "view"
   name: string
   system: boolean
   listRule: string | null

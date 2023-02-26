@@ -207,6 +207,7 @@
         "options": {
           "collectionId": "_pb_users_auth_",
           "cascadeDelete": false,
+          "minSelect": null,
           "maxSelect": 1,
           "displayFields": null
         }
@@ -221,6 +222,7 @@
         "options": {
           "collectionId": "rs7hepu8zl6kr8e",
           "cascadeDelete": false,
+          "minSelect": null,
           "maxSelect": 5,
           "displayFields": null
         }
@@ -235,6 +237,7 @@
         "options": {
           "collectionId": "z6b9mssubo9megi",
           "cascadeDelete": false,
+          "minSelect": null,
           "maxSelect": 1,
           "displayFields": null
         }
@@ -323,11 +326,11 @@
         }
       }
     ],
-    "listRule": null,
-    "viewRule": null,
-    "createRule": null,
-    "updateRule": null,
-    "deleteRule": null,
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "",
+    "updateRule": "",
+    "deleteRule": "",
     "options": {}
   },
   {
@@ -392,5 +395,58 @@
     "updateRule": null,
     "deleteRule": null,
     "options": {}
+  },
+  {
+    "id": "ngpunwfmpl9x50r",
+    "name": "my_view",
+    "type": "view",
+    "system": false,
+    "schema": [
+      {
+        "id": "iwh5jvyg",
+        "name": "post_relation_field",
+        "type": "relation",
+        "system": false,
+        "required": false,
+        "unique": false,
+        "options": {
+          "collectionId": "z6b9mssubo9megi",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "id": "ze7zu2ji",
+        "name": "text_field",
+        "type": "text",
+        "system": false,
+        "required": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "id": "pbwoyo77",
+        "name": "json_field",
+        "type": "json",
+        "system": false,
+        "required": false,
+        "unique": false,
+        "options": {}
+      }
+    ],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {
+      "query": "select id, post_relation_field, text_field, json_field from everything"
+    }
   }
 ]

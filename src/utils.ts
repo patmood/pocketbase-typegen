@@ -26,7 +26,14 @@ export async function saveFile(outPath: string, typeString: string) {
 }
 
 export function getSystemFields(type: CollectionRecord["type"]) {
-  return type === "auth" ? "AuthSystemFields" : "BaseSystemFields"
+  switch (type) {
+    case "auth":
+      return "AuthSystemFields"
+    case "view":
+      return "ViewSystemFields"
+    default:
+      return "BaseSystemFields"
+  }
 }
 
 export function getOptionEnumName(recordName: string, fieldName: string) {

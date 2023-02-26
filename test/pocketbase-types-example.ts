@@ -6,6 +6,7 @@ export enum Collections {
 	Base = "base",
 	CustomAuth = "custom_auth",
 	Everything = "everything",
+	MyView = "my_view",
 	Posts = "posts",
 	Users = "users",
 }
@@ -31,6 +32,13 @@ export type AuthSystemFields<T = never> = {
 	username: string
 	verified: boolean
 } & BaseSystemFields<T>
+
+export type ViewSystemFields<T = never> = {
+  	id: RecordIdString
+  	collectionId: string
+  	collectionName: Collections
+  	expand?: T
+}
 
 // Record types for each collection
 
@@ -69,6 +77,12 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	rich_editor_field?: HTMLString
 }
 
+export type MyViewRecord<Tjson_field = unknown> = {
+	post_relation_field?: RecordIdString
+	text_field?: string
+	json_field?: null | Tjson_field
+}
+
 export type PostsRecord = {
 	field?: string
 	nonempty_field: string
@@ -85,6 +99,7 @@ export type UsersRecord = {
 export type BaseResponse = BaseRecord & BaseSystemFields
 export type CustomAuthResponse = CustomAuthRecord & AuthSystemFields
 export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, Texpand = unknown> = EverythingRecord<Tanother_json_field, Tjson_field> & BaseSystemFields<Texpand>
+export type MyViewResponse<Tjson_field = unknown, Texpand = unknown> = MyViewRecord<Tjson_field> & ViewSystemFields<Texpand>
 export type PostsResponse = PostsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 
@@ -92,6 +107,7 @@ export type CollectionRecords = {
 	base: BaseRecord
 	custom_auth: CustomAuthRecord
 	everything: EverythingRecord
+	my_view: MyViewRecord
 	posts: PostsRecord
 	users: UsersRecord
 }
