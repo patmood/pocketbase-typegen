@@ -65,6 +65,13 @@ export type AuthSystemFields<T = never> = {
 	verified: boolean
 } & BaseSystemFields<T>
 
+export type ViewSystemFields<T = never> = {
+  	id: RecordIdString
+  	collectionId: string
+  	collectionName: Collections
+  	expand?: T
+}
+
 // Record types for each collection
 
 export type BooksRecord = {

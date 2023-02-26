@@ -28,3 +28,10 @@ export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = n
 \tusername: string
 \tverified: boolean
 } & BaseSystemFields<T>`
+
+export const VIEW_SYSTEM_FIELDS_DEFINITION = `export type ViewSystemFields<T = never> = {
+  \tid: ${RECORD_ID_STRING_NAME}
+  \tcollectionId: string
+  \tcollectionName: Collections
+  \texpand?: T
+}`
