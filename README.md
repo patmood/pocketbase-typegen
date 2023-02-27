@@ -57,6 +57,7 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
 - `[CollectionName]Response` One response type for each collection (eg ProfilesResponse) which includes system fields. This is what is returned from the PocketBase API.
   - `[CollectionName][FieldName]Options` If the collection contains a select field with set values, an enum of the options will be generated.
 - `CollectionRecords` A type mapping each collection name to the record type.
+- `CollectionResponses` A type mapping each collection name to the response type.
 
 ## Example Usage
 
@@ -78,8 +79,8 @@ import { Collections, CommentsResponse, UserResponse } from "./pocketbase-types"
 /**
   type CommentsRecord<Tmetadata = unknown> = {
     text: string
-    metadata: null | Tmetadata
-    user: RecordIdString
+    metadata: null | Tmetadata // This is a json field
+    user: RecordIdString // This is a relation field
   }
 */
 type Tmetadata = {
@@ -95,3 +96,7 @@ const result = await pb
 // Now you can access the expanded relation with type safety and hints in your IDE
 result.expand?.user.username
 ```
+
+## Status
+
+![](https://github.com/patmood/pocketbase-typegen/actions/workflows/test.yml/badge.svg?branch=main) ![](https://github.com/patmood/pocketbase-typegen/actions/workflows/integration.yml/badge.svg?branch=main)

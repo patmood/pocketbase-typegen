@@ -1,11 +1,5 @@
 import { CollectionRecord, FieldSchema } from "../src/types"
-import {
-  createCollectionEnum,
-  createCollectionRecords,
-  createRecordType,
-  createResponseType,
-  generate,
-} from "../src/lib"
+import { createRecordType, createResponseType, generate } from "../src/lib"
 
 describe("generate", () => {
   it("generates correct output given db input", () => {
@@ -35,20 +29,6 @@ describe("generate", () => {
     ]
     const result = generate(collections)
     expect(result).toMatchSnapshot()
-  })
-})
-
-describe("createCollectionEnum", () => {
-  it("creates enum of collection names", () => {
-    const names = ["book", "magazine"]
-    expect(createCollectionEnum(names)).toMatchSnapshot()
-  })
-})
-
-describe("createCollectionRecord", () => {
-  it("creates mapping of collection name to record type", () => {
-    const names = ["book", "magazine"]
-    expect(createCollectionRecords(names)).toMatchSnapshot()
   })
 })
 

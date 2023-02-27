@@ -1,5 +1,6 @@
 import {
   ALIAS_TYPE_DEFINITIONS,
+  ALL_RECORD_RESPONSE_COMMENT,
   AUTH_SYSTEM_FIELDS_DEFINITION,
   BASE_SYSTEM_FIELDS_DEFINITION,
   EXPAND_GENERIC_NAME,
@@ -14,6 +15,11 @@ import {
   getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
 } from "./generics"
+import {
+  createCollectionEnum,
+  createCollectionRecords,
+  createCollectionResponses,
+} from "./collections"
 import { createSelectOptions, createTypeField } from "./fields"
 import { getSystemFields, toPascalCase } from "./utils"
 
@@ -43,31 +49,12 @@ export function generate(results: Array<CollectionRecord>): string {
     RECORD_TYPE_COMMENT,
     ...recordTypes,
     responseTypes.join("\n"),
+    ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
+    createCollectionResponses(sortedCollectionNames),
   ]
 
   return fileParts.join("\n\n")
-}
-
-export function createCollectionEnum(collectionNames: Array<string>): string {
-  const collections = collectionNames
-    .map((name) => `\t${toPascalCase(name)} = "${name}",`)
-    .join("\n")
-  const typeString = `export enum Collections {
-${collections}
-}`
-  return typeString
-}
-
-export function createCollectionRecords(
-  collectionNames: Array<string>
-): string {
-  const nameRecordMap = collectionNames
-    .map((name) => `\t${name}: ${toPascalCase(name)}Record`)
-    .join("\n")
-  return `export type CollectionRecords = {
-${nameRecordMap}
-}`
 }
 
 export function createRecordType(
