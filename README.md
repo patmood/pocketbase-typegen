@@ -57,6 +57,7 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
 - `[CollectionName]Response` One response type for each collection (eg ProfilesResponse) which includes system fields. This is what is returned from the PocketBase API.
   - `[CollectionName][FieldName]Options` If the collection contains a select field with set values, an enum of the options will be generated.
 - `CollectionRecords` A type mapping each collection name to the record type.
+- `CollectionResponses` A type mapping each collection name to the response type.
 
 ## Example Usage
 
