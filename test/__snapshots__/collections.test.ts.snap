@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createCollectionEnum creates enum of collection names 1`] = `
+"export enum Collections {
+	Book = "book",
+	Magazine = "magazine",
+}"
+`;
+
+exports[`createCollectionRecords creates mapping of collection name to record type 1`] = `
+"export type CollectionRecords = {
+	book: BookRecord
+	magazine: MagazineRecord
+}"
+`;
+
+exports[`createCollectionResponses creates mapping of collection name to response type 1`] = `
+"export type CollectionResponses = {
+	book: BookResponse
+	magazine: MagazineResponse
+}"
+`;

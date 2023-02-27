@@ -106,6 +106,8 @@ export type MyViewResponse<Tjson_field = unknown, Texpand = unknown> = MyViewRec
 export type PostsResponse = PostsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 
+// Types containing all Records and Responses, useful for creating typing helper functions
+
 export type CollectionRecords = {
 	base: BaseRecord
 	custom_auth: CustomAuthRecord
@@ -113,5 +115,14 @@ export type CollectionRecords = {
 	my_view: MyViewRecord
 	posts: PostsRecord
 	users: UsersRecord
+}
+
+export type CollectionResponses = {
+	base: BaseResponse
+	custom_auth: CustomAuthResponse
+	everything: EverythingResponse
+	my_view: MyViewResponse
+	posts: PostsResponse
+	users: UsersResponse
 }"
 `;

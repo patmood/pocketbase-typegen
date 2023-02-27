@@ -1,19 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`createCollectionEnum creates enum of collection names 1`] = `
-"export enum Collections {
-	Book = "book",
-	Magazine = "magazine",
-}"
-`;
-
-exports[`createCollectionRecord creates mapping of collection name to record type 1`] = `
-"export type CollectionRecords = {
-	book: BookRecord
-	magazine: MagazineRecord
-}"
-`;
-
 exports[`createRecordType creates type definition for a record 1`] = `
 "export type BooksRecord = {
 	title?: string
@@ -81,7 +67,13 @@ export type BooksRecord = {
 // Response types include system fields and match responses from the PocketBase API
 export type BooksResponse = BooksRecord & BaseSystemFields
 
+// Types containing all Records and Responses, useful for creating typing helper functions
+
 export type CollectionRecords = {
 	books: BooksRecord
+}
+
+export type CollectionResponses = {
+	books: BooksResponse
 }"
 `;

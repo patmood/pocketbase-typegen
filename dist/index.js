@@ -43,6 +43,7 @@ var EXPORT_COMMENT = `/**
 */`;
 var RECORD_TYPE_COMMENT = `// Record types for each collection`;
 var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
+var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
 var EXPAND_GENERIC_NAME = "expand";
 var DATE_STRING_TYPE_NAME = `IsoDateString`;
 var RECORD_ID_STRING_NAME = `RecordIdString`;
@@ -138,6 +139,27 @@ function getOptionValues(field) {
   return values.filter((val, i) => values.indexOf(val) === i);
 }
 
+// src/collections.ts
+function createCollectionEnum(collectionNames) {
+  const collections = collectionNames.map((name) => `	${toPascalCase(name)} = "${name}",`).join("\n");
+  const typeString = `export enum Collections {
+${collections}
+}`;
+  return typeString;
+}
+function createCollectionRecords(collectionNames) {
+  const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Record`).join("\n");
+  return `export type CollectionRecords = {
+${nameRecordMap}
+}`;
+}
+function createCollectionResponses(collectionNames) {
+  const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Response`).join("\n");
+  return `export type CollectionResponses = {
+${nameRecordMap}
+}`;
+}
+
 // src/fields.ts
 var pbSchemaTypescriptMap = {
   bool: "boolean",
@@ -204,22 +226,11 @@ function generate(results) {
     RECORD_TYPE_COMMENT,
     ...recordTypes,
     responseTypes.join("\n"),
-    createCollectionRecords(sortedCollectionNames)
+    ALL_RECORD_RESPONSE_COMMENT,
+    createCollectionRecords(sortedCollectionNames),
+    createCollectionResponses(sortedCollectionNames)
   ];
   return fileParts.join("\n\n");
-}
-function createCollectionEnum(collectionNames) {
-  const collections = collectionNames.map((name) => `	${toPascalCase(name)} = "${name}",`).join("\n");
-  const typeString = `export enum Collections {
-${collections}
-}`;
-  return typeString;
-}
-function createCollectionRecords(collectionNames) {
-  const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Record`).join("\n");
-  return `export type CollectionRecords = {
-${nameRecordMap}
-}`;
 }
 function createRecordType(name, schema) {
   const selectOptionEnums = createSelectOptions(name, schema);
@@ -267,7 +278,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.5";
+var version = "1.1.6";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(

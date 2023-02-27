@@ -78,8 +78,8 @@ import { Collections, CommentsResponse, UserResponse } from "./pocketbase-types"
 /**
   type CommentsRecord<Tmetadata = unknown> = {
     text: string
-    metadata: null | Tmetadata
-    user: RecordIdString
+    metadata: null | Tmetadata // This is a json field
+    user: RecordIdString // This is a relation field
   }
 */
 type Tmetadata = {
