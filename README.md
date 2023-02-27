@@ -95,3 +95,7 @@ const result = await pb
 // Now you can access the expanded relation with type safety and hints in your IDE
 result.expand?.user.username
 ```
+
+## Status
+
+![](https://github.com/patmood/pocketbase-typegen/actions/workflows/test.yml/badge.svg?branch=main) ![](https://github.com/patmood/pocketbase-typegen/actions/workflows/integration.yml/badge.svg?branch=main)
