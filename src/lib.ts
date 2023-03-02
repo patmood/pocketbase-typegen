@@ -7,7 +7,6 @@ import {
   EXPORT_COMMENT,
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
-  VIEW_SYSTEM_FIELDS_DEFINITION,
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
 import {
@@ -45,7 +44,6 @@ export function generate(results: Array<CollectionRecord>): string {
     ALIAS_TYPE_DEFINITIONS,
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
-    VIEW_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
     responseTypes.join("\n"),

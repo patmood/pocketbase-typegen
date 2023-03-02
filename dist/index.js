@@ -67,12 +67,6 @@ var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
 	username: string
 	verified: boolean
 } & BaseSystemFields<T>`;
-var VIEW_SYSTEM_FIELDS_DEFINITION = `export type ViewSystemFields<T = never> = {
-  	id: ${RECORD_ID_STRING_NAME}
-  	collectionId: string
-  	collectionName: Collections
-  	expand?: T
-}`;
 
 // src/generics.ts
 function fieldNameToGeneric(name) {
@@ -123,8 +117,6 @@ function getSystemFields(type) {
   switch (type) {
     case "auth":
       return "AuthSystemFields";
-    case "view":
-      return "ViewSystemFields";
     default:
       return "BaseSystemFields";
   }
@@ -222,7 +214,6 @@ function generate(results) {
     ALIAS_TYPE_DEFINITIONS,
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
-    VIEW_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
     responseTypes.join("\n"),
@@ -278,7 +269,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.6";
+var version = "1.1.7";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(

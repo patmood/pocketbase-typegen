@@ -29,9 +29,8 @@ export function getSystemFields(type: CollectionRecord["type"]) {
   switch (type) {
     case "auth":
       return "AuthSystemFields"
-    case "view":
-      return "ViewSystemFields"
     default:
+      // `view` and `base` collection types share the same system fields (for now)
       return "BaseSystemFields"
   }
 }

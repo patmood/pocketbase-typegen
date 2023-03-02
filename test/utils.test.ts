@@ -33,9 +33,9 @@ describe("sanitizeFieldName", () => {
 
 describe("getSystemFields", () => {
   it("returns the system field type name for a given collection type", () => {
-    expect(getSystemFields("base")).toBe("BaseSystemFields")
     expect(getSystemFields("auth")).toBe("AuthSystemFields")
-    expect(getSystemFields("view")).toBe("ViewSystemFields")
+    expect(getSystemFields("base")).toBe("BaseSystemFields")
+    expect(getSystemFields("view")).toBe("BaseSystemFields")
   })
 })
 

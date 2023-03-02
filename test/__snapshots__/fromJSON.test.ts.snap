@@ -36,13 +36,6 @@ export type AuthSystemFields<T = never> = {
 	verified: boolean
 } & BaseSystemFields<T>
 
-export type ViewSystemFields<T = never> = {
-  	id: RecordIdString
-  	collectionId: string
-  	collectionName: Collections
-  	expand?: T
-}
-
 // Record types for each collection
 
 export type BaseRecord = {
@@ -102,7 +95,7 @@ export type UsersRecord = {
 export type BaseResponse = BaseRecord & BaseSystemFields
 export type CustomAuthResponse = CustomAuthRecord & AuthSystemFields
 export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, Texpand = unknown> = EverythingRecord<Tanother_json_field, Tjson_field> & BaseSystemFields<Texpand>
-export type MyViewResponse<Tjson_field = unknown, Texpand = unknown> = MyViewRecord<Tjson_field> & ViewSystemFields<Texpand>
+export type MyViewResponse<Tjson_field = unknown, Texpand = unknown> = MyViewRecord<Tjson_field> & BaseSystemFields<Texpand>
 export type PostsResponse = PostsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 
