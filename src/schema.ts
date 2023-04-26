@@ -32,20 +32,32 @@ export async function fromURL(
   const formData = new FormData()
   formData.append("identity", email)
   formData.append("password", password)
+  let collections: Array<CollectionRecord> = []
+  try {
+    // Login
+    const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
+      // @ts-ignore
+      body: formData,
+      method: "post",
+    }).then((res) => {
+      if (!res.ok) throw res
+      return res.json()
+    })
 
-  // Login
-  const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
-    // @ts-ignore
-    body: formData,
-    method: "post",
-  }).then((res) => res.json())
+    // Get the collections
+    const result = await fetch(`${url}/api/collections?perPage=200`, {
+      headers: {
+        Authorization: token,
+      },
+    }).then((res) => {
+      if (!res.ok) throw res
+      return res.json()
+    })
+    collections = result.items
+  } catch (error) {
+    console.error(error)
+    process.exit(1)
+  }
 
-  // Get the collection
-  const result = await fetch(`${url}/api/collections?perPage=200`, {
-    headers: {
-      Authorization: token,
-    },
-  }).then((res) => res.json())
-
-  return result.items as Array<CollectionRecord>
+  return collections
 }

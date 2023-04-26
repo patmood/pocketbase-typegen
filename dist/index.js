@@ -25,16 +25,31 @@ async function fromURL(url, email = "", password = "") {
   const formData = new FormData();
   formData.append("identity", email);
   formData.append("password", password);
-  const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
-    body: formData,
-    method: "post"
-  }).then((res) => res.json());
-  const result = await fetch(`${url}/api/collections?perPage=200`, {
-    headers: {
-      Authorization: token
-    }
-  }).then((res) => res.json());
-  return result.items;
+  let collections = [];
+  try {
+    const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
+      body: formData,
+      method: "post"
+    }).then((res) => {
+      if (!res.ok)
+        throw res;
+      return res.json();
+    });
+    const result = await fetch(`${url}/api/collections?perPage=200`, {
+      headers: {
+        Authorization: token
+      }
+    }).then((res) => {
+      if (!res.ok)
+        throw res;
+      return res.json();
+    });
+    collections = result.items;
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+  return collections;
 }
 
 // src/constants.ts
@@ -269,7 +284,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.7";
+var version = "1.1.8";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(
