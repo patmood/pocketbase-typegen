@@ -11,4 +11,11 @@ node ./dist/index.js --url http://0.0.0.0:8090 --email test@test.com --password 
 node ./dist/index.js --db pb_data/data.db --out output/pocketbase-types-db.ts
 
 node integration.js
-echo "Integration tests pass"
+exit_status=$?
+
+if [ $exit_status -eq 0 ]; then
+  echo "Integration tests pass"
+else
+  echo "FAIL integration tests"
+  exit $exit_status
+fi
