@@ -18,6 +18,7 @@ RUN apk add --no-cache \
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip /tmp/pocketbase.zip
 RUN unzip /tmp/pocketbase.zip -d /app/
 
+# Install dependencies for the pocketbase-typegen package
 COPY package.json package-lock.json ./
 RUN npm ci
 

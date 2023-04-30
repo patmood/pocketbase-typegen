@@ -245,9 +245,9 @@ function createRecordType(name, schema) {
     includeExpand: false
   });
   const fields = schema.map((fieldSchema) => createTypeField(name, fieldSchema)).join("\n");
-  return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = {
+  return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = ${fields ? `{
 ${fields}
-}`;
+}` : "never"}`;
 }
 function createResponseType(collectionSchemaEntry) {
   const { name, schema, type } = collectionSchemaEntry;
