@@ -258,7 +258,7 @@ function createResponseType(collectionSchemaEntry) {
   const genericArgsForRecord = getGenericArgStringForRecord(schema);
   const systemFields = getSystemFields(type);
   const expandArgString = canExpand(schema) ? `<T${EXPAND_GENERIC_NAME}>` : "";
-  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgsForRecord} & ${systemFields}${expandArgString}`;
+  return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`;
 }
 
 // src/cli.ts
@@ -284,7 +284,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.8";
+var version = "1.1.9";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(

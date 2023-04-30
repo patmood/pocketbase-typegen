@@ -85,5 +85,5 @@ export function createResponseType(
   const systemFields = getSystemFields(type)
   const expandArgString = canExpand(schema) ? `<T${EXPAND_GENERIC_NAME}>` : ""
 
-  return `export type ${pascaleName}Response${genericArgsWithDefaults} = ${pascaleName}Record${genericArgsForRecord} & ${systemFields}${expandArgString}`
+  return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`
 }
