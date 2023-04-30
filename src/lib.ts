@@ -68,9 +68,13 @@ export function createRecordType(
     .map((fieldSchema: FieldSchema) => createTypeField(name, fieldSchema))
     .join("\n")
 
-  return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = {
+  return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = ${
+    fields
+      ? `{
 ${fields}
 }`
+      : "never"
+  }`
 }
 
 export function createResponseType(
