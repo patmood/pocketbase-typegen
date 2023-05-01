@@ -1,5 +1,56 @@
 [
   {
+    "id": "ngpunwfmpl9x50r",
+    "name": "my_view",
+    "type": "view",
+    "system": false,
+    "schema": [
+      {
+        "id": "iwh5jvyg",
+        "name": "post_relation_field",
+        "type": "relation",
+        "system": false,
+        "required": false,
+        "options": {
+          "collectionId": "z6b9mssubo9megi",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "id": "ze7zu2ji",
+        "name": "text_field",
+        "type": "text",
+        "system": false,
+        "required": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "id": "pbwoyo77",
+        "name": "json_field",
+        "type": "json",
+        "system": false,
+        "required": false,
+        "options": {}
+      }
+    ],
+    "indexes": [],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {
+      "query": "select id, post_relation_field, text_field, json_field from everything"
+    }
+  },
+  {
     "id": "_pb_users_auth_",
     "name": "users",
     "type": "auth",
@@ -11,7 +62,6 @@
         "type": "text",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "min": null,
           "max": null,
@@ -24,7 +74,6 @@
         "type": "file",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "maxSelect": 1,
           "maxSize": 5242880,
@@ -35,9 +84,13 @@
             "image/svg+xml",
             "image/gif"
           ],
-          "thumbs": null
+          "thumbs": null,
+          "protected": false
         }
       }
+    ],
+    "indexes": [
+      "CREATE INDEX `__pb_users_auth__created_idx` ON `users` (`created`)"
     ],
     "listRule": "id = @request.auth.id",
     "viewRule": "id = @request.auth.id",
@@ -67,7 +120,6 @@
         "type": "text",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "min": null,
           "max": null,
@@ -80,7 +132,6 @@
         "type": "number",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "min": null,
           "max": null
@@ -92,7 +143,6 @@
         "type": "bool",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {}
       },
       {
@@ -101,7 +151,6 @@
         "type": "email",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "exceptDomains": [],
           "onlyDomains": []
@@ -113,7 +162,6 @@
         "type": "url",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "exceptDomains": null,
           "onlyDomains": null
@@ -125,7 +173,6 @@
         "type": "date",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "min": "",
           "max": ""
@@ -137,7 +184,6 @@
         "type": "select",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "maxSelect": 1,
           "values": [
@@ -157,7 +203,6 @@
         "type": "json",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {}
       },
       {
@@ -166,7 +211,6 @@
         "type": "json",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {}
       },
       {
@@ -175,12 +219,12 @@
         "type": "file",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "maxSelect": 1,
           "maxSize": 5242880,
           "mimeTypes": [],
-          "thumbs": []
+          "thumbs": [],
+          "protected": false
         }
       },
       {
@@ -189,12 +233,12 @@
         "type": "file",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "maxSelect": 3,
           "maxSize": 5242880,
           "mimeTypes": [],
-          "thumbs": []
+          "thumbs": [],
+          "protected": false
         }
       },
       {
@@ -203,7 +247,6 @@
         "type": "relation",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "collectionId": "_pb_users_auth_",
           "cascadeDelete": false,
@@ -218,7 +261,6 @@
         "type": "relation",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "collectionId": "rs7hepu8zl6kr8e",
           "cascadeDelete": false,
@@ -233,7 +275,6 @@
         "type": "relation",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "collectionId": "z6b9mssubo9megi",
           "cascadeDelete": false,
@@ -248,7 +289,6 @@
         "type": "text",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "min": null,
           "max": null,
@@ -261,9 +301,11 @@
         "type": "editor",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {}
       }
+    ],
+    "indexes": [
+      "CREATE INDEX `_8uexthr74u6jat4_created_idx` ON `everything` (`created`)"
     ],
     "listRule": "",
     "viewRule": "",
@@ -284,7 +326,6 @@
         "type": "text",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "min": null,
           "max": null,
@@ -297,7 +338,6 @@
         "type": "text",
         "system": false,
         "required": true,
-        "unique": false,
         "options": {
           "min": null,
           "max": null,
@@ -310,7 +350,6 @@
         "type": "bool",
         "system": false,
         "required": true,
-        "unique": false,
         "options": {}
       },
       {
@@ -319,12 +358,14 @@
         "type": "number",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "min": null,
           "max": null
         }
       }
+    ],
+    "indexes": [
+      "CREATE INDEX `_z6b9mssubo9megi_created_idx` ON `posts` (`created`)"
     ],
     "listRule": "",
     "viewRule": "",
@@ -345,13 +386,15 @@
         "type": "text",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "min": null,
           "max": null,
           "pattern": ""
         }
       }
+    ],
+    "indexes": [
+      "CREATE INDEX `_rs7hepu8zl6kr8e_created_idx` ON `custom_auth` (`created`)"
     ],
     "listRule": null,
     "viewRule": null,
@@ -381,13 +424,15 @@
         "type": "text",
         "system": false,
         "required": false,
-        "unique": false,
         "options": {
           "min": null,
           "max": null,
           "pattern": ""
         }
       }
+    ],
+    "indexes": [
+      "CREATE INDEX `_kr8109mcfuu18qq_created_idx` ON `base` (`created`)"
     ],
     "listRule": null,
     "viewRule": null,
@@ -395,58 +440,5 @@
     "updateRule": null,
     "deleteRule": null,
     "options": {}
-  },
-  {
-    "id": "ngpunwfmpl9x50r",
-    "name": "my_view",
-    "type": "view",
-    "system": false,
-    "schema": [
-      {
-        "id": "iwh5jvyg",
-        "name": "post_relation_field",
-        "type": "relation",
-        "system": false,
-        "required": false,
-        "unique": false,
-        "options": {
-          "collectionId": "z6b9mssubo9megi",
-          "cascadeDelete": false,
-          "minSelect": null,
-          "maxSelect": 1,
-          "displayFields": null
-        }
-      },
-      {
-        "id": "ze7zu2ji",
-        "name": "text_field",
-        "type": "text",
-        "system": false,
-        "required": false,
-        "unique": false,
-        "options": {
-          "min": null,
-          "max": null,
-          "pattern": ""
-        }
-      },
-      {
-        "id": "pbwoyo77",
-        "name": "json_field",
-        "type": "json",
-        "system": false,
-        "required": false,
-        "unique": false,
-        "options": {}
-      }
-    ],
-    "listRule": "",
-    "viewRule": "",
-    "createRule": null,
-    "updateRule": null,
-    "deleteRule": null,
-    "options": {
-      "query": "select id, post_relation_field, text_field, json_field from everything"
-    }
   }
 ]
