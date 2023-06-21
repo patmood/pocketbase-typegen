@@ -25,15 +25,10 @@ export function getGenericArgStringWithDefault(
 ): string {
   const argList = getGenericArgList(schema)
 
-  if (opts.includeExpand && canExpand(schema)) {
+  if (opts.includeExpand) {
     argList.push(fieldNameToGeneric(EXPAND_GENERIC_NAME))
   }
 
   if (argList.length === 0) return ""
   return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`
-}
-
-// Does the collection have relation fields that can be expanded
-export function canExpand(schema: FieldSchema[]) {
-  return !!schema.find((field) => field.type === "relation")
 }

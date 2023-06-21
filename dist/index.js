@@ -83,33 +83,6 @@ var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
 	verified: boolean
 } & BaseSystemFields<T>`;
 
-// src/generics.ts
-function fieldNameToGeneric(name) {
-  return `T${name}`;
-}
-function getGenericArgList(schema) {
-  const jsonFields = schema.filter((field) => field.type === "json").map((field) => fieldNameToGeneric(field.name)).sort();
-  return jsonFields;
-}
-function getGenericArgStringForRecord(schema) {
-  const argList = getGenericArgList(schema);
-  if (argList.length === 0)
-    return "";
-  return `<${argList.map((name) => `${name}`).join(", ")}>`;
-}
-function getGenericArgStringWithDefault(schema, opts) {
-  const argList = getGenericArgList(schema);
-  if (opts.includeExpand && canExpand(schema)) {
-    argList.push(fieldNameToGeneric(EXPAND_GENERIC_NAME));
-  }
-  if (argList.length === 0)
-    return "";
-  return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`;
-}
-function canExpand(schema) {
-  return !!schema.find((field) => field.type === "relation");
-}
-
 // src/utils.ts
 import { promises as fs2 } from "fs";
 function toPascalCase(str) {
@@ -165,6 +138,30 @@ function createCollectionResponses(collectionNames) {
   return `export type CollectionResponses = {
 ${nameRecordMap}
 }`;
+}
+
+// src/generics.ts
+function fieldNameToGeneric(name) {
+  return `T${name}`;
+}
+function getGenericArgList(schema) {
+  const jsonFields = schema.filter((field) => field.type === "json").map((field) => fieldNameToGeneric(field.name)).sort();
+  return jsonFields;
+}
+function getGenericArgStringForRecord(schema) {
+  const argList = getGenericArgList(schema);
+  if (argList.length === 0)
+    return "";
+  return `<${argList.map((name) => `${name}`).join(", ")}>`;
+}
+function getGenericArgStringWithDefault(schema, opts) {
+  const argList = getGenericArgList(schema);
+  if (opts.includeExpand) {
+    argList.push(fieldNameToGeneric(EXPAND_GENERIC_NAME));
+  }
+  if (argList.length === 0)
+    return "";
+  return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`;
 }
 
 // src/fields.ts
@@ -257,7 +254,7 @@ function createResponseType(collectionSchemaEntry) {
   });
   const genericArgsForRecord = getGenericArgStringForRecord(schema);
   const systemFields = getSystemFields(type);
-  const expandArgString = canExpand(schema) ? `<T${EXPAND_GENERIC_NAME}>` : "";
+  const expandArgString = `<T${EXPAND_GENERIC_NAME}>`;
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`;
 }
 
@@ -284,7 +281,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.9";
+var version = "1.1.10";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(
