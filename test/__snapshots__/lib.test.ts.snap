@@ -12,7 +12,7 @@ exports[`createRecordType handles file fields with multiple files 1`] = `
 }"
 `;
 
-exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse = Required<BooksRecord> & BaseSystemFields"`;
+exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>"`;
 
 exports[`createResponseType handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
@@ -58,7 +58,7 @@ export type BooksRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
-export type BooksResponse = Required<BooksRecord> & BaseSystemFields
+export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 

@@ -10,16 +10,15 @@ import {
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
 import {
-  canExpand,
-  getGenericArgStringForRecord,
-  getGenericArgStringWithDefault,
-} from "./generics"
-import {
   createCollectionEnum,
   createCollectionRecords,
   createCollectionResponses,
 } from "./collections"
 import { createSelectOptions, createTypeField } from "./fields"
+import {
+  getGenericArgStringForRecord,
+  getGenericArgStringWithDefault,
+} from "./generics"
 import { getSystemFields, toPascalCase } from "./utils"
 
 export function generate(results: Array<CollectionRecord>): string {
@@ -87,7 +86,7 @@ export function createResponseType(
   })
   const genericArgsForRecord = getGenericArgStringForRecord(schema)
   const systemFields = getSystemFields(type)
-  const expandArgString = canExpand(schema) ? `<T${EXPAND_GENERIC_NAME}>` : ""
+  const expandArgString = `<T${EXPAND_GENERIC_NAME}>`
 
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`
 }

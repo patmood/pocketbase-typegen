@@ -1,5 +1,4 @@
 import {
-  canExpand,
   getGenericArgList,
   getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
@@ -125,14 +124,5 @@ describe("getGenericArgStringForRecord", () => {
     expect(
       getGenericArgStringForRecord([textField, jsonField2, jsonField1])
     ).toEqual("<Tdata1, Tdata2>")
-  })
-})
-
-describe("canExpand", () => {
-  it("detects collections that can be expanded", () => {
-    expect(canExpand([textField, jsonField1, expandField])).toEqual(true)
-  })
-  it("detects collections that cannot be expanded", () => {
-    expect(canExpand([textField, jsonField1])).toEqual(false)
   })
 })
