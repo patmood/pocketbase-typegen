@@ -316,6 +316,9 @@ program.name("Pocketbase Typegen").version(version).description(
   "-o, --out <char>",
   "path to save the typescript output file",
   "pocketbase-types.ts"
+).option(
+  "-e, --env",
+  "flag to use environment variables for configuration, add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file"
 );
 program.parse(process.argv);
 var options = program.opts();
