@@ -25,6 +25,7 @@ Options:
   -e, --email <char>     email for an admin pocketbase user. Use this with the --url option
   -p, --password <char>  password for an admin pocketbase user. Use this with the --url option
   -o, --out <char>       path to save the typescript output file (default: "pocketbase-types.ts")
+  -e, --env              flag to use environment variables for configuration, add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file
   -h, --help             display help for command
 ```
 
@@ -39,6 +40,18 @@ JSON example (export JSON schema from the pocketbase admin dashboard):
 URL example:
 
 `npx pocketbase-typegen --url https://myproject.pockethost.io --email admin@myproject.com --password 'secr3tp@ssword!'`
+
+ENV example (add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL and PB_TYPEGEN_PASSWORD to your .env file)
+
+`npx pocketbase-typegen --env`
+
+.env:
+
+```
+PB_TYPEGEN_URL=https://myproject.pockethost.io
+PB_TYPEGEN_EMAIL=admin@myproject.com
+PB_TYPEGEN_PASSWORD=secr3tp@ssword!
+```
 
 Add it to your projects `package.json`:
 
