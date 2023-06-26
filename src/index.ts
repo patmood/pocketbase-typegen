@@ -33,6 +33,10 @@ program
     "path to save the typescript output file",
     "pocketbase-types.ts"
   )
+  .option(
+    "-e, --env",
+    "flag to use environment variables for configuration, add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file"
+  )
 
 program.parse(process.argv)
 const options = program.opts<Options>()

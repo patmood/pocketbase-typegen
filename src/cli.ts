@@ -1,5 +1,8 @@
+import 'dotenv/config'
+
 import type { CollectionRecord, Options } from "./types"
 import { fromDatabase, fromJSON, fromURL } from "./schema"
+
 
 import { generate } from "./lib"
 import { saveFile } from "./utils"
@@ -12,6 +15,17 @@ export async function main(options: Options) {
     schema = await fromJSON(options.json)
   } else if (options.url) {
     schema = await fromURL(options.url, options.email, options.password)
+  } else if (options.env) {
+    if (!process.env.PB_TYPEGEN_URL || !process.env.PB_TYPEGEN_EMAIL || !process.env.PB_TYPEGEN_PASSWORD) {
+      return console.error(
+        "Missing environment variables. Check options: pocketbase-typegen --help"
+      )
+    }
+    schema = await fromURL(
+      process.env.PB_TYPEGEN_URL,
+      process.env.PB_TYPEGEN_EMAIL,
+      process.env.PB_TYPEGEN_PASSWORD
+    )
   } else {
     return console.error(
       "Missing schema path. Check options: pocketbase-typegen --help"
