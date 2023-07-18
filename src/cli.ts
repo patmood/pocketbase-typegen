@@ -19,7 +19,7 @@ export async function main(options: Options) {
     const path: string = typeof options.env === "string"
       ? options.env
       : ".env"
-    dotenv.config({ path: path, override: true })
+    dotenv.config({ path: path })
     if (!process.env.PB_TYPEGEN_URL || !process.env.PB_TYPEGEN_EMAIL || !process.env.PB_TYPEGEN_PASSWORD) {
       return console.error(
         "Missing environment variables. Check options: pocketbase-typegen --help"
