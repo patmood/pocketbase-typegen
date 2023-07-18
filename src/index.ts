@@ -34,7 +34,7 @@ program
     "pocketbase-types.ts"
   )
   .option(
-    "-e, --env",
+    "-e, --env [path]",
     "flag to use environment variables for configuration, add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file"
   )
 

@@ -5,7 +5,7 @@ export type Options = {
   json?: string
   email?: string
   password?: string
-  env?: boolean
+  env?: boolean | string
 }
 
 export type FieldSchema = {
