@@ -16,7 +16,7 @@ export async function main(options: Options) {
   } else if (options.url) {
     schema = await fromURL(options.url, options.email, options.password)
   } else if (options.env) {
-    let path: string = typeof options.env === "string"
+    const path: string = typeof options.env === "string"
       ? options.env
       : ".env"
     dotenv.config({ path: path, override: true })
