@@ -1,4 +1,8 @@
-import { createSelectOptions, createTypeField } from "../src/fields"
+import {
+  createSelectOptions,
+  createTypeField,
+  getSelectOptionEnumName,
+} from "../src/fields"
 
 import { FieldSchema } from "../src/types"
 
@@ -263,5 +267,18 @@ describe("createSelectOptions", () => {
     ]
     const result = createSelectOptions(name, schema)
     expect(result).toMatchSnapshot()
+  })
+})
+
+describe("getSelectOptionEnumName", () => {
+  it("uses the select option value as the enum name", () => {
+    expect(getSelectOptionEnumName("hello")).toEqual("hello")
+    expect(getSelectOptionEnumName("2022X")).toEqual("2022X")
+  })
+
+  it("prefixes the enum name when the value is a number", () => {
+    expect(getSelectOptionEnumName("2022")).toEqual("E2022")
+    expect(getSelectOptionEnumName("0")).toEqual("E0")
+    expect(getSelectOptionEnumName("0123")).toEqual("E0123")
   })
 })

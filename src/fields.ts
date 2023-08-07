@@ -87,10 +87,19 @@ export function createSelectOptions(
     .map(
       (field) => `export enum ${getOptionEnumName(recordName, field.name)} {
 ${getOptionValues(field)
-  .map((val) => `\t"${val}" = "${val}",`)
+  .map((val) => `\t"${getSelectOptionEnumName(val)}" = "${val}",`)
   .join("\n")}
 }\n`
     )
     .join("\n")
   return typestring
+}
+
+export function getSelectOptionEnumName(val: string) {
+  if (!isNaN(Number(val))) {
+    // The value is a number, which cannot be used as an enum name
+    return `E${val}`
+  } else {
+    return val
+  }
 }
