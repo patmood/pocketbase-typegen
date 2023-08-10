@@ -6,6 +6,9 @@ export type Options = {
   email?: string
   password?: string
   env?: boolean | string
+  watch?: boolean
+  interval?: number
+  hook?: string
 }
 
 export type FieldSchema = {

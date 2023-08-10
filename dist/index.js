@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 
 // src/schema.ts
 import FormData from "form-data";
-import fetch from "cross-fetch";
+import fetch2 from "cross-fetch";
 import { promises as fs } from "fs";
 import { open } from "sqlite";
 import sqlite3 from "sqlite3";
@@ -30,7 +30,7 @@ async function fromURL(url, email = "", password = "") {
   formData.append("password", password);
   let collections = [];
   try {
-    const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
+    const { token } = await fetch2(`${url}/api/admins/auth-with-password`, {
       body: formData,
       method: "post"
     }).then((res) => {
@@ -38,7 +38,7 @@ async function fromURL(url, email = "", password = "") {
         throw res;
       return res.json();
     });
-    const result = await fetch(`${url}/api/collections?perPage=200`, {
+    const result = await fetch2(`${url}/api/collections?perPage=200`, {
       headers: {
         Authorization: token
       }
@@ -328,7 +328,64 @@ program.name("Pocketbase Typegen").version(version).description(
 ).option(
   "-e, --env [path]",
   "flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file"
+).option(
+  "-w, --watch",
+  "watch for changes in the database and automatically regenerate types, does not work with --json"
+).option(
+  "-i, --interval <number>",
+  "interval in ms to check for changes in watch mode, defaults to 5000"
+).option(
+  "--hook <char>",
+  "URL to a custom hook url to check date of the last change. Use this with the --watch option"
 );
 program.parse(process.argv);
 var options = program.opts();
+if (options.watch) {
+  if (!options.interval) {
+    options.interval = 5e3;
+  }
+  if (options.hook == "") {
+    console.error("Hook url must not be empty when using --watch");
+    process.exit(1);
+  }
+  if (options.json) {
+    console.error(
+      "Cannot use --watch with --json. Check options: pocketbase-typegen --help"
+    );
+    process.exit(1);
+  }
+}
 main(options);
+if (options.watch) {
+  console.log("[pocketbase-typegen] watching for changes...");
+  let lastTime = Date.now();
+  setInterval(async () => {
+    if (!options.hook || options.db) {
+      console.log("test");
+      main(options);
+      return console.log("[pocketbase-typegen] synchronizing changes");
+    }
+    try {
+      const res = await fetch(options.hook, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      if (res.status !== 200) {
+        return console.log(
+          "[pocketbase-typegen] error synchronizing changes, skipping"
+        );
+      }
+      const data = await res.json();
+      if (data.timestamp > lastTime) {
+        lastTime = data.timestamp;
+        main(options);
+        console.log("[pocketbase-typegen] synchronizing changes");
+      }
+    } catch (err) {
+      console.log("[pocketbase-typegen] error synchronizing changes, skipping");
+      console.error(err);
+    }
+  }, options.interval);
+}
