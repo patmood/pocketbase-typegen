@@ -28,7 +28,7 @@ Options:
   -e, --env              flag to use environment variables for configuration, add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file
   -w, --watch            watch for changes in the database and automatically regenerate types, does not work with --json
   -i, --interval <int>   interval in milliseconds to check for changes (default: 5000)
-  -h, --hook-url <char>  custom hook url for checking changes, should return json with timestamp of last change, use with --watch
+  --hook <char>  custom hook url for checking changes, should return json with timestamp of last change, use with --watch
   -h, --help             display help for command
 ```
 
@@ -57,41 +57,52 @@ PB_TYPEGEN_PASSWORD=secr3tp@ssword!
 ```
 
 Watch mode example:
+
 `npx pocketbase-typegen --db ./pb_data/data.db --watch`
+
 `npx pocketbase-typegen --url https://myproject.pockethost.io --email admin@myproject --password 'secr3tp@ssword!' --watch`
+
 `npx pocketbase-typegen --env --watch`
+
 Optional flags:
-  - `--interval` - interval in milliseconds to check for changes (default: 5000)
-  - `--hook` - custom hook url for checking changes, should return json with timestamp of last change
-example hook js code (works after v0.17.0, add to pb_hooks directory):
+
+- `--interval` - interval in milliseconds to check for changes (default: 5000)
+- `--hook` - custom hook url for checking changes, should return json with timestamp of last change
+
+example hook javascript code (works on pocketbase version ^0.17.0, add to pb_hooks directory):
+
+watch.pb.js
+
 ```javascript
 routerAdd("GET", "/schema/last-update", (c) => {
-	try {
-		const config = require(`./pb_hooks/config.js`)
-    		return c.json(200, { "timestamp": config.lastTimestamp })
-	} catch (err) {
-		return c.json(200, {"message": err.message})
-	}
+  try {
+    const config = require(`./pb_hooks/config.js`)
+    return c.json(200, { timestamp: config.lastTimestamp })
+  } catch (err) {
+    return c.json(200, { message: err.message })
+  }
 })
 
 // Hooks for updating lastTimestamp
 onModelAfterCreate((_) => {
-  	const config = require(`./pb_hooks/config.js`)
-	config.lastTimestamp = Date.now()
+  const config = require(`./pb_hooks/config.js`)
+  config.lastTimestamp = Date.now()
 })
 onModelAfterUpdate((_) => {
-	const config = require(`./pb_hooks/config.js`)
-	config.lastTimestamp = Date.now()
+  const config = require(`./pb_hooks/config.js`)
+  config.lastTimestamp = Date.now()
 })
 onModelAfterDelete((_) => {
-	const config = require(`./pb_hooks/config.js`)
-	config.lastTimestamp = Date.now()
+  const config = require(`./pb_hooks/config.js`)
+  config.lastTimestamp = Date.now()
 })
 ```
+
 config.js:
+
 ```javascript
 module.exports = {
-  lastTimestamp: 0
+  lastTimestamp: 0,
 }
 ```
 
