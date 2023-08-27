@@ -65,6 +65,7 @@ export function createRecordType(
   })
   const fields = schema
     .map((fieldSchema: FieldSchema) => createTypeField(name, fieldSchema))
+    .sort()
     .join("\n")
 
   return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = ${

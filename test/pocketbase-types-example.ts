@@ -52,40 +52,40 @@ export enum EverythingSelectFieldOptions {
 	"sy?mb@!$" = "sy?mb@!$",
 }
 export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknown> = {
-	text_field?: string
-	number_field?: number
-	bool_field?: boolean
-	email_field?: string
-	url_field?: string
-	date_field?: IsoDateString
-	select_field?: EverythingSelectFieldOptions
-	json_field?: null | Tjson_field
 	another_json_field?: null | Tanother_json_field
-	file_field?: string
-	three_files_field?: string[]
-	user_relation_field?: RecordIdString
+	bool_field?: boolean
 	custom_relation_field?: RecordIdString[]
+	date_field?: IsoDateString
+	email_field?: string
+	file_field?: string
+	json_field?: null | Tjson_field
+	number_field?: number
 	post_relation_field?: RecordIdString
-	select_field_no_values?: string
 	rich_editor_field?: HTMLString
+	select_field?: EverythingSelectFieldOptions
+	select_field_no_values?: string
+	text_field?: string
+	three_files_field?: string[]
+	url_field?: string
+	user_relation_field?: RecordIdString
 }
 
 export type MyViewRecord<Tjson_field = unknown> = {
+	json_field?: null | Tjson_field
 	post_relation_field?: RecordIdString
 	text_field?: string
-	json_field?: null | Tjson_field
 }
 
 export type PostsRecord = {
-	field?: string
-	nonempty_field: string
-	nonempty_bool: boolean
 	field1?: number
+	field?: string
+	nonempty_bool: boolean
+	nonempty_field: string
 }
 
 export type UsersRecord = {
-	name?: string
 	avatar?: string
+	name?: string
 }
 
 // Response types include system fields and match responses from the PocketBase API
