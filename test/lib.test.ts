@@ -66,6 +66,36 @@ describe("createRecordType", () => {
     const result = createRecordType(name, schema)
     expect(result).toMatchSnapshot()
   })
+
+  it("sorts fields alphabetically", () => {
+    const name = "books"
+    const schema: FieldSchema[] = [
+      {
+        id: "1",
+        name: "banana",
+        options: {},
+        required: false,
+        system: false,
+        type: "text",
+        unique: false,
+      },
+      {
+        id: "1",
+        name: "apple",
+        options: {},
+        required: false,
+        system: false,
+        type: "text",
+        unique: false,
+      },
+    ]
+    const result = createRecordType(name, schema)
+    const aIndex = result.indexOf("apple")
+    const bIndex = result.indexOf("banana")
+    expect(aIndex).toBeGreaterThan(0)
+    expect(bIndex).toBeGreaterThan(0)
+    expect(aIndex).toBeLessThan(bIndex)
+  })
 })
 
 describe("createResponseType", () => {

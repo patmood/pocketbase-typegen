@@ -251,7 +251,7 @@ function createRecordType(name, schema) {
   const genericArgs = getGenericArgStringWithDefault(schema, {
     includeExpand: false
   });
-  const fields = schema.map((fieldSchema) => createTypeField(name, fieldSchema)).join("\n");
+  const fields = schema.map((fieldSchema) => createTypeField(name, fieldSchema)).sort().join("\n");
   return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = ${fields ? `{
 ${fields}
 }` : "never"}`;
@@ -304,7 +304,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.1.12";
+var version = "1.1.13";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(
