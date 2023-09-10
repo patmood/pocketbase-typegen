@@ -9,12 +9,29 @@ import fetch from "cross-fetch";
 import { promises as fs } from "fs";
 import { open } from "sqlite";
 import sqlite3 from "sqlite3";
+async function getCollectionsIsomorphic(dbPath) {
+  try {
+    console.log("trying with bun:sqlite");
+    const { Database } = await import("bun:sqlite");
+    const db = new Database(dbPath);
+    const query = db.query("SELECT * FROM _collections");
+    const result = query.all();
+    console.log("ran with bun:sqlite");
+    return result;
+  } catch (error) {
+    console.log(error);
+    console.log("trying with sqlite3");
+    const db = await open({
+      driver: sqlite3.Database,
+      filename: dbPath
+    });
+    const result = await db.all("SELECT * FROM _collections");
+    console.log("ran with sqlite3");
+    return result;
+  }
+}
 async function fromDatabase(dbPath) {
-  const db = await open({
-    driver: sqlite3.Database,
-    filename: dbPath
-  });
-  const result = await db.all("SELECT * FROM _collections");
+  const result = await getCollectionsIsomorphic(dbPath);
   return result.map((collection) => ({
     ...collection,
     schema: JSON.parse(collection.schema)
@@ -302,12 +319,7 @@ async function main(options2) {
 
 // src/index.ts
 import { program } from "commander";
-
-// package.json
-var version = "1.1.13";
-
-// src/index.ts
-program.name("Pocketbase Typegen").version(version).description(
+program.name("Pocketbase Typegen").description(
   "CLI to create typescript typings for your pocketbase.io records"
 ).option("-d, --db <char>", "path to the pocketbase SQLite database").option(
   "-j, --json <char>",
