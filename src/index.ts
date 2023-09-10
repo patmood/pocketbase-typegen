@@ -3,7 +3,12 @@
 import type { Options } from "./types"
 import { main } from "./cli"
 import { program } from "commander"
-import { version } from "../package.json"
+import { readFileSync } from "fs"
+import { join } from "path"
+
+const packageJsonBuffer = readFileSync(join(__dirname, "../package.json"))
+const packageJson = JSON.parse(packageJsonBuffer.toString())
+const { version } = packageJson
 
 program
   .name("Pocketbase Typegen")

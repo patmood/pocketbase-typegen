@@ -3,16 +3,30 @@ import FormData from "form-data"
 import fetch from "cross-fetch"
 import { promises as fs } from "fs"
 import { open } from "sqlite"
-import sqlite3 from "sqlite3"
+
+async function getCollectionsIsomorphic(dbPath: string): Promise<any[]> {
+  try {
+    // @ts-expect-error using the bun-types package makes a lot of stuff error
+    const { Database } = await import("bun:sqlite")
+    const db = new Database(dbPath)
+    const query = db.query("SELECT * FROM _collections")
+
+    return query.all()
+  } catch (error) {
+    const sqlite3 = await import("sqlite3")
+    const db = await open({
+      driver: sqlite3.Database,
+      filename: dbPath,
+    })
+
+    return await db.all("SELECT * FROM _collections")
+  }
+}
 
 export async function fromDatabase(
   dbPath: string
 ): Promise<Array<CollectionRecord>> {
-  const db = await open({
-    driver: sqlite3.Database,
-    filename: dbPath,
-  })
-  const result = await db.all("SELECT * FROM _collections")
+  const result = await getCollectionsIsomorphic(dbPath)
   return result.map((collection) => ({
     ...collection,
     schema: JSON.parse(collection.schema),
