@@ -7,28 +7,19 @@ import sqlite3 from "sqlite3"
 
 async function getCollectionsIsomorphic(dbPath: string): Promise<any[]> {
   try {
-    console.log("trying with bun:sqlite")
-
     // @ts-expect-error using the bun-types package makes a lot of stuff error
     const { Database } = await import("bun:sqlite")
     const db = new Database(dbPath)
     const query = db.query("SELECT * FROM _collections")
-    const result = query.all()
 
-    console.log("ran with bun:sqlite")
-    return result
+    return query.all()
   } catch (error) {
-    console.log(error)
-    console.log("trying with sqlite3")
-
     const db = await open({
       driver: sqlite3.Database,
       filename: dbPath,
     })
-    const result = await db.all("SELECT * FROM _collections")
 
-    console.log("ran with sqlite3")
-    return result
+    return await db.all("SELECT * FROM _collections")
   }
 }
 
