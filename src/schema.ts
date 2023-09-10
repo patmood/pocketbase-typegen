@@ -3,7 +3,6 @@ import FormData from "form-data"
 import fetch from "cross-fetch"
 import { promises as fs } from "fs"
 import { open } from "sqlite"
-import sqlite3 from "sqlite3"
 
 async function getCollectionsIsomorphic(dbPath: string): Promise<any[]> {
   try {
@@ -14,6 +13,7 @@ async function getCollectionsIsomorphic(dbPath: string): Promise<any[]> {
 
     return query.all()
   } catch (error) {
+    const sqlite3 = await import("sqlite3")
     const db = await open({
       driver: sqlite3.Database,
       filename: dbPath,

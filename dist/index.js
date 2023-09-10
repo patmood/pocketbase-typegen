@@ -8,7 +8,6 @@ import FormData from "form-data";
 import fetch from "cross-fetch";
 import { promises as fs } from "fs";
 import { open } from "sqlite";
-import sqlite3 from "sqlite3";
 async function getCollectionsIsomorphic(dbPath) {
   try {
     const { Database } = await import("bun:sqlite");
@@ -16,6 +15,7 @@ async function getCollectionsIsomorphic(dbPath) {
     const query = db.query("SELECT * FROM _collections");
     return query.all();
   } catch (error) {
+    const sqlite3 = await import("sqlite3");
     const db = await open({
       driver: sqlite3.Database,
       filename: dbPath
