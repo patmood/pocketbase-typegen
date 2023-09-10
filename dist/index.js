@@ -11,23 +11,16 @@ import { open } from "sqlite";
 import sqlite3 from "sqlite3";
 async function getCollectionsIsomorphic(dbPath) {
   try {
-    console.log("trying with bun:sqlite");
     const { Database } = await import("bun:sqlite");
     const db = new Database(dbPath);
     const query = db.query("SELECT * FROM _collections");
-    const result = query.all();
-    console.log("ran with bun:sqlite");
-    return result;
+    return query.all();
   } catch (error) {
-    console.log(error);
-    console.log("trying with sqlite3");
     const db = await open({
       driver: sqlite3.Database,
       filename: dbPath
     });
-    const result = await db.all("SELECT * FROM _collections");
-    console.log("ran with sqlite3");
-    return result;
+    return await db.all("SELECT * FROM _collections");
   }
 }
 async function fromDatabase(dbPath) {
@@ -319,7 +312,12 @@ async function main(options2) {
 
 // src/index.ts
 import { program } from "commander";
-program.name("Pocketbase Typegen").description(
+import { readFileSync } from "fs";
+import { join } from "path";
+var packageJsonBuffer = readFileSync(join(__dirname, "../package.json"));
+var packageJson = JSON.parse(packageJsonBuffer.toString());
+var { version } = packageJson;
+program.name("Pocketbase Typegen").version(version).description(
   "CLI to create typescript typings for your pocketbase.io records"
 ).option("-d, --db <char>", "path to the pocketbase SQLite database").option(
   "-j, --json <char>",
