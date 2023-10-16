@@ -25,7 +25,9 @@ Options:
   -e, --email <char>     email for an admin pocketbase user. Use this with the --url option
   -p, --password <char>  password for an admin pocketbase user. Use this with the --url option
   -o, --out <char>       path to save the typescript output file (default: "pocketbase-types.ts")
-  -e, --env              flag to use environment variables for configuration, add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file
+  --no-sdk               skip generating typed SDK
+  -e, --env [path]       flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to
+                         your .env file
   -h, --help             display help for command
 ```
 
@@ -71,15 +73,27 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
   - `[CollectionName][FieldName]Options` If the collection contains a select field with set values, an enum of the options will be generated.
 - `CollectionRecords` A type mapping each collection name to the record type.
 - `CollectionResponses` A type mapping each collection name to the response type.
+- `TypedPocketBase` A type for usage with type asserted PocketBase instance.
 
 ## Example Usage
+
+In [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.18.3+ you can use the PocketBase SDK with type assertion to have collections automatically typed:
+
+```typescript
+import { TypedPocketBase } from "./pocketbase-types"
+
+const pb = new PocketBase('http://127.0.0.1:8090') as TypedPocketBase
+
+await pb.collection('tasks').getOne("RECORD_ID") // -> results in TaskResponse
+await pb.collection('posts').getOne("RECORD_ID") // -> results in PostResponse
+```
 
 In [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.8+ you can use generic types when fetching records, eg:
 
 ```typescript
 import { Collections, TasksResponse } from "./pocketbase-types"
 
-pb.collection(Collections.Tasks).getOne<TasksResponse>("RECORD_ID") // -> results in Promise<TaskResponse>
+await pb.collection(Collections.Tasks).getOne<TasksResponse>("RECORD_ID") // -> results in TaskResponse
 ```
 
 ## Example Advanced Usage
