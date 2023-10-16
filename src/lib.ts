@@ -63,7 +63,7 @@ export function generate(results: Array<CollectionRecord>, options: GenerateOpti
 
   return fileParts
     .filter(Boolean)
-    .join("\n\n")
+    .join("\n\n") + '\n'
 }
 
 export function createRecordType(
