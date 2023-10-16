@@ -34,6 +34,10 @@ program
     "pocketbase-types.ts"
   )
   .option(
+    "--no-sdk",
+    "skip generating typed SDK"
+  )
+  .option(
     "-e, --env [path]",
     "flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file"
   )

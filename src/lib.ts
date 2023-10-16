@@ -24,7 +24,11 @@ import {
 } from "./generics"
 import { getSystemFields, toPascalCase } from "./utils"
 
-export function generate(results: Array<CollectionRecord>): string {
+type GenerateOptions = {
+  sdk: boolean
+}
+
+export function generate(results: Array<CollectionRecord>, options: GenerateOptions): string {
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
@@ -42,7 +46,7 @@ export function generate(results: Array<CollectionRecord>): string {
 
   const fileParts = [
     EXPORT_COMMENT,
-    IMPORTS,
+    options.sdk && IMPORTS,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
     BASE_SYSTEM_FIELDS_DEFINITION,
@@ -53,11 +57,13 @@ export function generate(results: Array<CollectionRecord>): string {
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
-    TYPED_POCKETBASE_COMMENT,
-    createTypedPocketbase(sortedCollectionNames),
+    options.sdk && TYPED_POCKETBASE_COMMENT,
+    options.sdk && createTypedPocketbase(sortedCollectionNames)
   ]
 
-  return fileParts.join("\n\n")
+  return fileParts
+    .filter(Boolean)
+    .join("\n\n")
 }
 
 export function createRecordType(

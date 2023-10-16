@@ -227,7 +227,7 @@ function getSelectOptionEnumName(val) {
 }
 
 // src/lib.ts
-function generate(results) {
+function generate(results, options2) {
   const collectionNames = [];
   const recordTypes = [];
   const responseTypes = [RESPONSE_TYPE_COMMENT];
@@ -242,7 +242,7 @@ function generate(results) {
   const sortedCollectionNames = collectionNames;
   const fileParts = [
     EXPORT_COMMENT,
-    IMPORTS,
+    options2.sdk && IMPORTS,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
     BASE_SYSTEM_FIELDS_DEFINITION,
@@ -253,10 +253,10 @@ function generate(results) {
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
-    TYPED_POCKETBASE_COMMENT,
-    createTypedPocketbase(sortedCollectionNames)
+    options2.sdk && TYPED_POCKETBASE_COMMENT,
+    options2.sdk && createTypedPocketbase(sortedCollectionNames)
   ];
-  return fileParts.join("\n\n");
+  return fileParts.filter(Boolean).join("\n\n");
 }
 function createRecordType(name, schema) {
   const selectOptionEnums = createSelectOptions(name, schema);
@@ -308,7 +308,9 @@ async function main(options2) {
       "Missing schema path. Check options: pocketbase-typegen --help"
     );
   }
-  const typeString = generate(schema);
+  const typeString = generate(schema, {
+    sdk: options2.sdk ?? true
+  });
   await saveFile(options2.out, typeString);
   return typeString;
 }
@@ -338,6 +340,9 @@ program.name("Pocketbase Typegen").version(version).description(
   "-o, --out <char>",
   "path to save the typescript output file",
   "pocketbase-types.ts"
+).option(
+  "--no-sdk",
+  "skip generating typed SDK"
 ).option(
   "-e, --env [path]",
   "flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file"
