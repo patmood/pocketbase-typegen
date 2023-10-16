@@ -59,9 +59,12 @@ async function fromURL(url, email = "", password = "") {
 var EXPORT_COMMENT = `/**
 * This file was @generated using pocketbase-typegen
 */`;
+var IMPORTS = `import PocketBase, { RecordService } from 'pocketbase'`;
 var RECORD_TYPE_COMMENT = `// Record types for each collection`;
 var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
 var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
+var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted Pocketbase instance
+// https://github.com/pocketbase/js-sdk#specify-typescript-definitions`;
 var EXPAND_GENERIC_NAME = "expand";
 var DATE_STRING_TYPE_NAME = `IsoDateString`;
 var RECORD_ID_STRING_NAME = `RecordIdString`;
@@ -139,6 +142,13 @@ ${nameRecordMap}
 function createCollectionResponses(collectionNames) {
   const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Response`).join("\n");
   return `export type CollectionResponses = {
+${nameRecordMap}
+}`;
+}
+function createTypedPocketbase(collectionNames) {
+  const nameRecordMap = collectionNames.map((name) => `	collection(idOrName: '${name}'): RecordService<${toPascalCase(name)}Response>`).join("\n");
+  return `export type TypedPocketBase = PocketBase & {
+	collection(idOrName: string): RecordService
 ${nameRecordMap}
 }`;
 }
@@ -232,6 +242,7 @@ function generate(results) {
   const sortedCollectionNames = collectionNames;
   const fileParts = [
     EXPORT_COMMENT,
+    IMPORTS,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
     BASE_SYSTEM_FIELDS_DEFINITION,
@@ -241,7 +252,9 @@ function generate(results) {
     responseTypes.join("\n"),
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
-    createCollectionResponses(sortedCollectionNames)
+    createCollectionResponses(sortedCollectionNames),
+    TYPED_POCKETBASE_COMMENT,
+    createTypedPocketbase(sortedCollectionNames)
   ];
   return fileParts.join("\n\n");
 }
