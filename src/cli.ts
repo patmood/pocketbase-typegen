@@ -35,7 +35,9 @@ export async function main(options: Options) {
       "Missing schema path. Check options: pocketbase-typegen --help"
     )
   }
-  const typeString = generate(schema)
+  const typeString = generate(schema, {
+    sdk: options.sdk ?? true
+  })
   await saveFile(options.out, typeString)
   return typeString
 }

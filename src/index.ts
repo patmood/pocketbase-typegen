@@ -34,6 +34,10 @@ program
     "pocketbase-types.ts"
   )
   .option(
+    "--no-sdk",
+    "remove the pocketbase package dependency. A typed version of the SDK will not be generated."
+  )
+  .option(
     "-e, --env [path]",
     "flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file"
   )

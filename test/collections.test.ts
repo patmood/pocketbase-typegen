@@ -2,6 +2,7 @@ import {
   createCollectionEnum,
   createCollectionRecords,
   createCollectionResponses,
+  createTypedPocketbase,
 } from "../src/collections"
 
 describe("createCollectionEnum", () => {
@@ -22,5 +23,12 @@ describe("createCollectionResponses", () => {
   it("creates mapping of collection name to response type", () => {
     const names = ["book", "magazine"]
     expect(createCollectionResponses(names)).toMatchSnapshot()
+  })
+})
+
+describe("createTypedPocketBase", () => {
+  it("creates typed variant of PocketBase client", () => {
+    const names = ["book", "magazine"]
+    expect(createTypedPocketbase(names)).toMatchSnapshot()
   })
 })

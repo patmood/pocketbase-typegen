@@ -27,8 +27,37 @@ describe("generate", () => {
         viewRule: null,
       },
     ]
-    const result = generate(collections)
+    const result = generate(collections, { sdk: true })
     expect(result).toMatchSnapshot()
+  })
+
+  it("skips generatic sdk if told not to", () => {
+    const collections: Array<CollectionRecord> = [
+      {
+        createRule: null,
+        deleteRule: null,
+        id: "123",
+        listRule: null,
+        name: "books",
+        schema: [
+          {
+            id: "xyz",
+            name: "title",
+            options: {},
+            required: false,
+            system: false,
+            type: "text",
+            unique: false,
+          },
+        ],
+        system: false,
+        type: "base",
+        updateRule: null,
+        viewRule: null,
+      },
+    ]
+    const result = generate(collections, { sdk: false })
+    expect(result).not.toMatch(/import .* from 'pocketbase'/)
   })
 })
 

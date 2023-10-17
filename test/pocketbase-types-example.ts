@@ -2,6 +2,9 @@
 * This file was @generated using pocketbase-typegen
 */
 
+import type PocketBase from 'pocketbase'
+import { type RecordService } from 'pocketbase'
+
 export enum Collections {
 	Base = "base",
 	CustomAuth = "custom_auth",
@@ -114,4 +117,16 @@ export type CollectionResponses = {
 	my_view: MyViewResponse
 	posts: PostsResponse
 	users: UsersResponse
+}
+
+// Type for usage with type asserted PocketBase instance
+// https://github.com/pocketbase/js-sdk#specify-typescript-definitions
+
+export type TypedPocketBase = PocketBase & {
+	collection(idOrName: 'base'): RecordService<BaseResponse>
+	collection(idOrName: 'custom_auth'): RecordService<CustomAuthResponse>
+	collection(idOrName: 'everything'): RecordService<EverythingResponse>
+	collection(idOrName: 'my_view'): RecordService<MyViewResponse>
+	collection(idOrName: 'posts'): RecordService<PostsResponse>
+	collection(idOrName: 'users'): RecordService<UsersResponse>
 }

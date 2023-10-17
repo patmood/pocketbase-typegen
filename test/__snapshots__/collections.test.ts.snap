@@ -20,3 +20,10 @@ exports[`createCollectionResponses creates mapping of collection name to respons
 	magazine: MagazineResponse
 }"
 `;
+
+exports[`createTypedPocketBase creates typed variant of PocketBase client 1`] = `
+"export type TypedPocketBase = PocketBase & {
+	collection(idOrName: 'book'): RecordService<BookResponse>
+	collection(idOrName: 'magazine'): RecordService<MagazineResponse>
+}"
+`;

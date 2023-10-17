@@ -1,18 +1,21 @@
 import {
   ALIAS_TYPE_DEFINITIONS,
   ALL_RECORD_RESPONSE_COMMENT,
+  TYPED_POCKETBASE_COMMENT,
   AUTH_SYSTEM_FIELDS_DEFINITION,
   BASE_SYSTEM_FIELDS_DEFINITION,
   EXPAND_GENERIC_NAME,
   EXPORT_COMMENT,
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
+  IMPORTS,
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
 import {
   createCollectionEnum,
   createCollectionRecords,
   createCollectionResponses,
+  createTypedPocketbase,
 } from "./collections"
 import { createSelectOptions, createTypeField } from "./fields"
 import {
@@ -21,7 +24,11 @@ import {
 } from "./generics"
 import { getSystemFields, toPascalCase } from "./utils"
 
-export function generate(results: Array<CollectionRecord>): string {
+type GenerateOptions = {
+  sdk: boolean
+}
+
+export function generate(results: Array<CollectionRecord>, options: GenerateOptions): string {
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
@@ -39,6 +46,7 @@ export function generate(results: Array<CollectionRecord>): string {
 
   const fileParts = [
     EXPORT_COMMENT,
+    options.sdk && IMPORTS,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
     BASE_SYSTEM_FIELDS_DEFINITION,
@@ -49,9 +57,13 @@ export function generate(results: Array<CollectionRecord>): string {
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
+    options.sdk && TYPED_POCKETBASE_COMMENT,
+    options.sdk && createTypedPocketbase(sortedCollectionNames)
   ]
 
-  return fileParts.join("\n\n")
+  return fileParts
+    .filter(Boolean)
+    .join("\n\n") + '\n'
 }
 
 export function createRecordType(
