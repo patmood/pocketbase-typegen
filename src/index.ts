@@ -35,7 +35,7 @@ program
   )
   .option(
     "--no-sdk",
-    "skip generating typed SDK"
+    "remove the pocketbase package dependency. A typed version of the SDK will not be generated."
   )
   .option(
     "-e, --env [path]",

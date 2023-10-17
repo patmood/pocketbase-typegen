@@ -59,11 +59,12 @@ async function fromURL(url, email = "", password = "") {
 var EXPORT_COMMENT = `/**
 * This file was @generated using pocketbase-typegen
 */`;
-var IMPORTS = `import PocketBase, { RecordService } from 'pocketbase'`;
+var IMPORTS = `import type PocketBase from 'pocketbase'
+import { type RecordService } from 'pocketbase'`;
 var RECORD_TYPE_COMMENT = `// Record types for each collection`;
 var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
 var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
-var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted Pocketbase instance
+var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions`;
 var EXPAND_GENERIC_NAME = "expand";
 var DATE_STRING_TYPE_NAME = `IsoDateString`;
@@ -148,7 +149,6 @@ ${nameRecordMap}
 function createTypedPocketbase(collectionNames) {
   const nameRecordMap = collectionNames.map((name) => `	collection(idOrName: '${name}'): RecordService<${toPascalCase(name)}Response>`).join("\n");
   return `export type TypedPocketBase = PocketBase & {
-	collection(idOrName: string): RecordService
 ${nameRecordMap}
 }`;
 }
@@ -256,7 +256,7 @@ function generate(results, options2) {
     options2.sdk && TYPED_POCKETBASE_COMMENT,
     options2.sdk && createTypedPocketbase(sortedCollectionNames)
   ];
-  return fileParts.filter(Boolean).join("\n\n");
+  return fileParts.filter(Boolean).join("\n\n") + "\n";
 }
 function createRecordType(name, schema) {
   const selectOptionEnums = createSelectOptions(name, schema);
@@ -342,7 +342,7 @@ program.name("Pocketbase Typegen").version(version).description(
   "pocketbase-types.ts"
 ).option(
   "--no-sdk",
-  "skip generating typed SDK"
+  "remove the pocketbase package dependency. A typed version of the SDK will not be generated."
 ).option(
   "-e, --env [path]",
   "flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file"

@@ -39,7 +39,6 @@ export function createTypedPocketbase(
     .map((name) => `\tcollection(idOrName: '${name}'): RecordService<${toPascalCase(name)}Response>`)
     .join("\n")
   return `export type TypedPocketBase = PocketBase & {
-\tcollection(idOrName: string): RecordService
 ${nameRecordMap}
 }`
 }

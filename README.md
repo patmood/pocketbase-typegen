@@ -25,9 +25,8 @@ Options:
   -e, --email <char>     email for an admin pocketbase user. Use this with the --url option
   -p, --password <char>  password for an admin pocketbase user. Use this with the --url option
   -o, --out <char>       path to save the typescript output file (default: "pocketbase-types.ts")
-  --no-sdk               skip generating typed SDK
-  -e, --env [path]       flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to
-                         your .env file
+  --no-sdk               remove the pocketbase package dependency. A typed version of the SDK will not be generated.
+  -e, --env [path]       flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file
   -h, --help             display help for command
 ```
 
@@ -77,7 +76,7 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
 
 ## Example Usage
 
-In [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.18.3+ you can use the PocketBase SDK with type assertion to have collections automatically typed:
+Using PocketBase SDK v0.18.3+, collections can be [automatically typed](https://github.com/pocketbase/js-sdk#specify-typescript-definitions) using the generated `TypedPocketBase` type:
 
 ```typescript
 import { TypedPocketBase } from "./pocketbase-types"
@@ -88,7 +87,7 @@ await pb.collection('tasks').getOne("RECORD_ID") // -> results in TaskResponse
 await pb.collection('posts').getOne("RECORD_ID") // -> results in PostResponse
 ```
 
-In [PocketBase SDK](https://github.com/pocketbase/js-sdk) v0.8+ you can use generic types when fetching records, eg:
+Alternatively, you can use generic types for each request, eg:
 
 ```typescript
 import { Collections, TasksResponse } from "./pocketbase-types"

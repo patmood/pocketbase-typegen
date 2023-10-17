@@ -25,7 +25,8 @@ exports[`generate generates correct output given db input 1`] = `
 * This file was @generated using pocketbase-typegen
 */
 
-import PocketBase, { RecordService } from 'pocketbase'
+import type PocketBase from 'pocketbase'
+import { type RecordService } from 'pocketbase'
 
 export enum Collections {
 	Books = "books",
@@ -72,11 +73,11 @@ export type CollectionResponses = {
 	books: BooksResponse
 }
 
-// Type for usage with type asserted Pocketbase instance
+// Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 export type TypedPocketBase = PocketBase & {
-	collection(idOrName: string): RecordService
 	collection(idOrName: 'books'): RecordService<BooksResponse>
-}"
+}
+"
 `;
