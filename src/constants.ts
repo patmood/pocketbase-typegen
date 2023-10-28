@@ -2,7 +2,7 @@ export const EXPORT_COMMENT = `/**
 * This file was @generated using pocketbase-typegen
 */`
 export const IMPORTS = `import type PocketBase from 'pocketbase'
-import { type RecordService } from 'pocketbase'`
+import type { RecordService } from 'pocketbase'`
 export const RECORD_TYPE_COMMENT = `// Record types for each collection`
 export const RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`
 export const ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`
