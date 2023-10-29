@@ -26,7 +26,7 @@ exports[`generate generates correct output given db input 1`] = `
 */
 
 import type PocketBase from 'pocketbase'
-import { type RecordService } from 'pocketbase'
+import type { RecordService } from 'pocketbase'
 
 export enum Collections {
 	Books = "books",

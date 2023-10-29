@@ -3,7 +3,7 @@
 */
 
 import type PocketBase from 'pocketbase'
-import { type RecordService } from 'pocketbase'
+import type { RecordService } from 'pocketbase'
 
 export enum Collections {
 	Base = "base",
