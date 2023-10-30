@@ -60,7 +60,7 @@ var EXPORT_COMMENT = `/**
 * This file was @generated using pocketbase-typegen
 */`;
 var IMPORTS = `import type PocketBase from 'pocketbase'
-import { type RecordService } from 'pocketbase'`;
+import type { RecordService } from 'pocketbase'`;
 var RECORD_TYPE_COMMENT = `// Record types for each collection`;
 var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
 var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
@@ -319,7 +319,7 @@ async function main(options2) {
 import { program } from "commander";
 
 // package.json
-var version = "1.2.0";
+var version = "1.2.1";
 
 // src/index.ts
 program.name("Pocketbase Typegen").version(version).description(

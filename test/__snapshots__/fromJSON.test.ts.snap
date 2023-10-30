@@ -6,7 +6,7 @@ exports[`creates a type file from json schema 1`] = `
 */
 
 import type PocketBase from 'pocketbase'
-import { type RecordService } from 'pocketbase'
+import type { RecordService } from 'pocketbase'
 
 export enum Collections {
 	Base = "base",
