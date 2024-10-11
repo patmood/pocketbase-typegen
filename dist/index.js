@@ -30,7 +30,7 @@ async function fromURL(url, email = "", password = "") {
   formData.append("password", password);
   let collections = [];
   try {
-    const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
+    const { token } = await fetch(`${url}/api/collections/_superusers/auth-with-password`, {
       body: formData,
       method: "post"
     }).then((res) => {
