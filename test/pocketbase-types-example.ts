@@ -38,66 +38,7 @@ export type AuthSystemFields<T = never> = {
 
 // Record types for each collection
 
-export type BaseRecord = {
-	field?: string
-}
-
-export type CustomAuthRecord = {
-	custom_field?: string
-}
-
-export enum EverythingSelectFieldOptions {
-	"optionA" = "optionA",
-	"OptionA" = "OptionA",
-	"optionB" = "optionB",
-	"optionC" = "optionC",
-	"option with space" = "option with space",
-	"sy?mb@!$" = "sy?mb@!$",
-}
-export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknown> = {
-	another_json_field?: null | Tanother_json_field
-	bool_field?: boolean
-	custom_relation_field?: RecordIdString[]
-	date_field?: IsoDateString
-	email_field?: string
-	file_field?: string
-	json_field?: null | Tjson_field
-	number_field?: number
-	post_relation_field?: RecordIdString
-	rich_editor_field?: HTMLString
-	select_field?: EverythingSelectFieldOptions
-	select_field_no_values?: string
-	text_field?: string
-	three_files_field?: string[]
-	url_field?: string
-	user_relation_field?: RecordIdString
-}
-
-export type MyViewRecord<Tjson_field = unknown> = {
-	json_field?: null | Tjson_field
-	post_relation_field?: RecordIdString
-	text_field?: string
-}
-
-export type PostsRecord = {
-	field1?: number
-	field?: string
-	nonempty_bool: boolean
-	nonempty_field: string
-}
-
-export type UsersRecord = {
-	avatar?: string
-	name?: string
-}
-
 // Response types include system fields and match responses from the PocketBase API
-export type BaseResponse<Texpand = unknown> = Required<BaseRecord> & BaseSystemFields<Texpand>
-export type CustomAuthResponse<Texpand = unknown> = Required<CustomAuthRecord> & AuthSystemFields<Texpand>
-export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, Texpand = unknown> = Required<EverythingRecord<Tanother_json_field, Tjson_field>> & BaseSystemFields<Texpand>
-export type MyViewResponse<Tjson_field = unknown, Texpand = unknown> = Required<MyViewRecord<Tjson_field>> & BaseSystemFields<Texpand>
-export type PostsResponse<Texpand = unknown> = Required<PostsRecord> & BaseSystemFields<Texpand>
-export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 

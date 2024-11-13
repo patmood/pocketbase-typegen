@@ -28,7 +28,10 @@ type GenerateOptions = {
   sdk: boolean
 }
 
-export function generate(results: Array<CollectionRecord>, options: GenerateOptions): string {
+export function generate(
+  results: Array<CollectionRecord>,
+  options: GenerateOptions
+): string {
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
@@ -37,8 +40,8 @@ export function generate(results: Array<CollectionRecord>, options: GenerateOpti
     .sort((a, b) => (a.name <= b.name ? -1 : 1))
     .forEach((row) => {
       if (row.name) collectionNames.push(row.name)
-      if (row.schema) {
-        recordTypes.push(createRecordType(row.name, row.schema))
+      if (row.fields) {
+        recordTypes.push(createRecordType(row.name, row.fields))
         responseTypes.push(createResponseType(row))
       }
     })
@@ -58,12 +61,10 @@ export function generate(results: Array<CollectionRecord>, options: GenerateOpti
     createCollectionRecords(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
     options.sdk && TYPED_POCKETBASE_COMMENT,
-    options.sdk && createTypedPocketbase(sortedCollectionNames)
+    options.sdk && createTypedPocketbase(sortedCollectionNames),
   ]
 
-  return fileParts
-    .filter(Boolean)
-    .join("\n\n") + '\n'
+  return fileParts.filter(Boolean).join("\n\n") + "\n"
 }
 
 export function createRecordType(
@@ -92,12 +93,12 @@ ${fields}
 export function createResponseType(
   collectionSchemaEntry: CollectionRecord
 ): string {
-  const { name, schema, type } = collectionSchemaEntry
+  const { name, fields, type } = collectionSchemaEntry
   const pascaleName = toPascalCase(name)
-  const genericArgsWithDefaults = getGenericArgStringWithDefault(schema, {
+  const genericArgsWithDefaults = getGenericArgStringWithDefault(fields, {
     includeExpand: true,
   })
-  const genericArgsForRecord = getGenericArgStringForRecord(schema)
+  const genericArgsForRecord = getGenericArgStringForRecord(fields)
   const systemFields = getSystemFields(type)
   const expandArgString = `<T${EXPAND_GENERIC_NAME}>`
 

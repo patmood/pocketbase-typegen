@@ -9,7 +9,6 @@ import { FieldSchema } from "../src/types"
 const defaultFieldSchema: FieldSchema = {
   id: "abc",
   name: "defaultName",
-  options: {},
   required: true,
   system: false,
   type: "text",
@@ -111,9 +110,7 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "selectFieldWithOpts",
-        options: {
-          values: ["one", "two", "three"],
-        },
+        values: ["one", "two", "three"],
         type: "select",
       })
     ).toEqual(`\tselectFieldWithOpts: TestCollectionSelectFieldWithOptsOptions`)
@@ -124,9 +121,7 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "selectField",
-        options: {
-          maxSelect: 2,
-        },
+        maxSelect: 2,
         type: "select",
       })
     ).toEqual("\tselectField: string[]")
@@ -137,10 +132,8 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "selectFieldWithOpts",
-        options: {
-          maxSelect: 2,
-          values: ["one", "two", "three"],
-        },
+        maxSelect: 2,
+        values: ["one", "two", "three"],
         type: "select",
       })
     ).toEqual(
@@ -183,9 +176,7 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "fileField",
-        options: {
-          maxSelect: 3,
-        },
+        maxSelect: 3,
         type: "file",
       })
     ).toEqual("\tfileField: string[]")
@@ -206,9 +197,7 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "relationFieldMany",
-        options: {
-          maxSelect: 3,
-        },
+        maxSelect: 3,
         type: "relation",
       })
     ).toEqual("\trelationFieldMany: RecordIdString[]")
@@ -219,9 +208,7 @@ describe("createTypeField", () => {
       createTypeField("test_collection", {
         ...defaultFieldSchema,
         name: "relationFieldMany",
-        options: {
-          maxSelect: null,
-        },
+        maxSelect: null,
         type: "relation",
       })
     ).toEqual("\trelationFieldMany: RecordIdString[]")
@@ -258,7 +245,7 @@ describe("createSelectOptions", () => {
       {
         id: "hhnwjkke",
         name: "title",
-        options: { values: ["one", "one", "two", "space space", "$@#*(&#%"] },
+        values: ["one", "one", "two", "space space", "$@#*(&#%"],
         required: false,
         system: false,
         type: "select",

@@ -17,7 +17,7 @@ async function fromDatabase(dbPath) {
   const result = await db.all("SELECT * FROM _collections");
   return result.map((collection) => ({
     ...collection,
-    schema: JSON.parse(collection.schema)
+    fields: JSON.parse(collection.fields)
   }));
 }
 async function fromJSON(path) {
@@ -120,7 +120,7 @@ function getOptionEnumName(recordName, fieldName) {
   return `${toPascalCase(recordName)}${toPascalCase(fieldName)}Options`;
 }
 function getOptionValues(field) {
-  const values = field.options.values;
+  const values = field.values;
   if (!values)
     return [];
   return values.filter((val, i) => values.indexOf(val) === i);
@@ -181,19 +181,21 @@ function getGenericArgStringWithDefault(schema, opts) {
 var pbSchemaTypescriptMap = {
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
+  autodate: DATE_STRING_TYPE_NAME,
   editor: HTML_STRING_NAME,
   email: "string",
   text: "string",
   url: "string",
+  password: "string",
   number: "number",
-  file: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? "string[]" : "string",
+  file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
-  relation: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
+  relation: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema, collectionName) => {
-    const valueType = fieldSchema.options.values ? getOptionEnumName(collectionName, fieldSchema.name) : "string";
-    return fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${valueType}[]` : valueType;
+    const valueType = fieldSchema.values ? getOptionEnumName(collectionName, fieldSchema.name) : "string";
+    return fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? `${valueType}[]` : valueType;
   },
-  user: (fieldSchema) => fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1 ? `${RECORD_ID_STRING_NAME}[]` : RECORD_ID_STRING_NAME
+  user: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? `${RECORD_ID_STRING_NAME}[]` : RECORD_ID_STRING_NAME
 };
 function createTypeField(collectionName, fieldSchema) {
   let typeStringOrFunc;
@@ -208,8 +210,8 @@ function createTypeField(collectionName, fieldSchema) {
   const required = fieldSchema.required ? "" : "?";
   return `	${fieldName}${required}: ${typeString}`;
 }
-function createSelectOptions(recordName, schema) {
-  const selectFields = schema.filter((field) => field.type === "select");
+function createSelectOptions(recordName, fields) {
+  const selectFields = fields.filter((field) => field.type === "select");
   const typestring = selectFields.map(
     (field) => `export enum ${getOptionEnumName(recordName, field.name)} {
 ${getOptionValues(field).map((val) => `	"${getSelectOptionEnumName(val)}" = "${val}",`).join("\n")}
@@ -234,8 +236,8 @@ function generate(results, options2) {
   results.sort((a, b) => a.name <= b.name ? -1 : 1).forEach((row) => {
     if (row.name)
       collectionNames.push(row.name);
-    if (row.schema) {
-      recordTypes.push(createRecordType(row.name, row.schema));
+    if (row.fields) {
+      recordTypes.push(createRecordType(row.name, row.fields));
       responseTypes.push(createResponseType(row));
     }
   });
@@ -270,12 +272,12 @@ ${fields}
 }` : "never"}`;
 }
 function createResponseType(collectionSchemaEntry) {
-  const { name, schema, type } = collectionSchemaEntry;
+  const { name, fields, type } = collectionSchemaEntry;
   const pascaleName = toPascalCase(name);
-  const genericArgsWithDefaults = getGenericArgStringWithDefault(schema, {
+  const genericArgsWithDefaults = getGenericArgStringWithDefault(fields, {
     includeExpand: true
   });
-  const genericArgsForRecord = getGenericArgStringForRecord(schema);
+  const genericArgsForRecord = getGenericArgStringForRecord(fields);
   const systemFields = getSystemFields(type);
   const expandArgString = `<T${EXPAND_GENERIC_NAME}>`;
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`;

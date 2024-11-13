@@ -15,36 +15,36 @@ export const pbSchemaTypescriptMap = {
   // Basic fields
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
+  autodate: DATE_STRING_TYPE_NAME,
   editor: HTML_STRING_NAME,
   email: "string",
   text: "string",
   url: "string",
+  password: "string",
   number: "number",
 
   // Dependent on schema
   file: (fieldSchema: FieldSchema) =>
-    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
-      ? "string[]"
-      : "string",
+    fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
   json: (fieldSchema: FieldSchema) =>
     `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   relation: (fieldSchema: FieldSchema) =>
-    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect === 1
+    fieldSchema.maxSelect && fieldSchema.maxSelect === 1
       ? RECORD_ID_STRING_NAME
       : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema: FieldSchema, collectionName: string) => {
     // pocketbase v0.8+ values are required
-    const valueType = fieldSchema.options.values
+    const valueType = fieldSchema.values
       ? getOptionEnumName(collectionName, fieldSchema.name)
       : "string"
-    return fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
+    return fieldSchema.maxSelect && fieldSchema.maxSelect > 1
       ? `${valueType}[]`
       : valueType
   },
 
   // DEPRECATED: PocketBase v0.8 does not have a dedicated user relation
   user: (fieldSchema: FieldSchema) =>
-    fieldSchema.options.maxSelect && fieldSchema.options.maxSelect > 1
+    fieldSchema.maxSelect && fieldSchema.maxSelect > 1
       ? `${RECORD_ID_STRING_NAME}[]`
       : RECORD_ID_STRING_NAME,
 }
@@ -80,9 +80,9 @@ export function createTypeField(
 
 export function createSelectOptions(
   recordName: string,
-  schema: Array<FieldSchema>
+  fields: Array<FieldSchema>
 ): string {
-  const selectFields = schema.filter((field) => field.type === "select")
+  const selectFields = fields.filter((field) => field.type === "select")
   const typestring = selectFields
     .map(
       (field) => `export enum ${getOptionEnumName(recordName, field.name)} {

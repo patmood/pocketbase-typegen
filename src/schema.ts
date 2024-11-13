@@ -12,10 +12,11 @@ export async function fromDatabase(
     driver: sqlite3.Database,
     filename: dbPath,
   })
+
   const result = await db.all("SELECT * FROM _collections")
   return result.map((collection) => ({
     ...collection,
-    schema: JSON.parse(collection.schema),
+    fields: JSON.parse(collection.fields),
   }))
 }
 

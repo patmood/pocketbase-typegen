@@ -40,7 +40,7 @@ export function getOptionEnumName(recordName: string, fieldName: string) {
 }
 
 export function getOptionValues(field: FieldSchema) {
-  const values = field.options.values
+  const values = field.values
   if (!values) return []
   return values.filter((val, i) => values.indexOf(val) === i)
 }

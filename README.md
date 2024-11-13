@@ -10,9 +10,11 @@ This will produce types for all your PocketBase collections to use in your front
 
 ## Versions
 
-When using PocketBase > v0.8.x, use `pocketbase-typegen` v1.1.x
-
-Users of PocketBase < v0.7.x should use `pocketbase-typegen` v1.0.x
+| PocketBase | pocketbase-typegen |
+|------------|--------------------|
+| v0.23.x    | v2.0.x             |
+| v0.8.x     | v1.1.x             |
+| v0.7.x     | v1.0.x             |
 
 ## Usage
 
