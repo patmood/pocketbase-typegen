@@ -9,7 +9,6 @@ import { FieldSchema } from "../src/types"
 const textField: FieldSchema = {
   id: "1",
   name: "field1",
-  options: {},
   required: true,
   system: false,
   type: "text",
@@ -18,7 +17,6 @@ const textField: FieldSchema = {
 const jsonField1: FieldSchema = {
   id: "2",
   name: "data1",
-  options: {},
   required: true,
   system: false,
   type: "json",
@@ -27,7 +25,6 @@ const jsonField1: FieldSchema = {
 const jsonField2: FieldSchema = {
   id: "3",
   name: "data2",
-  options: {},
   required: true,
   system: false,
   type: "json",
@@ -36,7 +33,6 @@ const jsonField2: FieldSchema = {
 const expandField: FieldSchema = {
   id: "4",
   name: "post_relation_field",
-  options: {},
   required: true,
   system: false,
   type: "relation",

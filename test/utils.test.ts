@@ -53,7 +53,6 @@ describe("getOptionValues", () => {
     const fieldWithoutValues: FieldSchema = {
       id: "1",
       name: "myfield",
-      options: {},
       required: false,
       system: false,
       type: "text",
@@ -66,9 +65,7 @@ describe("getOptionValues", () => {
     const fieldWithValues: FieldSchema = {
       id: "1",
       name: "myfield",
-      options: {
-        values: ["one", "one", "one", "two"],
-      },
+      values: ["one", "one", "one", "two"],
       required: false,
       system: false,
       type: "text",
