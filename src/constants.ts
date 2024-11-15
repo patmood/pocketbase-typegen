@@ -19,8 +19,6 @@ export type ${HTML_STRING_NAME} = string`
 export const BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = never> = {
 \tid: ${RECORD_ID_STRING_NAME}
-\tcreated: ${DATE_STRING_TYPE_NAME}
-\tupdated: ${DATE_STRING_TYPE_NAME}
 \tcollectionId: string
 \tcollectionName: Collections
 \texpand?: T
