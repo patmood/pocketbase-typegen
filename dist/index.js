@@ -30,10 +30,13 @@ async function fromURL(url, email = "", password = "") {
   formData.append("password", password);
   let collections = [];
   try {
-    const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
-      body: formData,
-      method: "post"
-    }).then((res) => {
+    const { token } = await fetch(
+      `${url}/api/collections/_superusers/auth-with-password`,
+      {
+        body: formData,
+        method: "post"
+      }
+    ).then((res) => {
       if (!res.ok)
         throw res;
       return res.json();
@@ -77,8 +80,6 @@ export type ${HTML_STRING_NAME} = string`;
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = never> = {
 	id: ${RECORD_ID_STRING_NAME}
-	created: ${DATE_STRING_TYPE_NAME}
-	updated: ${DATE_STRING_TYPE_NAME}
 	collectionId: string
 	collectionName: Collections
 	expand?: T
@@ -147,7 +148,11 @@ ${nameRecordMap}
 }`;
 }
 function createTypedPocketbase(collectionNames) {
-  const nameRecordMap = collectionNames.map((name) => `	collection(idOrName: '${name}'): RecordService<${toPascalCase(name)}Response>`).join("\n");
+  const nameRecordMap = collectionNames.map(
+    (name) => `	collection(idOrName: '${name}'): RecordService<${toPascalCase(
+      name
+    )}Response>`
+  ).join("\n");
   return `export type TypedPocketBase = PocketBase & {
 ${nameRecordMap}
 }`;

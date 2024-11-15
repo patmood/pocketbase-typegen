@@ -36,11 +36,14 @@ export async function fromURL(
   let collections: Array<CollectionRecord> = []
   try {
     // Login
-    const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
-      // @ts-ignore
-      body: formData,
-      method: "post",
-    }).then((res) => {
+    const { token } = await fetch(
+      `${url}/api/collections/_superusers/auth-with-password`,
+      {
+        // @ts-ignore
+        body: formData,
+        method: "post",
+      }
+    ).then((res) => {
       if (!res.ok) throw res
       return res.json()
     })
