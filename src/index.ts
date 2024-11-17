@@ -21,7 +21,7 @@ program
     "URL to your hosted pocketbase instance. When using this options you must also provide email and password options."
   )
   .option(
-    "-e, --email <char>",
+    "--email <char>",
     "email for an admin pocketbase user. Use this with the --url option"
   )
   .option(
@@ -38,7 +38,7 @@ program
     "remove the pocketbase package dependency. A typed version of the SDK will not be generated."
   )
   .option(
-    "-e, --env [path]",
+    "--env [path]",
     "flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file"
   )
 

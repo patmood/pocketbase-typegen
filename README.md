@@ -22,11 +22,11 @@ Options:
   -d, --db <char>        path to the pocketbase SQLite database
   -j, --json <char>      path to JSON schema exported from pocketbase admin UI
   -u, --url <char>       URL to your hosted pocketbase instance. When using this options you must also provide email and password options.
-  -e, --email <char>     email for an admin pocketbase user. Use this with the --url option
+  --email <char>     email for an admin pocketbase user. Use this with the --url option
   -p, --password <char>  password for an admin pocketbase user. Use this with the --url option
   -o, --out <char>       path to save the typescript output file (default: "pocketbase-types.ts")
   --no-sdk               remove the pocketbase package dependency. A typed version of the SDK will not be generated.
-  -e, --env [path]       flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file
+  --env [path]       flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file
   -h, --help             display help for command
 ```
 
