@@ -8,13 +8,13 @@ Generate typescript definitions from your [pocketbase.io](https://pocketbase.io/
 
 This will produce types for all your PocketBase collections to use in your frontend typescript codebase.
 
-## Versions
+## Version Support
 
-| PocketBase | pocketbase-typegen |
-|------------|--------------------|
-| v0.23.x    | v2.0.x             |
-| v0.8.x     | v1.1.x             |
-| v0.7.x     | v1.0.x             |
+| PocketBase | pocketbase-typegen | npx command                                                                    |
+|------------|--------------------| ------------------------------------------------------------------------------ |
+| v0.23.x    | v1.2.x             | npx pocketbase-typegen --db ./pb_data/data.db --out pocketbase-types.ts        |
+| v0.8.x     | v1.1.x             | npx pocketbase-typegen@1.2.1 --db ./pb_data/data.db --out pocketbase-types.ts  |
+| v0.7.x     | v1.0.x             | npx pocketbase-typegen@1.0.13 --db ./pb_data/data.db --out pocketbase-types.ts |
 
 ## Usage
 
