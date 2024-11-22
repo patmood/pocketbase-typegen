@@ -75,6 +75,7 @@ export type OtpsRecord = {
 	id: string
 	password: string
 	recordRef: string
+	sentTo?: string
 	updated?: IsoDateString
 }
 
