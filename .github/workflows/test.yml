@@ -25,3 +25,4 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
+      - run: npm run typecheck

@@ -23,6 +23,7 @@ const thing = getOne(Collections.Everything, "a")
 
 // Works when passing in JSON generic
 const everythingRecordWithGeneric: EverythingRecord<{ a: "some string" }> = {
+  id: "abc",
   bool_field: true,
   json_field: { a: "some string" },
   number_field: 1,
@@ -30,6 +31,7 @@ const everythingRecordWithGeneric: EverythingRecord<{ a: "some string" }> = {
 
 // Works without passing in JSON generic
 const everythingRecordWithoutGeneric: EverythingRecord = {
+  id: "abc",
   bool_field: true,
   json_field: { a: "some string" },
   number_field: 1,
@@ -37,6 +39,7 @@ const everythingRecordWithoutGeneric: EverythingRecord = {
 
 // Test select option enums
 const selectOptions: EverythingRecord = {
+  id: "abc",
   select_field: EverythingSelectFieldOptions.optionA,
   select_field_no_values: "foo",
 }
