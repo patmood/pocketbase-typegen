@@ -10,11 +10,10 @@ describe("generate", () => {
         id: "123",
         listRule: null,
         name: "books",
-        schema: [
+        fields: [
           {
             id: "xyz",
             name: "title",
-            options: {},
             required: false,
             system: false,
             type: "text",
@@ -39,11 +38,10 @@ describe("generate", () => {
         id: "123",
         listRule: null,
         name: "books",
-        schema: [
+        fields: [
           {
             id: "xyz",
             name: "title",
-            options: {},
             required: false,
             system: false,
             type: "text",
@@ -68,7 +66,9 @@ describe("createRecordType", () => {
       {
         id: "hhnwjkke",
         name: "title",
-        options: { max: null, min: null, pattern: "" },
+        max: null,
+        min: null,
+        pattern: "",
         required: false,
         system: false,
         type: "text",
@@ -85,7 +85,7 @@ describe("createRecordType", () => {
       {
         id: "hhnwjkke",
         name: "avatars",
-        options: { maxSelect: 2 },
+        maxSelect: 2,
         required: false,
         system: false,
         type: "file",
@@ -102,7 +102,6 @@ describe("createRecordType", () => {
       {
         id: "1",
         name: "banana",
-        options: {},
         required: false,
         system: false,
         type: "text",
@@ -111,7 +110,6 @@ describe("createRecordType", () => {
       {
         id: "1",
         name: "apple",
-        options: {},
         required: false,
         system: false,
         type: "text",
@@ -135,11 +133,13 @@ describe("createResponseType", () => {
       id: "123",
       listRule: null,
       name: "books",
-      schema: [
+      fields: [
         {
           id: "hhnwjkke",
           name: "title",
-          options: { max: null, min: null, pattern: "" },
+          max: null,
+          min: null,
+          pattern: "",
           required: false,
           system: false,
           type: "text",
@@ -162,7 +162,7 @@ describe("createResponseType", () => {
       {
         id: "hhnwjkke",
         name: "avatars",
-        options: { maxSelect: 2 },
+        maxSelect: 2,
         required: false,
         system: false,
         type: "file",

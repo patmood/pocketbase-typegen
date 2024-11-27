@@ -21,6 +21,7 @@ export type FieldSchema = {
     | "email"
     | "url"
     | "date"
+    | "autodate"
     | "select"
     | "json"
     | "relation"
@@ -29,20 +30,19 @@ export type FieldSchema = {
   system: boolean
   required: boolean
   unique: boolean
-  options: RecordOptions
-}
+} & RecordOptions
 
 export type CollectionRecord = {
   id: string
   type: "base" | "auth" | "view"
   name: string
   system: boolean
+  fields: FieldSchema[]
   listRule: string | null
   viewRule: string | null
   createRule: string | null
   updateRule: string | null
   deleteRule: string | null
-  schema: Array<FieldSchema>
 }
 
 // Every field is optional

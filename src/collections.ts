@@ -32,11 +32,14 @@ ${nameRecordMap}
 }`
 }
 
-export function createTypedPocketbase(
-  collectionNames: Array<string>
-): string {
+export function createTypedPocketbase(collectionNames: Array<string>): string {
   const nameRecordMap = collectionNames
-    .map((name) => `\tcollection(idOrName: '${name}'): RecordService<${toPascalCase(name)}Response>`)
+    .map(
+      (name) =>
+        `\tcollection(idOrName: '${name}'): RecordService<${toPascalCase(
+          name
+        )}Response>`
+    )
     .join("\n")
   return `export type TypedPocketBase = PocketBase & {
 ${nameRecordMap}

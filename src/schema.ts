@@ -12,10 +12,11 @@ export async function fromDatabase(
     driver: sqlite3.Database,
     filename: dbPath,
   })
+
   const result = await db.all("SELECT * FROM _collections")
   return result.map((collection) => ({
     ...collection,
-    schema: JSON.parse(collection.schema),
+    fields: JSON.parse(collection.fields),
   }))
 }
 
@@ -35,11 +36,14 @@ export async function fromURL(
   let collections: Array<CollectionRecord> = []
   try {
     // Login
-    const { token } = await fetch(`${url}/api/admins/auth-with-password`, {
-      // @ts-ignore
-      body: formData,
-      method: "post",
-    }).then((res) => {
+    const { token } = await fetch(
+      `${url}/api/collections/_superusers/auth-with-password`,
+      {
+        // @ts-ignore
+        body: formData,
+        method: "post",
+      }
+    ).then((res) => {
       if (!res.ok) throw res
       return res.json()
     })

@@ -3,7 +3,6 @@ import dotenv from "dotenv"
 import type { CollectionRecord, Options } from "./types"
 import { fromDatabase, fromJSON, fromURL } from "./schema"
 
-
 import { generate } from "./lib"
 import { saveFile } from "./utils"
 
@@ -16,11 +15,13 @@ export async function main(options: Options) {
   } else if (options.url) {
     schema = await fromURL(options.url, options.email, options.password)
   } else if (options.env) {
-    const path: string = typeof options.env === "string"
-      ? options.env
-      : ".env"
+    const path: string = typeof options.env === "string" ? options.env : ".env"
     dotenv.config({ path: path })
-    if (!process.env.PB_TYPEGEN_URL || !process.env.PB_TYPEGEN_EMAIL || !process.env.PB_TYPEGEN_PASSWORD) {
+    if (
+      !process.env.PB_TYPEGEN_URL ||
+      !process.env.PB_TYPEGEN_EMAIL ||
+      !process.env.PB_TYPEGEN_PASSWORD
+    ) {
       return console.error(
         "Missing environment variables. Check options: pocketbase-typegen --help"
       )
@@ -36,7 +37,7 @@ export async function main(options: Options) {
     )
   }
   const typeString = generate(schema, {
-    sdk: options.sdk ?? true
+    sdk: options.sdk ?? true,
   })
   await saveFile(options.out, typeString)
   return typeString

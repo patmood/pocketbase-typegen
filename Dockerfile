@@ -1,18 +1,18 @@
 # Dockerfile to run e2e integration tests against a test PocketBase server
 FROM node:16-alpine3.16
 
-ARG POCKETBASE_VERSION=0.15.0
+ARG POCKETBASE_VERSION=0.23.1
 
 WORKDIR /app/output/
 WORKDIR /app/
 
 # Install the dependencies
 RUN apk add --no-cache \
-    ca-certificates \
-    unzip \
-    wget \
-    zip \
-    zlib-dev
+  ca-certificates \
+  unzip \
+  wget \
+  zip \
+  zlib-dev
 
 # Download Pocketbase and install it
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip /tmp/pocketbase.zip
