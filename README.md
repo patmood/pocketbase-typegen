@@ -11,9 +11,10 @@ This will produce types for all your PocketBase collections to use in your front
 ## Version Support
 
 | PocketBase | pocketbase-typegen | npx command                                                                    |
-|------------|--------------------| ------------------------------------------------------------------------------ |
-| v0.23.x    | v1.2.x             | npx pocketbase-typegen --db ./pb_data/data.db --out pocketbase-types.ts        |
-| v0.8.x     | v1.1.x             | npx pocketbase-typegen@1.2.1 --db ./pb_data/data.db --out pocketbase-types.ts  |
+| ---------- | ------------------ | ------------------------------------------------------------------------------ |
+| v0.23.x    | v1.3.x             | npx pocketbase-typegen --db ./pb_data/data.db --out pocketbase-types.ts        |
+| v0.18.x    | v1.2.x             | npx pocketbase-typegen@1.2.1 --db ./pb_data/data.db --out pocketbase-types.ts  |
+| v0.8.x     | v1.1.x             | npx pocketbase-typegen@1.1.1 --db ./pb_data/data.db --out pocketbase-types.ts  |
 | v0.7.x     | v1.0.x             | npx pocketbase-typegen@1.0.13 --db ./pb_data/data.db --out pocketbase-types.ts |
 
 ## Usage
@@ -83,10 +84,10 @@ Using PocketBase SDK v0.18.3+, collections can be [automatically typed](https://
 ```typescript
 import { TypedPocketBase } from "./pocketbase-types"
 
-const pb = new PocketBase('http://127.0.0.1:8090') as TypedPocketBase
+const pb = new PocketBase("http://127.0.0.1:8090") as TypedPocketBase
 
-await pb.collection('tasks').getOne("RECORD_ID") // -> results in TaskResponse
-await pb.collection('posts').getOne("RECORD_ID") // -> results in PostResponse
+await pb.collection("tasks").getOne("RECORD_ID") // -> results in TaskResponse
+await pb.collection("posts").getOne("RECORD_ID") // -> results in PostResponse
 ```
 
 Alternatively, you can use generic types for each request, eg:
