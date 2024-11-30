@@ -15,18 +15,33 @@ export const ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
 export type ${RECORD_ID_STRING_NAME} = string
 export type ${HTML_STRING_NAME} = string`
-
+export const IS_EXACTLY_UNKNOWN_TYPE_DEFINITION = `// Utility type to check if T is exactly unknown
+type IsExactlyUnknown<T> =
+  unknown extends T
+    ? T extends unknown
+      ? keyof T extends never
+        ? true
+        : false
+      : false
+    : false`
 export const BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
-export type BaseSystemFields<T = never> = {
-\tid: ${RECORD_ID_STRING_NAME}
-\tcollectionId: string
-\tcollectionName: Collections
-\texpand?: T
-}`
+export type BaseSystemFields<T = unknown> = IsExactlyUnknown<T> extends true
+  ? {
+    id: ${RECORD_ID_STRING_NAME}
+    collectionId: string
+    collectionName: Collections
+    expand?: unknown
+  }
+  : {
+    id: ${RECORD_ID_STRING_NAME}
+    collectionId: string
+    collectionName: Collections
+    expand: T
+  };`
 
-export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
-\temail: string
-\temailVisibility: boolean
-\tusername: string
-\tverified: boolean
+export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = unknown> = {
+  email: string
+  emailVisibility: boolean
+  username: string
+  verified: boolean
 } & BaseSystemFields<T>`
