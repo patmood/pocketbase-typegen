@@ -15,9 +15,10 @@ async function fromDatabase(dbPath) {
     filename: dbPath
   });
   const result = await db.all("SELECT * FROM _collections");
+  console.log(result);
   return result.map((collection) => ({
     ...collection,
-    fields: JSON.parse(collection.fields)
+    fields: JSON.parse(collection.schema)
   }));
 }
 async function fromJSON(path) {
@@ -77,18 +78,34 @@ var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
 export type ${RECORD_ID_STRING_NAME} = string
 export type ${HTML_STRING_NAME} = string`;
+var IS_EXACTLY_UNKNOWN_TYPE_DEFINITION = `// Utility type to check if T is exactly unknown
+type IsExactlyUnknown<T> =
+  unknown extends T
+    ? T extends unknown
+      ? keyof T extends never
+        ? true
+        : false
+      : false
+    : false`;
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
-export type BaseSystemFields<T = never> = {
-	id: ${RECORD_ID_STRING_NAME}
-	collectionId: string
-	collectionName: Collections
-	expand?: T
-}`;
-var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
-	email: string
-	emailVisibility: boolean
-	username: string
-	verified: boolean
+export type BaseSystemFields<T = unknown> = IsExactlyUnknown<T> extends true
+  ? {
+    id: ${RECORD_ID_STRING_NAME}
+    collectionId: string
+    collectionName: Collections
+    expand?: unknown
+  }
+  : {
+    id: ${RECORD_ID_STRING_NAME}
+    collectionId: string
+    collectionName: Collections
+    expand: T
+  };`;
+var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = unknown> = {
+  email: string
+  emailVisibility: boolean
+  username: string
+  verified: boolean
 } & BaseSystemFields<T>`;
 
 // src/utils.ts
@@ -252,6 +269,7 @@ function generate(results, options2) {
     options2.sdk && IMPORTS,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
+    IS_EXACTLY_UNKNOWN_TYPE_DEFINITION,
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,

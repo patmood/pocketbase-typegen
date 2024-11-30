@@ -37,19 +37,36 @@ export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
 
-// System fields
-export type BaseSystemFields<T = never> = {
-	id: RecordIdString
-	collectionId: string
-	collectionName: Collections
-	expand?: T
-}
+// Utility type to check if T is exactly unknown
+type IsExactlyUnknown<T> =
+  unknown extends T
+    ? T extends unknown
+      ? keyof T extends never
+        ? true
+        : false
+      : false
+    : false
 
-export type AuthSystemFields<T = never> = {
-	email: string
-	emailVisibility: boolean
-	username: string
-	verified: boolean
+// System fields
+export type BaseSystemFields<T = unknown> = IsExactlyUnknown<T> extends true
+  ? {
+    id: RecordIdString
+    collectionId: string
+    collectionName: Collections
+    expand?: unknown
+  }
+  : {
+    id: RecordIdString
+    collectionId: string
+    collectionName: Collections
+    expand: T
+  };
+
+export type AuthSystemFields<T = unknown> = {
+  email: string
+  emailVisibility: boolean
+  username: string
+  verified: boolean
 } & BaseSystemFields<T>
 
 // Record types for each collection

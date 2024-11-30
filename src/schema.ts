@@ -16,7 +16,7 @@ export async function fromDatabase(
   const result = await db.all("SELECT * FROM _collections")
   return result.map((collection) => ({
     ...collection,
-    fields: JSON.parse(collection.fields),
+    fields: JSON.parse(collection.schema),
   }))
 }
 

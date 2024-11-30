@@ -9,6 +9,7 @@ import {
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
   IMPORTS,
+  IS_EXACTLY_UNKNOWN_TYPE_DEFINITION,
 } from "./constants"
 import { CollectionRecord, FieldSchema } from "./types"
 import {
@@ -52,6 +53,7 @@ export function generate(
     options.sdk && IMPORTS,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
+    IS_EXACTLY_UNKNOWN_TYPE_DEFINITION,
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
