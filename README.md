@@ -112,15 +112,15 @@ import { Collections, CommentsResponse, UserResponse } from "./pocketbase-types"
     user: RecordIdString // This is a relation field
   }
 */
-type Tmetadata = {
+type Metadata = {
   likes: number
 }
-type Texpand = {
+type Expand = {
   user: UsersResponse
 }
 const result = await pb
   .collection(Collections.Comments)
-  .getOne<CommentsResponse<Tmetadata, Texpand>>("RECORD_ID", { expand: "user" })
+  .getOne<CommentsResponse<Metadata, Expand>>("RECORD_ID", { expand: "user" })
 
 // Now you can access the expanded relation with type safety and hints in your IDE
 result.expand?.user.username
