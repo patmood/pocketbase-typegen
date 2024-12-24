@@ -26,6 +26,7 @@ export enum Collections {
 export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
+export type Nullable<T> = T | null | ''
 
 // System fields
 export type BaseSystemFields<T = never> = {
@@ -261,7 +262,7 @@ export type EverythingUpdate<Tanother_json_field = unknown, Tjson_field = unknow
 	custom_relation_field?: RecordIdString[]
 	date_field?: IsoDateString
 	email_field?: string
-	file_field?: File
+	file_field?: Nullable<File>
 	json_field?: null | Tjson_field
 	number_field?: number
 	post_relation_field?: RecordIdString
@@ -269,7 +270,7 @@ export type EverythingUpdate<Tanother_json_field = unknown, Tjson_field = unknow
 	select_field?: EverythingSelectFieldOptions
 	select_field_no_values?: string
 	text_field?: string
-	three_files_field?: File[]
+	three_files_field?: Nullable<File[]>
 	url_field?: string
 	user_relation_field?: RecordIdString
 } & BaseSystemUpdateFields
@@ -287,7 +288,7 @@ export type PostsUpdate = {
 } & BaseSystemUpdateFields
 
 export type UsersUpdate = {
-	avatar?: File
+	avatar?: Nullable<File>
 	name?: string
 } & AuthSystemUpdateFields
 

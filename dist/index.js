@@ -78,7 +78,8 @@ var HTML_STRING_NAME = `HTMLString`;
 var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
 export type ${RECORD_ID_STRING_NAME} = string
-export type ${HTML_STRING_NAME} = string`;
+export type ${HTML_STRING_NAME} = string
+export type Nullable<T> = T | null | ''`;
 var NOT_COMMON_COLLECTIONS = ["_authOrigins", "_externalAuths", "_mfas", "_otps"];
 var EXTRA_SYSTEM_FIELDS = ["created", "updated"];
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
@@ -246,7 +247,8 @@ var pbSchemaTypescriptMap = {
   password: "string",
   number: "number",
   file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
-  _file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "File[]" : "File",
+  file_create: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "File[]" : "File",
+  file_update: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "Nullable<File[]>" : "Nullable<File>",
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   relation: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema, collectionName) => {
@@ -270,7 +272,7 @@ function createTypeField(collectionName, fieldSchema) {
 }
 function createTypeCreateField(collectionName, fieldSchema) {
   let typeStringOrFunc;
-  const fieldType = fieldSchema.type === "file" ? "_file" : fieldSchema.type;
+  const fieldType = fieldSchema.type === "file" ? "file_create" : fieldSchema.type;
   if (!(fieldType in pbSchemaTypescriptMap)) {
     console.log(`WARNING: unknown type "${fieldType}" found in schema`);
     typeStringOrFunc = "unknown";
@@ -284,7 +286,7 @@ function createTypeCreateField(collectionName, fieldSchema) {
 }
 function createTypeUpdateField(collectionName, fieldSchema) {
   let typeStringOrFunc;
-  const fieldType = fieldSchema.type === "file" ? "_file" : fieldSchema.type;
+  const fieldType = fieldSchema.type === "file" ? "file_update" : fieldSchema.type;
   if (!(fieldType in pbSchemaTypescriptMap)) {
     console.log(`WARNING: unknown type "${fieldType}" found in schema`);
     typeStringOrFunc = "unknown";
@@ -390,9 +392,6 @@ function createUpdateType(collectionSchemaEntry) {
   const genericArgs = getGenericArgStringWithDefault(fields, {
     includeExpand: false
   });
-  if (name === "users") {
-    console.log(name, type, fields);
-  }
   const systemFields = getSystemUpdateFields(type);
   const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name)).map((fieldSchema) => createTypeUpdateField(name, fieldSchema)).sort().join("\n");
   return `export type ${typeName}Update${genericArgs} = ${collectionFields ? `{

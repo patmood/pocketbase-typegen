@@ -26,8 +26,10 @@ export const pbSchemaTypescriptMap = {
   // Dependent on schema
   file: (fieldSchema: FieldSchema) =>
     fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
-  _file: (fieldSchema: FieldSchema) =>
+  file_create: (fieldSchema: FieldSchema) =>
     fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "File[]" : "File",
+  file_update: (fieldSchema: FieldSchema) =>
+    fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "Nullable<File[]>" : "Nullable<File>",
   json: (fieldSchema: FieldSchema) =>
     `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   relation: (fieldSchema: FieldSchema) =>
@@ -88,7 +90,7 @@ export function createTypeCreateField(
     | string
     | ((fieldSchema: FieldSchema, collectionName: string) => string)
 
-  const fieldType = fieldSchema.type === 'file' ? '_file' : fieldSchema.type;
+  const fieldType = fieldSchema.type === 'file' ? 'file_create' : fieldSchema.type;
   if (!(fieldType in pbSchemaTypescriptMap)) {
     console.log(`WARNING: unknown type "${fieldType}" found in schema`)
     typeStringOrFunc = "unknown"
@@ -118,7 +120,7 @@ export function createTypeUpdateField(
     | string
     | ((fieldSchema: FieldSchema, collectionName: string) => string)
 
-  const fieldType = fieldSchema.type === 'file' ? '_file' : fieldSchema.type;
+  const fieldType = fieldSchema.type === 'file' ? 'file_update' : fieldSchema.type;
   if (!(fieldType in pbSchemaTypescriptMap)) {
     console.log(`WARNING: unknown type "${fieldType}" found in schema`)
     typeStringOrFunc = "unknown"

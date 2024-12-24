@@ -36,6 +36,7 @@ export enum Collections {
 export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
+export type Nullable<T> = T | null | ''
 
 // System fields
 export type BaseSystemFields<T = never> = {

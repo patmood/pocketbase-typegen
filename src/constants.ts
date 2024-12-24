@@ -16,7 +16,8 @@ export const HTML_STRING_NAME = `HTMLString`
 export const ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
 export type ${RECORD_ID_STRING_NAME} = string
-export type ${HTML_STRING_NAME} = string`
+export type ${HTML_STRING_NAME} = string
+export type Nullable<T> = T | null | ''`
 export const NOT_COMMON_COLLECTIONS = ['_authOrigins', '_externalAuths', '_mfas', '_otps']
 export const EXTRA_SYSTEM_FIELDS = ['created', 'updated']
 
