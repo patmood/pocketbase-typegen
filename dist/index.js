@@ -58,39 +58,6 @@ async function fromURL(url, email = "", password = "") {
   return collections;
 }
 
-// src/constants.ts
-var EXPORT_COMMENT = `/**
-* This file was @generated using pocketbase-typegen
-*/`;
-var IMPORTS = `import type PocketBase from 'pocketbase'
-import type { RecordService } from 'pocketbase'`;
-var RECORD_TYPE_COMMENT = `// Record types for each collection`;
-var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
-var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
-var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted PocketBase instance
-// https://github.com/pocketbase/js-sdk#specify-typescript-definitions`;
-var EXPAND_GENERIC_NAME = "expand";
-var DATE_STRING_TYPE_NAME = `IsoDateString`;
-var RECORD_ID_STRING_NAME = `RecordIdString`;
-var HTML_STRING_NAME = `HTMLString`;
-var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
-export type ${DATE_STRING_TYPE_NAME} = string
-export type ${RECORD_ID_STRING_NAME} = string
-export type ${HTML_STRING_NAME} = string`;
-var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
-export type BaseSystemFields<T = never> = {
-	id: ${RECORD_ID_STRING_NAME}
-	collectionId: string
-	collectionName: Collections
-	expand?: T
-}`;
-var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
-	email: string
-	emailVisibility: boolean
-	username: string
-	verified: boolean
-} & BaseSystemFields<T>`;
-
 // src/utils.ts
 import { promises as fs2 } from "fs";
 function toPascalCase(str) {
@@ -115,6 +82,22 @@ function getSystemFields(type) {
       return "AuthSystemFields";
     default:
       return "BaseSystemFields";
+  }
+}
+function getSystemCreateFields(type) {
+  switch (type) {
+    case "auth":
+      return "AuthSystemCreateFields";
+    default:
+      return "BaseSystemCreateFields";
+  }
+}
+function getSystemUpdateFields(type) {
+  switch (type) {
+    case "auth":
+      return "AuthSystemUpdateFields";
+    default:
+      return "BaseSystemUpdateFields";
   }
 }
 function getOptionEnumName(recordName, fieldName) {
@@ -158,6 +141,63 @@ ${nameRecordMap}
 }`;
 }
 
+// src/constants.ts
+var EXPORT_COMMENT = `/**
+* This file was @generated using pocketbase-typegen
+*/`;
+var IMPORTS = `import type PocketBase from 'pocketbase'
+import type { RecordService } from 'pocketbase'`;
+var RECORD_TYPE_COMMENT = `// Record types for each collection`;
+var CREATE_TYPE_COMMENT = `// Create types for each collection`;
+var UPDATE_TYPE_COMMENT = `// Update types for each collection`;
+var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
+var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
+var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted PocketBase instance
+// https://github.com/pocketbase/js-sdk#specify-typescript-definitions`;
+var EXPAND_GENERIC_NAME = "expand";
+var DATE_STRING_TYPE_NAME = `IsoDateString`;
+var RECORD_ID_STRING_NAME = `RecordIdString`;
+var HTML_STRING_NAME = `HTMLString`;
+var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
+export type ${DATE_STRING_TYPE_NAME} = string
+export type ${RECORD_ID_STRING_NAME} = string
+export type ${HTML_STRING_NAME} = string`;
+var NOT_COMMON_COLLECTIONS = ["_authOrigins", "_externalAuths", "_mfas", "_otps"];
+var EXTRA_SYSTEM_FIELDS = ["created", "updated"];
+var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
+export type BaseSystemFields<T = never> = {
+	id: ${RECORD_ID_STRING_NAME}
+	collectionId: string
+	collectionName: Collections
+	expand?: T
+}`;
+var BASE_SYSTEM_CREATE_FIELDS_DEFINITION = `export type BaseSystemCreateFields = {
+	id?: ${RECORD_ID_STRING_NAME}
+}`;
+var BASE_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type BaseSystemUpdateFields = never`;
+var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
+	email: string
+	emailVisibility: boolean
+	username: string
+	verified: boolean
+} & BaseSystemFields<T>`;
+var AUTH_SYSTEM_CREATE_FIELDS_DEFINITION = `export type AuthSystemCreateFields = {
+	id?: ${RECORD_ID_STRING_NAME}
+	email: string
+	emailVisibility?: boolean
+	password: string
+	passwordConfirm: string
+	verified?: boolean
+}`;
+var AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type AuthSystemUpdateFields = {
+	email?: string
+	emailVisibility?: boolean
+	oldPassword?: string
+	password?: string
+	passwordConfirm?: string
+	verified?: boolean
+}`;
+
 // src/generics.ts
 function fieldNameToGeneric(name) {
   return `T${name}`;
@@ -194,6 +234,7 @@ var pbSchemaTypescriptMap = {
   password: "string",
   number: "number",
   file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
+  _file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "File[]" : "File",
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   relation: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema, collectionName) => {
@@ -214,6 +255,33 @@ function createTypeField(collectionName, fieldSchema) {
   const fieldName = sanitizeFieldName(fieldSchema.name);
   const required = fieldSchema.required ? "" : "?";
   return `	${fieldName}${required}: ${typeString}`;
+}
+function createTypeCreateField(collectionName, fieldSchema) {
+  let typeStringOrFunc;
+  const fieldType = fieldSchema.type === "file" ? "_file" : fieldSchema.type;
+  if (!(fieldType in pbSchemaTypescriptMap)) {
+    console.log(`WARNING: unknown type "${fieldType}" found in schema`);
+    typeStringOrFunc = "unknown";
+  } else {
+    typeStringOrFunc = pbSchemaTypescriptMap[fieldType];
+  }
+  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
+  const fieldName = sanitizeFieldName(fieldSchema.name);
+  const required = fieldSchema.required ? "" : "?";
+  return `	${fieldName}${required}: ${typeString}`;
+}
+function createTypeUpdateField(collectionName, fieldSchema) {
+  let typeStringOrFunc;
+  const fieldType = fieldSchema.type === "file" ? "_file" : fieldSchema.type;
+  if (!(fieldType in pbSchemaTypescriptMap)) {
+    console.log(`WARNING: unknown type "${fieldType}" found in schema`);
+    typeStringOrFunc = "unknown";
+  } else {
+    typeStringOrFunc = pbSchemaTypescriptMap[fieldType];
+  }
+  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
+  const fieldName = sanitizeFieldName(fieldSchema.name);
+  return `	${fieldName}?: ${typeString}`;
 }
 function createSelectOptions(recordName, fields) {
   const selectFields = fields.filter((field) => field.type === "select");
@@ -237,12 +305,18 @@ function getSelectOptionEnumName(val) {
 function generate(results, options2) {
   const collectionNames = [];
   const recordTypes = [];
+  const createTypes = [];
+  const updateTypes = [];
   const responseTypes = [RESPONSE_TYPE_COMMENT];
   results.sort((a, b) => a.name <= b.name ? -1 : 1).forEach((row) => {
     if (row.name)
       collectionNames.push(row.name);
     if (row.fields) {
       recordTypes.push(createRecordType(row.name, row.fields));
+      if (!NOT_COMMON_COLLECTIONS.includes(row.name)) {
+        createTypes.push(createCreateType(row));
+        updateTypes.push(createUpdateType(row));
+      }
       responseTypes.push(createResponseType(row));
     }
   });
@@ -253,9 +327,17 @@ function generate(results, options2) {
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
     BASE_SYSTEM_FIELDS_DEFINITION,
+    BASE_SYSTEM_CREATE_FIELDS_DEFINITION,
+    BASE_SYSTEM_UPDATE_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
+    AUTH_SYSTEM_CREATE_FIELDS_DEFINITION,
+    AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
+    CREATE_TYPE_COMMENT,
+    ...createTypes,
+    UPDATE_TYPE_COMMENT,
+    ...updateTypes,
     responseTypes.join("\n"),
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
@@ -275,6 +357,27 @@ function createRecordType(name, schema) {
   return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = ${fields ? `{
 ${fields}
 }` : "never"}`;
+}
+function createCreateType(collectionSchemaEntry) {
+  const { name, fields, type } = collectionSchemaEntry;
+  const typeName = toPascalCase(name);
+  const systemFields = getSystemCreateFields(type);
+  const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name)).map((fieldSchema) => createTypeCreateField(name, fieldSchema)).sort().join("\n");
+  return `export type ${typeName}Create = ${collectionFields ? `{
+${collectionFields}
+} & ${systemFields}` : systemFields}`;
+}
+function createUpdateType(collectionSchemaEntry) {
+  const { name, fields, type } = collectionSchemaEntry;
+  const typeName = toPascalCase(name);
+  if (name === "users") {
+    console.log(name, type, fields);
+  }
+  const systemFields = getSystemUpdateFields(type);
+  const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name)).map((fieldSchema) => createTypeUpdateField(name, fieldSchema)).sort().join("\n");
+  return `export type ${typeName}Update = ${collectionFields ? `{
+${collectionFields}
+} & ${systemFields}` : systemFields}`;
 }
 function createResponseType(collectionSchemaEntry) {
   const { name, fields, type } = collectionSchemaEntry;

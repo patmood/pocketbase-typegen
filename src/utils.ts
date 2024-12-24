@@ -35,6 +35,26 @@ export function getSystemFields(type: CollectionRecord["type"]) {
   }
 }
 
+export function getSystemCreateFields(type: CollectionRecord["type"]) {
+  switch (type) {
+    case "auth":
+      return "AuthSystemCreateFields"
+    default:
+      // `view` and `base` collection types share the same system fields (for now)
+      return "BaseSystemCreateFields"
+  }
+}
+
+export function getSystemUpdateFields(type: CollectionRecord["type"]) {
+  switch (type) {
+    case "auth":
+      return "AuthSystemUpdateFields"
+    default:
+      // `view` and `base` collection types share the same system fields (for now)
+      return "BaseSystemUpdateFields"
+  }
+}
+
 export function getOptionEnumName(recordName: string, fieldName: string) {
   return `${toPascalCase(recordName)}${toPascalCase(fieldName)}Options`
 }
