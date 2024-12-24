@@ -58,6 +58,63 @@ async function fromURL(url, email = "", password = "") {
   return collections;
 }
 
+// src/constants.ts
+var EXPORT_COMMENT = `/**
+* This file was @generated using pocketbase-typegen
+*/`;
+var IMPORTS = `import type PocketBase from 'pocketbase'
+import type { RecordService } from 'pocketbase'`;
+var RECORD_TYPE_COMMENT = `// Record types for each collection`;
+var CREATE_TYPE_COMMENT = `// Create types for each collection`;
+var UPDATE_TYPE_COMMENT = `// Update types for each collection`;
+var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
+var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
+var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted PocketBase instance
+// https://github.com/pocketbase/js-sdk#specify-typescript-definitions`;
+var EXPAND_GENERIC_NAME = "expand";
+var DATE_STRING_TYPE_NAME = `IsoDateString`;
+var RECORD_ID_STRING_NAME = `RecordIdString`;
+var HTML_STRING_NAME = `HTMLString`;
+var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
+export type ${DATE_STRING_TYPE_NAME} = string
+export type ${RECORD_ID_STRING_NAME} = string
+export type ${HTML_STRING_NAME} = string`;
+var NOT_COMMON_COLLECTIONS = ["_authOrigins", "_externalAuths", "_mfas", "_otps"];
+var EXTRA_SYSTEM_FIELDS = ["created", "updated"];
+var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
+export type BaseSystemFields<T = never> = {
+	id: ${RECORD_ID_STRING_NAME}
+	collectionId: string
+	collectionName: Collections
+	expand?: T
+}`;
+var BASE_SYSTEM_CREATE_FIELDS_DEFINITION = `export type BaseSystemCreateFields = {
+	id?: ${RECORD_ID_STRING_NAME}
+}`;
+var BASE_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type BaseSystemUpdateFields = never`;
+var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
+	email: string
+	emailVisibility: boolean
+	username: string
+	verified: boolean
+} & BaseSystemFields<T>`;
+var AUTH_SYSTEM_CREATE_FIELDS_DEFINITION = `export type AuthSystemCreateFields = {
+	id?: ${RECORD_ID_STRING_NAME}
+	email: string
+	emailVisibility?: boolean
+	password: string
+	passwordConfirm: string
+	verified?: boolean
+}`;
+var AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type AuthSystemUpdateFields = {
+	email?: string
+	emailVisibility?: boolean
+	oldPassword?: string
+	password?: string
+	passwordConfirm?: string
+	verified?: boolean
+}`;
+
 // src/utils.ts
 import { promises as fs2 } from "fs";
 function toPascalCase(str) {
@@ -124,6 +181,18 @@ function createCollectionRecords(collectionNames) {
 ${nameRecordMap}
 }`;
 }
+function createCollectionCreates(collectionNames) {
+  const nameRecordMap = collectionNames.filter((name) => !NOT_COMMON_COLLECTIONS.includes(name)).map((name) => `	${name}: ${toPascalCase(name)}Create`).join("\n");
+  return `export type CollectionCreates = {
+${nameRecordMap}
+}`;
+}
+function createCollectionUpdates(collectionNames) {
+  const nameRecordMap = collectionNames.filter((name) => !NOT_COMMON_COLLECTIONS.includes(name)).map((name) => `	${name}: ${toPascalCase(name)}Update`).join("\n");
+  return `export type CollectionUpdates = {
+${nameRecordMap}
+}`;
+}
 function createCollectionResponses(collectionNames) {
   const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Response`).join("\n");
   return `export type CollectionResponses = {
@@ -140,63 +209,6 @@ function createTypedPocketbase(collectionNames) {
 ${nameRecordMap}
 }`;
 }
-
-// src/constants.ts
-var EXPORT_COMMENT = `/**
-* This file was @generated using pocketbase-typegen
-*/`;
-var IMPORTS = `import type PocketBase from 'pocketbase'
-import type { RecordService } from 'pocketbase'`;
-var RECORD_TYPE_COMMENT = `// Record types for each collection`;
-var CREATE_TYPE_COMMENT = `// Create types for each collection`;
-var UPDATE_TYPE_COMMENT = `// Update types for each collection`;
-var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
-var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
-var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted PocketBase instance
-// https://github.com/pocketbase/js-sdk#specify-typescript-definitions`;
-var EXPAND_GENERIC_NAME = "expand";
-var DATE_STRING_TYPE_NAME = `IsoDateString`;
-var RECORD_ID_STRING_NAME = `RecordIdString`;
-var HTML_STRING_NAME = `HTMLString`;
-var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
-export type ${DATE_STRING_TYPE_NAME} = string
-export type ${RECORD_ID_STRING_NAME} = string
-export type ${HTML_STRING_NAME} = string`;
-var NOT_COMMON_COLLECTIONS = ["_authOrigins", "_externalAuths", "_mfas", "_otps"];
-var EXTRA_SYSTEM_FIELDS = ["created", "updated"];
-var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
-export type BaseSystemFields<T = never> = {
-	id: ${RECORD_ID_STRING_NAME}
-	collectionId: string
-	collectionName: Collections
-	expand?: T
-}`;
-var BASE_SYSTEM_CREATE_FIELDS_DEFINITION = `export type BaseSystemCreateFields = {
-	id?: ${RECORD_ID_STRING_NAME}
-}`;
-var BASE_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type BaseSystemUpdateFields = never`;
-var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
-	email: string
-	emailVisibility: boolean
-	username: string
-	verified: boolean
-} & BaseSystemFields<T>`;
-var AUTH_SYSTEM_CREATE_FIELDS_DEFINITION = `export type AuthSystemCreateFields = {
-	id?: ${RECORD_ID_STRING_NAME}
-	email: string
-	emailVisibility?: boolean
-	password: string
-	passwordConfirm: string
-	verified?: boolean
-}`;
-var AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type AuthSystemUpdateFields = {
-	email?: string
-	emailVisibility?: boolean
-	oldPassword?: string
-	password?: string
-	passwordConfirm?: string
-	verified?: boolean
-}`;
 
 // src/generics.ts
 function fieldNameToGeneric(name) {
@@ -341,6 +353,8 @@ function generate(results, options2) {
     responseTypes.join("\n"),
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
+    createCollectionCreates(sortedCollectionNames),
+    createCollectionUpdates(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
     options2.sdk && TYPED_POCKETBASE_COMMENT,
     options2.sdk && createTypedPocketbase(sortedCollectionNames)

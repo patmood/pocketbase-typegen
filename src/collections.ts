@@ -1,3 +1,4 @@
+import { NOT_COMMON_COLLECTIONS } from "./constants"
 import { toPascalCase } from "./utils"
 
 export function createCollectionEnum(collectionNames: Array<string>): string {
@@ -17,6 +18,30 @@ export function createCollectionRecords(
     .map((name) => `\t${name}: ${toPascalCase(name)}Record`)
     .join("\n")
   return `export type CollectionRecords = {
+${nameRecordMap}
+}`
+}
+
+export function createCollectionCreates(
+  collectionNames: Array<string>
+): string {
+  const nameRecordMap = collectionNames
+    .filter((name) => !NOT_COMMON_COLLECTIONS.includes(name))
+    .map((name) => `\t${name}: ${toPascalCase(name)}Create`)
+    .join("\n")
+  return `export type CollectionCreates = {
+${nameRecordMap}
+}`
+}
+
+export function createCollectionUpdates(
+  collectionNames: Array<string>
+): string {
+  const nameRecordMap = collectionNames
+    .filter((name) => !NOT_COMMON_COLLECTIONS.includes(name))
+    .map((name) => `\t${name}: ${toPascalCase(name)}Update`)
+    .join("\n")
+  return `export type CollectionUpdates = {
 ${nameRecordMap}
 }`
 }

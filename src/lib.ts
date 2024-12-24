@@ -1,7 +1,9 @@
 import {
+  createCollectionCreates,
   createCollectionEnum,
   createCollectionRecords,
   createCollectionResponses,
+  createCollectionUpdates,
   createTypedPocketbase,
 } from "./collections"
 import {
@@ -81,6 +83,8 @@ export function generate(
     responseTypes.join("\n"),
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
+    createCollectionCreates(sortedCollectionNames),
+    createCollectionUpdates(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
     options.sdk && TYPED_POCKETBASE_COMMENT,
     options.sdk && createTypedPocketbase(sortedCollectionNames),
