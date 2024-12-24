@@ -375,21 +375,27 @@ ${fields}
 function createCreateType(collectionSchemaEntry) {
   const { name, fields, type } = collectionSchemaEntry;
   const typeName = toPascalCase(name);
+  const genericArgs = getGenericArgStringWithDefault(fields, {
+    includeExpand: false
+  });
   const systemFields = getSystemCreateFields(type);
   const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name)).map((fieldSchema) => createTypeCreateField(name, fieldSchema)).sort().join("\n");
-  return `export type ${typeName}Create = ${collectionFields ? `{
+  return `export type ${typeName}Create${genericArgs} = ${collectionFields ? `{
 ${collectionFields}
 } & ${systemFields}` : systemFields}`;
 }
 function createUpdateType(collectionSchemaEntry) {
   const { name, fields, type } = collectionSchemaEntry;
   const typeName = toPascalCase(name);
+  const genericArgs = getGenericArgStringWithDefault(fields, {
+    includeExpand: false
+  });
   if (name === "users") {
     console.log(name, type, fields);
   }
   const systemFields = getSystemUpdateFields(type);
   const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name)).map((fieldSchema) => createTypeUpdateField(name, fieldSchema)).sort().join("\n");
-  return `export type ${typeName}Update = ${collectionFields ? `{
+  return `export type ${typeName}Update${genericArgs} = ${collectionFields ? `{
 ${collectionFields}
 } & ${systemFields}` : systemFields}`;
 }

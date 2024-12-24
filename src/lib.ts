@@ -121,6 +121,9 @@ export function createCreateType(
 ): string {
   const { name, fields, type } = collectionSchemaEntry
   const typeName = toPascalCase(name)
+  const genericArgs = getGenericArgStringWithDefault(fields, {
+    includeExpand: false,
+  })
   const systemFields = getSystemCreateFields(type)
   const collectionFields = fields
     .filter((fieldSchema: FieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name))
@@ -128,7 +131,7 @@ export function createCreateType(
     .sort()
     .join("\n")
 
-  return `export type ${typeName}Create = ${
+  return `export type ${typeName}Create${genericArgs} = ${
     collectionFields
       ? `{
 ${collectionFields}
@@ -142,9 +145,9 @@ export function createUpdateType(
 ): string {
   const { name, fields, type } = collectionSchemaEntry
   const typeName = toPascalCase(name)
-  if (name === 'users') {
-    console.log(name, type, fields);
-  }
+  const genericArgs = getGenericArgStringWithDefault(fields, {
+    includeExpand: false,
+  })
   const systemFields = getSystemUpdateFields(type)
   const collectionFields = fields
     .filter((fieldSchema: FieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name))
@@ -152,7 +155,7 @@ export function createUpdateType(
     .sort()
     .join("\n")
 
-  return `export type ${typeName}Update = ${
+  return `export type ${typeName}Update${genericArgs} = ${
     collectionFields
       ? `{
 ${collectionFields}

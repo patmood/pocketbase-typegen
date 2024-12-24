@@ -32,12 +32,36 @@ export type BaseSystemFields<T = never> = {
 	expand?: T
 }
 
+export type BaseSystemCreateFields = {
+	id?: RecordIdString
+}
+
+export type BaseSystemUpdateFields = never
+
 export type AuthSystemFields<T = never> = {
 	email: string
 	emailVisibility: boolean
 	username: string
 	verified: boolean
 } & BaseSystemFields<T>
+
+export type AuthSystemCreateFields = {
+	id?: RecordIdString
+	email: string
+	emailVisibility?: boolean
+	password: string
+	passwordConfirm: string
+	verified?: boolean
+}
+
+export type AuthSystemUpdateFields = {
+	email?: string
+	emailVisibility?: boolean
+	oldPassword?: string
+	password?: string
+	passwordConfirm?: string
+	verified?: boolean
+}
 
 // Record types for each collection
 
@@ -168,6 +192,102 @@ export type UsersRecord = {
 	verified?: boolean
 }
 
+// Create types for each collection
+
+export type SuperusersCreate = AuthSystemCreateFields
+
+export type BaseCreate = {
+	field?: string
+} & BaseSystemCreateFields
+
+export type CustomAuthCreate = {
+	custom_field?: string
+} & AuthSystemCreateFields
+
+export type EverythingCreate<Tanother_json_field = unknown, Tjson_field = unknown> = {
+	another_json_field?: null | Tanother_json_field
+	bool_field?: boolean
+	custom_relation_field?: RecordIdString[]
+	date_field?: IsoDateString
+	email_field?: string
+	file_field?: File
+	json_field?: null | Tjson_field
+	number_field?: number
+	post_relation_field?: RecordIdString
+	rich_editor_field?: HTMLString
+	select_field?: EverythingSelectFieldOptions
+	select_field_no_values?: string
+	text_field?: string
+	three_files_field?: File[]
+	url_field?: string
+	user_relation_field?: RecordIdString
+} & BaseSystemCreateFields
+
+export type MyViewCreate<Tjson_field = unknown> = {
+	json_field?: null | Tjson_field
+	post_relation_field?: RecordIdString
+	text_field?: string
+} & BaseSystemCreateFields
+
+export type PostsCreate = {
+	field1?: number
+	nonempty_bool: boolean
+	nonempty_field: string
+} & BaseSystemCreateFields
+
+export type UsersCreate = {
+	avatar?: File
+	name?: string
+} & AuthSystemCreateFields
+
+// Update types for each collection
+
+export type SuperusersUpdate = AuthSystemUpdateFields
+
+export type BaseUpdate = {
+	field?: string
+} & BaseSystemUpdateFields
+
+export type CustomAuthUpdate = {
+	custom_field?: string
+} & AuthSystemUpdateFields
+
+export type EverythingUpdate<Tanother_json_field = unknown, Tjson_field = unknown> = {
+	another_json_field?: null | Tanother_json_field
+	bool_field?: boolean
+	custom_relation_field?: RecordIdString[]
+	date_field?: IsoDateString
+	email_field?: string
+	file_field?: File
+	json_field?: null | Tjson_field
+	number_field?: number
+	post_relation_field?: RecordIdString
+	rich_editor_field?: HTMLString
+	select_field?: EverythingSelectFieldOptions
+	select_field_no_values?: string
+	text_field?: string
+	three_files_field?: File[]
+	url_field?: string
+	user_relation_field?: RecordIdString
+} & BaseSystemUpdateFields
+
+export type MyViewUpdate<Tjson_field = unknown> = {
+	json_field?: null | Tjson_field
+	post_relation_field?: RecordIdString
+	text_field?: string
+} & BaseSystemUpdateFields
+
+export type PostsUpdate = {
+	field1?: number
+	nonempty_bool?: boolean
+	nonempty_field?: string
+} & BaseSystemUpdateFields
+
+export type UsersUpdate = {
+	avatar?: File
+	name?: string
+} & AuthSystemUpdateFields
+
 // Response types include system fields and match responses from the PocketBase API
 export type AuthoriginsResponse<Texpand = unknown> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
 export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
@@ -195,6 +315,26 @@ export type CollectionRecords = {
 	my_view: MyViewRecord
 	posts: PostsRecord
 	users: UsersRecord
+}
+
+export type CollectionCreates = {
+	_superusers: SuperusersCreate
+	base: BaseCreate
+	custom_auth: CustomAuthCreate
+	everything: EverythingCreate
+	my_view: MyViewCreate
+	posts: PostsCreate
+	users: UsersCreate
+}
+
+export type CollectionUpdates = {
+	_superusers: SuperusersUpdate
+	base: BaseUpdate
+	custom_auth: CustomAuthUpdate
+	everything: EverythingUpdate
+	my_view: MyViewUpdate
+	posts: PostsUpdate
+	users: UsersUpdate
 }
 
 export type CollectionResponses = {
