@@ -36,6 +36,7 @@ export enum Collections {
 export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
+export type Nullable<T> = T | null | ''
 
 // System fields
 export type BaseSystemFields<T = never> = {
@@ -45,6 +46,12 @@ export type BaseSystemFields<T = never> = {
 	expand?: T
 }
 
+export type BaseSystemCreateFields = {
+	id?: RecordIdString
+}
+
+export type BaseSystemUpdateFields = unknown
+
 export type AuthSystemFields<T = never> = {
 	email: string
 	emailVisibility: boolean
@@ -52,11 +59,41 @@ export type AuthSystemFields<T = never> = {
 	verified: boolean
 } & BaseSystemFields<T>
 
+export type AuthSystemCreateFields = {
+	id?: RecordIdString
+	email: string
+	emailVisibility?: boolean
+	password: string
+	passwordConfirm: string
+	verified?: boolean
+}
+
+export type AuthSystemUpdateFields = {
+	email?: string
+	emailVisibility?: boolean
+	oldPassword?: string
+	password?: string
+	passwordConfirm?: string
+	verified?: boolean
+}
+
 // Record types for each collection
 
 export type BooksRecord = {
 	title?: string
 }
+
+// Create types for each collection
+
+export type BooksCreate = {
+	title?: string
+} & BaseSystemCreateFields
+
+// Update types for each collection
+
+export type BooksUpdate = {
+	title?: string
+} & BaseSystemUpdateFields
 
 // Response types include system fields and match responses from the PocketBase API
 export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>
@@ -65,6 +102,14 @@ export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSyste
 
 export type CollectionRecords = {
 	books: BooksRecord
+}
+
+export type CollectionCreates = {
+	books: BooksCreate
+}
+
+export type CollectionUpdates = {
+	books: BooksUpdate
 }
 
 export type CollectionResponses = {
