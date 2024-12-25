@@ -92,7 +92,7 @@ export type BaseSystemFields<T = never> = {
 var BASE_SYSTEM_CREATE_FIELDS_DEFINITION = `export type BaseSystemCreateFields = {
 	id?: ${RECORD_ID_STRING_NAME}
 }`;
-var BASE_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type BaseSystemUpdateFields = never`;
+var BASE_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type BaseSystemUpdateFields = unknown`;
 var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
 	email: string
 	emailVisibility: boolean

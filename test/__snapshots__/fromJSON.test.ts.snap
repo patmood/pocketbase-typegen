@@ -40,7 +40,7 @@ export type BaseSystemCreateFields = {
 	id?: RecordIdString
 }
 
-export type BaseSystemUpdateFields = never
+export type BaseSystemUpdateFields = unknown
 
 export type AuthSystemFields<T = never> = {
 	email: string

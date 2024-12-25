@@ -33,7 +33,7 @@ export const BASE_SYSTEM_CREATE_FIELDS_DEFINITION = `export type BaseSystemCreat
 \tid?: ${RECORD_ID_STRING_NAME}
 }`
 
-export const BASE_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type BaseSystemUpdateFields = never`
+export const BASE_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type BaseSystemUpdateFields = unknown`
 
 export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
 \temail: string
