@@ -81,7 +81,6 @@ export type ${RECORD_ID_STRING_NAME} = string
 export type ${HTML_STRING_NAME} = string
 export type Nullable<T> = T | null | ''`;
 var NOT_COMMON_COLLECTIONS = ["_authOrigins", "_externalAuths", "_mfas", "_otps"];
-var EXTRA_SYSTEM_FIELDS = ["created", "updated"];
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = never> = {
 	id: ${RECORD_ID_STRING_NAME}
@@ -381,7 +380,7 @@ function createCreateType(collectionSchemaEntry) {
     includeExpand: false
   });
   const systemFields = getSystemCreateFields(type);
-  const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name)).map((fieldSchema) => createTypeCreateField(name, fieldSchema)).sort().join("\n");
+  const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system).map((fieldSchema) => createTypeCreateField(name, fieldSchema)).sort().join("\n");
   return `export type ${typeName}Create${genericArgs} = ${collectionFields ? `{
 ${collectionFields}
 } & ${systemFields}` : systemFields}`;
@@ -393,7 +392,7 @@ function createUpdateType(collectionSchemaEntry) {
     includeExpand: false
   });
   const systemFields = getSystemUpdateFields(type);
-  const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name)).map((fieldSchema) => createTypeUpdateField(name, fieldSchema)).sort().join("\n");
+  const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system).map((fieldSchema) => createTypeUpdateField(name, fieldSchema)).sort().join("\n");
   return `export type ${typeName}Update${genericArgs} = ${collectionFields ? `{
 ${collectionFields}
 } & ${systemFields}` : systemFields}`;

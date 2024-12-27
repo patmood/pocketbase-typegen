@@ -198,16 +198,21 @@ export type UsersRecord = {
 export type SuperusersCreate = AuthSystemCreateFields
 
 export type BaseCreate = {
+	created?: IsoDateString
 	field?: string
+	updated?: IsoDateString
 } & BaseSystemCreateFields
 
 export type CustomAuthCreate = {
+	created?: IsoDateString
 	custom_field?: string
+	updated?: IsoDateString
 } & AuthSystemCreateFields
 
 export type EverythingCreate<Tanother_json_field = unknown, Tjson_field = unknown> = {
 	another_json_field?: null | Tanother_json_field
 	bool_field?: boolean
+	created?: IsoDateString
 	custom_relation_field?: RecordIdString[]
 	date_field?: IsoDateString
 	email_field?: string
@@ -220,6 +225,7 @@ export type EverythingCreate<Tanother_json_field = unknown, Tjson_field = unknow
 	select_field_no_values?: string
 	text_field?: string
 	three_files_field?: File[]
+	updated?: IsoDateString
 	url_field?: string
 	user_relation_field?: RecordIdString
 } & BaseSystemCreateFields
@@ -231,14 +237,18 @@ export type MyViewCreate<Tjson_field = unknown> = {
 } & BaseSystemCreateFields
 
 export type PostsCreate = {
+	created?: IsoDateString
 	field1?: number
 	nonempty_bool: boolean
 	nonempty_field: string
+	updated?: IsoDateString
 } & BaseSystemCreateFields
 
 export type UsersCreate = {
 	avatar?: File
+	created?: IsoDateString
 	name?: string
+	updated?: IsoDateString
 } & AuthSystemCreateFields
 
 // Update types for each collection
@@ -246,16 +256,21 @@ export type UsersCreate = {
 export type SuperusersUpdate = AuthSystemUpdateFields
 
 export type BaseUpdate = {
+	created?: IsoDateString
 	field?: string
+	updated?: IsoDateString
 } & BaseSystemUpdateFields
 
 export type CustomAuthUpdate = {
+	created?: IsoDateString
 	custom_field?: string
+	updated?: IsoDateString
 } & AuthSystemUpdateFields
 
 export type EverythingUpdate<Tanother_json_field = unknown, Tjson_field = unknown> = {
 	another_json_field?: null | Tanother_json_field
 	bool_field?: boolean
+	created?: IsoDateString
 	custom_relation_field?: RecordIdString[]
 	date_field?: IsoDateString
 	email_field?: string
@@ -268,6 +283,7 @@ export type EverythingUpdate<Tanother_json_field = unknown, Tjson_field = unknow
 	select_field_no_values?: string
 	text_field?: string
 	three_files_field?: Nullable<File[]>
+	updated?: IsoDateString
 	url_field?: string
 	user_relation_field?: RecordIdString
 } & BaseSystemUpdateFields
@@ -279,14 +295,18 @@ export type MyViewUpdate<Tjson_field = unknown> = {
 } & BaseSystemUpdateFields
 
 export type PostsUpdate = {
+	created?: IsoDateString
 	field1?: number
 	nonempty_bool?: boolean
 	nonempty_field?: string
+	updated?: IsoDateString
 } & BaseSystemUpdateFields
 
 export type UsersUpdate = {
 	avatar?: Nullable<File>
+	created?: IsoDateString
 	name?: string
+	updated?: IsoDateString
 } & AuthSystemUpdateFields
 
 // Response types include system fields and match responses from the PocketBase API

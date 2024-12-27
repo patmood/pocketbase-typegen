@@ -18,13 +18,12 @@ import {
   CREATE_TYPE_COMMENT,
   EXPAND_GENERIC_NAME,
   EXPORT_COMMENT,
-  EXTRA_SYSTEM_FIELDS,
   IMPORTS,
   NOT_COMMON_COLLECTIONS,
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
   TYPED_POCKETBASE_COMMENT,
-  UPDATE_TYPE_COMMENT,
+  UPDATE_TYPE_COMMENT
 } from "./constants"
 import { createSelectOptions, createTypeCreateField, createTypeField, createTypeUpdateField } from "./fields"
 import {
@@ -126,7 +125,7 @@ export function createCreateType(
   })
   const systemFields = getSystemCreateFields(type)
   const collectionFields = fields
-    .filter((fieldSchema: FieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name))
+    .filter((fieldSchema: FieldSchema) => !fieldSchema.system)
     .map((fieldSchema: FieldSchema) => createTypeCreateField(name, fieldSchema))
     .sort()
     .join("\n")
@@ -150,7 +149,7 @@ export function createUpdateType(
   })
   const systemFields = getSystemUpdateFields(type)
   const collectionFields = fields
-    .filter((fieldSchema: FieldSchema) => !fieldSchema.system && !EXTRA_SYSTEM_FIELDS.includes(fieldSchema.name))
+    .filter((fieldSchema: FieldSchema) => !fieldSchema.system)
     .map((fieldSchema: FieldSchema) => createTypeUpdateField(name, fieldSchema))
     .sort()
     .join("\n")

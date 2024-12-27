@@ -19,7 +19,6 @@ export type ${RECORD_ID_STRING_NAME} = string
 export type ${HTML_STRING_NAME} = string
 export type Nullable<T> = T | null | ''`
 export const NOT_COMMON_COLLECTIONS = ['_authOrigins', '_externalAuths', '_mfas', '_otps']
-export const EXTRA_SYSTEM_FIELDS = ['created', 'updated']
 
 export const BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = never> = {
