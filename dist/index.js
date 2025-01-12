@@ -255,7 +255,9 @@ from typing import Optional, List, Dict, Any, Literal, TypeVar, Generic
 from datetime import datetime
 from enum import Enum, auto`;
   const models = schema.map((collection) => {
-    const enums = collection.fields.filter((field) => field.type === "select" && field.values && field.values.length > 0).map((field) => generateEnum(collection.name, field)).join("\n\n");
+    const enums = collection.fields.filter(
+      (field) => field.type === "select" && field.values && field.values.length > 0
+    ).map((field) => generateEnum(collection.name, field)).join("\n\n");
     const fields = collection.fields.map((field) => generatePydanticField(collection.name, field)).join("\n    ");
     const baseClass = collection.type === "auth" ? "AuthSystemFields" : "BaseSystemFields";
     return `
@@ -265,7 +267,9 @@ class ${toPascalCase(collection.name)}Base(${baseClass}):
     """Base model for ${collection.name} collection"""
     ${fields}
 
-class ${toPascalCase(collection.name)}Create(${toPascalCase(collection.name)}Base):
+class ${toPascalCase(collection.name)}Create(${toPascalCase(
+      collection.name
+    )}Base):
     """Create model for ${collection.name} collection (used for creation/updates)"""
     pass
 
@@ -284,10 +288,10 @@ class BaseSystemFields(BaseModel):
     
 class AuthSystemFields(BaseSystemFields):
     """Additional system fields for auth collections"""
-    email: str
-    email_visibility: bool
-    username: str
-    verified: bool`;
+    email: Optional[str] = None
+    email_visibility: Optional[bool] = None
+    username: Optional[str] = None
+    verified: Optional[bool] = None`;
   const collectionMapping = `
 # Type mapping for all collections
 Collections = {
@@ -297,9 +301,7 @@ Collections = {
 }
 
 # Type alias for any collection model
-AnyCollection = ${schema.map(
-    (collection) => toPascalCase(collection.name)
-  ).join(" | ")}
+AnyCollection = ${schema.map((collection) => toPascalCase(collection.name)).join(" | ")}
 `;
   return `${imports}
 
@@ -313,7 +315,9 @@ ${collectionMapping}
 function generateEnum(collectionName, field) {
   if (!field.values)
     return "";
-  const enumName = `${toPascalCase(collectionName)}${toPascalCase(field.name)}Options`;
+  const enumName = `${toPascalCase(collectionName)}${toPascalCase(
+    field.name
+  )}Options`;
   const values = field.values.map((v) => `    ${v} = "${v}"`).join("\n");
   return `class ${enumName}(str, Enum):
     """Options for ${field.name} field in ${collectionName} collection"""
@@ -331,7 +335,9 @@ function generatePydanticField(collectionName, field) {
 }
 function getPydanticType(collectionName, field) {
   if (field.type === "select" && field.values && field.values.length > 0) {
-    const enumName = `${toPascalCase(collectionName)}${toPascalCase(field.name)}Options`;
+    const enumName = `${toPascalCase(collectionName)}${toPascalCase(
+      field.name
+    )}Options`;
     if (field.maxSelect && field.maxSelect > 1) {
       return `List[${enumName}]`;
     }
