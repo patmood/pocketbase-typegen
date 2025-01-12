@@ -59,10 +59,10 @@ class BaseSystemFields(BaseModel):
     
 class AuthSystemFields(BaseSystemFields):
     """Additional system fields for auth collections"""
-    email: str
-    email_visibility: bool
-    username: str
-    verified: bool`
+    email: Optional[str] = None
+    email_visibility: Optional[bool] = None
+    username: Optional[str] = None
+    verified: Optional[bool] = None`
 
   // Add collection mapping
   const collectionMapping = `
