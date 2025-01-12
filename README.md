@@ -29,7 +29,8 @@ Options:
   -p, --password <char>  password for an admin pocketbase user. Use this with the --url option
   -o, --out <char>       path to save the typescript output file (default: "pocketbase-types.ts")
   --no-sdk               remove the pocketbase package dependency. A typed version of the SDK will not be generated.
-  --env [path]       flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file
+  --env [path]           flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file
+  --pydantic            generate Pydantic models instead of TypeScript types (output file will be .py)
   -h, --help             display help for command
 ```
 
@@ -129,3 +130,65 @@ result.expand?.user.username
 ## Status
 
 ![](https://github.com/patmood/pocketbase-typegen/actions/workflows/test.yml/badge.svg?branch=main) ![](https://github.com/patmood/pocketbase-typegen/actions/workflows/integration.yml/badge.svg?branch=main)
+
+## Pydantic Support
+
+You can generate Pydantic models instead of TypeScript types using the `--pydantic` flag:
+
+```bash
+npx pocketbase-typegen --db ./pb_data/data.db --out models.py --pydantic
+```
+
+This will generate Pydantic models that you can use in your Python backend. Example output:
+
+```python
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any
+from datetime import datetime
+
+class TaskBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    status: str
+    due_date: datetime
+    assigned_to: Optional[str] = None
+    priority: Optional[float] = None
+    tags: List[str] = None
+    metadata: Optional[Dict[str, Any]] = None
+
+class TaskCreate(TaskBase):
+    pass
+
+class Task(TaskBase):
+    id: str
+    created: datetime
+    updated: datetime
+
+    class Config:
+        from_attributes = True
+
+class UserBase(BaseModel):
+    username: str
+    email: str
+    name: Optional[str] = None
+    avatar: Optional[str] = None
+    role: str
+
+class UserCreate(UserBase):
+    pass
+
+class User(UserBase):
+    id: str
+    created: datetime
+    updated: datetime
+
+    class Config:
+        from_attributes = True
+```
+
+The generator creates three classes for each collection:
+- A `Base` model containing all the fields from your collection
+- A `Create` model that inherits from Base (useful for creation endpoints)
+- A full model that includes system fields like `id`, `created`, and `updated`
+
+These models are compatible with FastAPI and other modern Python frameworks that use Pydantic for data validation.

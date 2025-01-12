@@ -27,7 +27,7 @@ export function createCollectionResponses(
   const nameRecordMap = collectionNames
     .map((name) => `\t${name}: ${toPascalCase(name)}Response`)
     .join("\n")
-  return `export type CollectionResponses = {
+  return `export type CollectionResponses = { 
 ${nameRecordMap}
 }`
 }

@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import type { CollectionRecord, Options } from "./types"
 import { fromDatabase, fromJSON, fromURL } from "./schema"
 
-import { generate } from "./lib"
+import { generate, generatePydantic } from "./lib"
 import { saveFile } from "./utils"
 
 export async function main(options: Options) {
@@ -36,6 +36,16 @@ export async function main(options: Options) {
       "Missing schema path. Check options: pocketbase-typegen --help"
     )
   }
+
+  if (options.pydantic) {
+    if (options.out === "pocketbase-types.ts") {
+      options.out = "pocketbase_models.py"
+    }
+    const pythonString = generatePydantic(schema)
+    await saveFile(options.out, pythonString)
+    return pythonString
+  }
+
   const typeString = generate(schema, {
     sdk: options.sdk ?? true,
   })

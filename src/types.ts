@@ -7,6 +7,7 @@ export type Options = {
   password?: string
   sdk?: boolean
   env?: boolean | string
+  pydantic?: boolean
 }
 
 export type FieldSchema = {
@@ -53,3 +54,18 @@ export type RecordOptions = {
   pattern?: string
   values?: string[]
 }
+
+// Add Pydantic type mappings
+export const pydanticTypeMap = {
+  text: "str",
+  number: "float",
+  bool: "bool",
+  date: "datetime",
+  json: "Dict[str, Any]",
+  file: "str",
+  email: "str",
+  url: "str",
+  select: "str",
+  relation: "str",
+  editor: "str",
+} as const

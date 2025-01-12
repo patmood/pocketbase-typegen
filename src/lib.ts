@@ -23,6 +23,7 @@ import {
   getGenericArgStringWithDefault,
 } from "./generics"
 import { getSystemFields, toPascalCase } from "./utils"
+import { generatePydantic } from "./pydantic"
 
 type GenerateOptions = {
   sdk: boolean
@@ -104,3 +105,5 @@ export function createResponseType(
 
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`
 }
+
+export { generatePydantic }

@@ -41,6 +41,10 @@ program
     "--env [path]",
     "flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file"
   )
+  .option(
+    "--pydantic",
+    "generate Pydantic models instead of TypeScript types (output file will be .py)"
+  )
 
 program.parse(process.argv)
 const options = program.opts<Options>()
