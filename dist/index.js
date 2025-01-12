@@ -143,7 +143,7 @@ ${nameRecordMap}
 }
 function createCollectionResponses(collectionNames) {
   const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Response`).join("\n");
-  return `export type CollectionResponses = {
+  return `export type CollectionResponses = { 
 ${nameRecordMap}
 }`;
 }
@@ -233,6 +233,120 @@ function getSelectOptionEnumName(val) {
   }
 }
 
+// src/types.ts
+var pydanticTypeMap = {
+  text: "str",
+  number: "float",
+  bool: "bool",
+  date: "datetime",
+  json: "Dict[str, Any]",
+  file: "str",
+  email: "str",
+  url: "str",
+  select: "str",
+  relation: "str",
+  editor: "str"
+};
+
+// src/pydantic.ts
+function generatePydantic(schema) {
+  const imports = `from pydantic import BaseModel, Field, ConfigDict
+from typing import Optional, List, Dict, Any, Literal, TypeVar, Generic
+from datetime import datetime
+from enum import Enum, auto`;
+  const models = schema.map((collection) => {
+    const enums = collection.fields.filter((field) => field.type === "select" && field.values && field.values.length > 0).map((field) => generateEnum(collection.name, field)).join("\n\n");
+    const fields = collection.fields.map((field) => generatePydanticField(collection.name, field)).join("\n    ");
+    const baseClass = collection.type === "auth" ? "AuthSystemFields" : "BaseSystemFields";
+    return `
+${enums}
+
+class ${toPascalCase(collection.name)}Base(${baseClass}):
+    """Base model for ${collection.name} collection"""
+    ${fields}
+
+class ${toPascalCase(collection.name)}Create(${toPascalCase(collection.name)}Base):
+    """Create model for ${collection.name} collection (used for creation/updates)"""
+    pass
+
+class ${toPascalCase(collection.name)}(${toPascalCase(collection.name)}Base):
+    """Full model for ${collection.name} collection including system fields"""
+    id: str
+    created: datetime
+    updated: datetime
+    
+    model_config = ConfigDict(from_attributes=True)`;
+  }).join("\n\n");
+  const systemFields = `
+class BaseSystemFields(BaseModel):
+    """Base system fields included in all collections"""
+    id: str
+    
+class AuthSystemFields(BaseSystemFields):
+    """Additional system fields for auth collections"""
+    email: str
+    email_visibility: bool
+    username: str
+    verified: bool`;
+  const collectionMapping = `
+# Type mapping for all collections
+Collections = {
+    ${schema.map(
+    (collection) => `"${collection.name}": ${toPascalCase(collection.name)}`
+  ).join(",\n    ")}
+}
+
+# Type alias for any collection model
+AnyCollection = ${schema.map(
+    (collection) => toPascalCase(collection.name)
+  ).join(" | ")}
+`;
+  return `${imports}
+
+${systemFields}
+
+${models}
+
+${collectionMapping}
+`;
+}
+function generateEnum(collectionName, field) {
+  if (!field.values)
+    return "";
+  const enumName = `${toPascalCase(collectionName)}${toPascalCase(field.name)}Options`;
+  const values = field.values.map((v) => `    ${v} = "${v}"`).join("\n");
+  return `class ${enumName}(str, Enum):
+    """Options for ${field.name} field in ${collectionName} collection"""
+${values}`;
+}
+function generatePydanticField(collectionName, field) {
+  var _a;
+  const typeStr = getPydanticType(collectionName, field);
+  const optional = !field.required;
+  const fieldType = optional ? `Optional[${typeStr}]` : typeStr;
+  const defaultValue = optional ? " = None" : "";
+  const description = field.type === "relation" ? `
+    """Reference to ${(_a = field.options) == null ? void 0 : _a.collectionId} collection"""` : "";
+  return `${field.name}: ${fieldType}${defaultValue}${description}`;
+}
+function getPydanticType(collectionName, field) {
+  if (field.type === "select" && field.values && field.values.length > 0) {
+    const enumName = `${toPascalCase(collectionName)}${toPascalCase(field.name)}Options`;
+    if (field.maxSelect && field.maxSelect > 1) {
+      return `List[${enumName}]`;
+    }
+    return enumName;
+  }
+  const baseType = pydanticTypeMap[field.type] || "Any";
+  if (field.type === "json") {
+    return "Dict[str, Any]";
+  }
+  if (field.maxSelect && field.maxSelect > 1) {
+    return `List[${baseType}]`;
+  }
+  return baseType;
+}
+
 // src/lib.ts
 function generate(results, options2) {
   const collectionNames = [];
@@ -315,6 +429,14 @@ async function main(options2) {
       "Missing schema path. Check options: pocketbase-typegen --help"
     );
   }
+  if (options2.pydantic) {
+    if (options2.out === "pocketbase-types.ts") {
+      options2.out = "pocketbase_models.py";
+    }
+    const pythonString = generatePydantic(schema);
+    await saveFile(options2.out, pythonString);
+    return pythonString;
+  }
   const typeString = generate(schema, {
     sdk: options2.sdk ?? true
   });
@@ -353,6 +475,9 @@ program.name("Pocketbase Typegen").version(version).description(
 ).option(
   "--env [path]",
   "flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file"
+).option(
+  "--pydantic",
+  "generate Pydantic models instead of TypeScript types (output file will be .py)"
 );
 program.parse(process.argv);
 var options = program.opts();
