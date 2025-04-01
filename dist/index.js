@@ -232,7 +232,7 @@ function getGenericArgStringWithDefault(schema, opts) {
   }
   if (argList.length === 0)
     return "";
-  return `<${argList.map((name) => `${name} = never`).join(", ")}>`;
+  return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`;
 }
 
 // src/fields.ts

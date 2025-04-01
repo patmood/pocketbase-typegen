@@ -68,7 +68,7 @@ describe("getGenericArgStringWithDefault", () => {
       getGenericArgStringWithDefault([textField, jsonField1], {
         includeExpand: false,
       })
-    ).toEqual("<Tdata1 = never>")
+    ).toEqual("<Tdata1 = unknown>")
   })
 
   it("multiple generics with a record", () => {
@@ -76,7 +76,7 @@ describe("getGenericArgStringWithDefault", () => {
       getGenericArgStringWithDefault([textField, jsonField1, jsonField2], {
         includeExpand: false,
       })
-    ).toEqual("<Tdata1 = never, Tdata2 = never>")
+    ).toEqual("<Tdata1 = unknown, Tdata2 = unknown>")
   })
 
   it("sorts the arguments", () => {
@@ -84,7 +84,7 @@ describe("getGenericArgStringWithDefault", () => {
       getGenericArgStringWithDefault([textField, jsonField2, jsonField1], {
         includeExpand: false,
       })
-    ).toEqual("<Tdata1 = never, Tdata2 = never>")
+    ).toEqual("<Tdata1 = unknown, Tdata2 = unknown>")
   })
 
   it("includes generic arg for expand fields", () => {
@@ -95,7 +95,7 @@ describe("getGenericArgStringWithDefault", () => {
           includeExpand: true,
         }
       )
-    ).toEqual("<Tdata1 = never, Tdata2 = never, Texpand = never>")
+    ).toEqual("<Tdata1 = unknown, Tdata2 = unknown, Texpand = unknown>")
   })
 })
 

@@ -143,7 +143,7 @@ export enum EverythingSelectFieldOptions {
 	"option with space" = "option with space",
 	"sy?mb@!$" = "sy?mb@!$",
 }
-export type EverythingRecord<Tanother_json_field = never, Tjson_field = never> = {
+export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknown> = {
 	another_json_field?: null | Tanother_json_field
 	bool_field?: boolean
 	created: IsoAutoDateString
@@ -165,7 +165,7 @@ export type EverythingRecord<Tanother_json_field = never, Tjson_field = never> =
 	user_relation_field?: RecordIdString
 }
 
-export type MyViewRecord<Tjson_field = never> = {
+export type MyViewRecord<Tjson_field = unknown> = {
 	id: string
 	json_field?: null | Tjson_field
 	post_relation_field?: RecordIdString
@@ -195,17 +195,17 @@ export type UsersRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
-export type AuthoriginsResponse<Texpand = never> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
-export type ExternalauthsResponse<Texpand = never> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
-export type MfasResponse<Texpand = never> = Required<MfasRecord> & BaseSystemFields<Texpand>
-export type OtpsResponse<Texpand = never> = Required<OtpsRecord> & BaseSystemFields<Texpand>
-export type SuperusersResponse<Texpand = never> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type BaseResponse<Texpand = never> = Required<BaseRecord> & BaseSystemFields<Texpand>
-export type CustomAuthResponse<Texpand = never> = Required<CustomAuthRecord> & AuthSystemFields<Texpand>
-export type EverythingResponse<Tanother_json_field = never, Tjson_field = never, Texpand = never> = Required<EverythingRecord<Tanother_json_field, Tjson_field>> & BaseSystemFields<Texpand>
-export type MyViewResponse<Tjson_field = never, Texpand = never> = Required<MyViewRecord<Tjson_field>> & BaseSystemFields<Texpand>
-export type PostsResponse<Texpand = never> = Required<PostsRecord> & BaseSystemFields<Texpand>
-export type UsersResponse<Texpand = never> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type AuthoriginsResponse<Texpand = unknown> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
+export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
+export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
+export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
+export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
+export type BaseResponse<Texpand = unknown> = Required<BaseRecord> & BaseSystemFields<Texpand>
+export type CustomAuthResponse<Texpand = unknown> = Required<CustomAuthRecord> & AuthSystemFields<Texpand>
+export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, Texpand = unknown> = Required<EverythingRecord<Tanother_json_field, Tjson_field>> & BaseSystemFields<Texpand>
+export type MyViewResponse<Tjson_field = unknown, Texpand = unknown> = Required<MyViewRecord<Tjson_field>> & BaseSystemFields<Texpand>
+export type PostsResponse<Texpand = unknown> = Required<PostsRecord> & BaseSystemFields<Texpand>
+export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
