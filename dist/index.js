@@ -265,7 +265,7 @@ function createTypeField(collectionName, fieldSchema) {
   }
   const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
   const fieldName = sanitizeFieldName(fieldSchema.name);
-  const required = fieldSchema.required ? "" : "?";
+  const required = fieldSchema.type === "autodate" && !fieldSchema.onCreate || fieldSchema.type !== "autodate" && !fieldSchema.required ? "?" : "";
   return `	${fieldName}${required}: ${typeString}`;
 }
 function createSelectOptions(recordName, fields) {

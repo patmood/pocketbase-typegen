@@ -69,69 +69,69 @@ export type AuthSystemUpdateFields = {
 
 export type AuthoriginsRecord = {
 	collectionRef: string
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	fingerprint: string
 	id: string
 	recordRef: string
-	updated?: IsoAutoDateString
+	updated: IsoAutoDateString
 }
 
 export type ExternalauthsRecord = {
 	collectionRef: string
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	id: string
 	provider: string
 	providerId: string
 	recordRef: string
-	updated?: IsoAutoDateString
+	updated: IsoAutoDateString
 }
 
 export type MfasRecord = {
 	collectionRef: string
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	id: string
 	method: string
 	recordRef: string
-	updated?: IsoAutoDateString
+	updated: IsoAutoDateString
 }
 
 export type OtpsRecord = {
 	collectionRef: string
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	id: string
 	password: string
 	recordRef: string
 	sentTo?: string
-	updated?: IsoAutoDateString
+	updated: IsoAutoDateString
 }
 
 export type SuperusersRecord = {
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	email: string
 	emailVisibility?: boolean
 	id: string
 	password: string
 	tokenKey: string
-	updated?: IsoAutoDateString
+	updated: IsoAutoDateString
 	verified?: boolean
 }
 
 export type BaseRecord = {
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	field?: string
 	id: string
-	updated?: IsoAutoDateString
+	updated: IsoAutoDateString
 }
 
 export type CustomAuthRecord = {
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	custom_field?: string
 	email: string
 	emailVisibility?: boolean
 	id: string
 	password: string
 	tokenKey: string
-	updated?: IsoAutoDateString
+	updated: IsoAutoDateString
 	verified?: boolean
 }
 
@@ -146,7 +146,7 @@ export enum EverythingSelectFieldOptions {
 export type EverythingRecord<Tanother_json_field = never, Tjson_field = never> = {
 	another_json_field?: null | Tanother_json_field
 	bool_field?: boolean
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	custom_relation_field?: RecordIdString[]
 	date_field?: IsoDateString
 	email_field?: string
@@ -173,7 +173,7 @@ export type MyViewRecord<Tjson_field = never> = {
 }
 
 export type PostsRecord = {
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	field1?: number
 	id: string
 	nonempty_bool: boolean
@@ -183,14 +183,14 @@ export type PostsRecord = {
 
 export type UsersRecord = {
 	avatar?: string | File
-	created?: IsoAutoDateString
+	created: IsoAutoDateString
 	email: string
 	emailVisibility?: boolean
 	id: string
 	name?: string
 	password: string
 	tokenKey: string
-	updated?: IsoAutoDateString
+	updated: IsoAutoDateString
 	verified?: boolean
 }
 

@@ -74,7 +74,8 @@ export function createTypeField(
       : typeStringOrFunc
 
   const fieldName = sanitizeFieldName(fieldSchema.name)
-  const required = fieldSchema.required ? "" : "?"
+  const required = (fieldSchema.type === 'autodate' && !fieldSchema.onCreate) || 
+    (fieldSchema.type !== 'autodate' && !fieldSchema.required) ? "?" : "";
 
   return `\t${fieldName}${required}: ${typeString}`
 }
