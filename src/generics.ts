@@ -30,5 +30,5 @@ export function getGenericArgStringWithDefault(
   }
 
   if (argList.length === 0) return ""
-  return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`
+  return `<${argList.map((name) => `${name} = never`).join(", ")}>`
 }

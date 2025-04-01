@@ -58,6 +58,63 @@ async function fromURL(url, email = "", password = "") {
   return collections;
 }
 
+// src/utils.ts
+import { promises as fs2 } from "fs";
+function toPascalCase(str) {
+  if (/^[\p{L}\d]+$/iu.test(str)) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  return str.replace(
+    /([\p{L}\d])([\p{L}\d]*)/giu,
+    (g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
+  ).replace(/[^\p{L}\d]/giu, "");
+}
+function sanitizeFieldName(name) {
+  return !isNaN(parseFloat(name.charAt(0))) ? `"${name}"` : name;
+}
+async function saveFile(outPath, typeString) {
+  await fs2.writeFile(outPath, typeString, "utf8");
+  console.log(`Created typescript definitions at ${outPath}`);
+}
+function getSystemFields(type) {
+  switch (type) {
+    case "auth":
+      return "AuthSystemFields";
+    default:
+      return "BaseSystemFields";
+  }
+}
+function getOptionEnumName(recordName, fieldName) {
+  return `${toPascalCase(recordName)}${toPascalCase(fieldName)}Options`;
+}
+function getOptionValues(field) {
+  const values = field.values;
+  if (!values)
+    return [];
+  return values.filter((val, i) => values.indexOf(val) === i);
+}
+
+// src/collections.ts
+function createCollectionEnum(collectionNames) {
+  const collections = collectionNames.map((name) => `	${toPascalCase(name)} = "${name}",`).join("\n");
+  const typeString = `export enum Collections {
+${collections}
+}`;
+  return typeString;
+}
+function createCollectionRecords(collectionNames) {
+  const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Record`).join("\n");
+  return `export type CollectionRecords = {
+${nameRecordMap}
+}`;
+}
+function createCollectionResponses(collectionNames) {
+  const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Response`).join("\n");
+  return `export type CollectionResponses = {
+${nameRecordMap}
+}`;
+}
+
 // src/constants.ts
 var EXPORT_COMMENT = `/**
 * This file was @generated using pocketbase-typegen
@@ -65,22 +122,27 @@ var EXPORT_COMMENT = `/**
 var IMPORTS = `import type PocketBase from 'pocketbase'
 import type { RecordService } from 'pocketbase'`;
 var RECORD_TYPE_COMMENT = `// Record types for each collection`;
-var CREATE_TYPE_COMMENT = `// Create types for each collection`;
-var UPDATE_TYPE_COMMENT = `// Update types for each collection`;
 var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
 var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
 var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted PocketBase instance
-// https://github.com/pocketbase/js-sdk#specify-typescript-definitions`;
+// https://github.com/pocketbase/js-sdk#specify-typescript-definitions
+
+export type TypedPocketBase = {
+	collection<T extends keyof CollectionResponses>(
+		idOrName: T
+	): RecordService<CollectionResponses[T]>;
+} & PocketBase;`;
 var EXPAND_GENERIC_NAME = "expand";
 var DATE_STRING_TYPE_NAME = `IsoDateString`;
+var AUTODATE_STRING_TYPE_NAME = `IsoAutoDateString`;
 var RECORD_ID_STRING_NAME = `RecordIdString`;
 var HTML_STRING_NAME = `HTMLString`;
 var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
+export type ${AUTODATE_STRING_TYPE_NAME} = string & { readonly auto: unique symbol }
 export type ${RECORD_ID_STRING_NAME} = string
 export type ${HTML_STRING_NAME} = string
 export type Nullable<T> = T | null | ''`;
-var NOT_COMMON_COLLECTIONS = ["_authOrigins", "_externalAuths", "_mfas", "_otps"];
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = never> = {
 	id: ${RECORD_ID_STRING_NAME}
@@ -114,101 +176,40 @@ var AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type AuthSystemUpdateFields =
 	passwordConfirm?: string
 	verified?: boolean
 }`;
+var UTILITY_TYPES = `/** Utility types for PocketBase record operations */
 
-// src/utils.ts
-import { promises as fs2 } from "fs";
-function toPascalCase(str) {
-  if (/^[\p{L}\d]+$/iu.test(str)) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-  return str.replace(
-    /([\p{L}\d])([\p{L}\d]*)/giu,
-    (g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
-  ).replace(/[^\p{L}\d]/giu, "");
-}
-function sanitizeFieldName(name) {
-  return !isNaN(parseFloat(name.charAt(0))) ? `"${name}"` : name;
-}
-async function saveFile(outPath, typeString) {
-  await fs2.writeFile(outPath, typeString, "utf8");
-  console.log(`Created typescript definitions at ${outPath}`);
-}
-function getSystemFields(type) {
-  switch (type) {
-    case "auth":
-      return "AuthSystemFields";
-    default:
-      return "BaseSystemFields";
-  }
-}
-function getSystemCreateFields(type) {
-  switch (type) {
-    case "auth":
-      return "AuthSystemCreateFields";
-    default:
-      return "BaseSystemCreateFields";
-  }
-}
-function getSystemUpdateFields(type) {
-  switch (type) {
-    case "auth":
-      return "AuthSystemUpdateFields";
-    default:
-      return "BaseSystemUpdateFields";
-  }
-}
-function getOptionEnumName(recordName, fieldName) {
-  return `${toPascalCase(recordName)}${toPascalCase(fieldName)}Options`;
-}
-function getOptionValues(field) {
-  const values = field.values;
-  if (!values)
-    return [];
-  return values.filter((val, i) => values.indexOf(val) === i);
-}
+// Helper to determine if a collection is Auth
+type IsAuthCollection<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields ? true : false;
 
-// src/collections.ts
-function createCollectionEnum(collectionNames) {
-  const collections = collectionNames.map((name) => `	${toPascalCase(name)} = "${name}",`).join("\n");
-  const typeString = `export enum Collections {
-${collections}
-}`;
-  return typeString;
-}
-function createCollectionRecords(collectionNames) {
-  const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Record`).join("\n");
-  return `export type CollectionRecords = {
-${nameRecordMap}
-}`;
-}
-function createCollectionCreates(collectionNames) {
-  const nameRecordMap = collectionNames.filter((name) => !NOT_COMMON_COLLECTIONS.includes(name)).map((name) => `	${name}: ${toPascalCase(name)}Create`).join("\n");
-  return `export type CollectionCreates = {
-${nameRecordMap}
-}`;
-}
-function createCollectionUpdates(collectionNames) {
-  const nameRecordMap = collectionNames.filter((name) => !NOT_COMMON_COLLECTIONS.includes(name)).map((name) => `	${name}: ${toPascalCase(name)}Update`).join("\n");
-  return `export type CollectionUpdates = {
-${nameRecordMap}
-}`;
-}
-function createCollectionResponses(collectionNames) {
-  const nameRecordMap = collectionNames.map((name) => `	${name}: ${toPascalCase(name)}Response`).join("\n");
-  return `export type CollectionResponses = {
-${nameRecordMap}
-}`;
-}
-function createTypedPocketbase(collectionNames) {
-  const nameRecordMap = collectionNames.map(
-    (name) => `	collection(idOrName: '${name}'): RecordService<${toPascalCase(
-      name
-    )}Response>`
-  ).join("\n");
-  return `export type TypedPocketBase = PocketBase & {
-${nameRecordMap}
-}`;
-}
+// Utility type that omits fields of type IsoAutoDateString
+type OmitAutodate<T> = {
+	[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
+};
+
+// Create type for Auth collections
+export type CreateAuth<T> = OmitAutodate<Omit<T, 'id'>> & AuthSystemCreateFields;
+
+// Create type for Base collections
+export type CreateBase<T> = OmitAutodate<Omit<T, 'id'>> & BaseSystemCreateFields;
+
+// Update type for Auth collections
+export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & AuthSystemUpdateFields;
+
+// Update type for Base collections
+export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>> & BaseSystemUpdateFields;
+
+// Get the correct create type for any collection
+export type Create<T extends keyof CollectionResponses> =
+	IsAuthCollection<T> extends true
+		? CreateAuth<CollectionRecords[T]>
+		: CreateBase<CollectionRecords[T]>;
+
+// Get the correct update type for any collection
+export type Update<T extends keyof CollectionResponses> =
+	IsAuthCollection<T> extends true
+		? UpdateAuth<CollectionRecords[T]>
+		: UpdateBase<CollectionRecords[T]>;`;
 
 // src/generics.ts
 function fieldNameToGeneric(name) {
@@ -231,23 +232,21 @@ function getGenericArgStringWithDefault(schema, opts) {
   }
   if (argList.length === 0)
     return "";
-  return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`;
+  return `<${argList.map((name) => `${name} = never`).join(", ")}>`;
 }
 
 // src/fields.ts
 var pbSchemaTypescriptMap = {
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
-  autodate: DATE_STRING_TYPE_NAME,
+  autodate: AUTODATE_STRING_TYPE_NAME,
   editor: HTML_STRING_NAME,
   email: "string",
   text: "string",
   url: "string",
   password: "string",
   number: "number",
-  file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
-  file_create: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "File[]" : "File",
-  file_update: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "Nullable<File[]>" : "Nullable<File>",
+  file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[] | File[]" : "string | File",
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   relation: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema, collectionName) => {
@@ -268,33 +267,6 @@ function createTypeField(collectionName, fieldSchema) {
   const fieldName = sanitizeFieldName(fieldSchema.name);
   const required = fieldSchema.required ? "" : "?";
   return `	${fieldName}${required}: ${typeString}`;
-}
-function createTypeCreateField(collectionName, fieldSchema) {
-  let typeStringOrFunc;
-  const fieldType = fieldSchema.type === "file" ? "file_create" : fieldSchema.type;
-  if (!(fieldType in pbSchemaTypescriptMap)) {
-    console.log(`WARNING: unknown type "${fieldType}" found in schema`);
-    typeStringOrFunc = "unknown";
-  } else {
-    typeStringOrFunc = pbSchemaTypescriptMap[fieldType];
-  }
-  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
-  const fieldName = sanitizeFieldName(fieldSchema.name);
-  const required = fieldSchema.required ? "" : "?";
-  return `	${fieldName}${required}: ${typeString}`;
-}
-function createTypeUpdateField(collectionName, fieldSchema) {
-  let typeStringOrFunc;
-  const fieldType = fieldSchema.type === "file" ? "file_update" : fieldSchema.type;
-  if (!(fieldType in pbSchemaTypescriptMap)) {
-    console.log(`WARNING: unknown type "${fieldType}" found in schema`);
-    typeStringOrFunc = "unknown";
-  } else {
-    typeStringOrFunc = pbSchemaTypescriptMap[fieldType];
-  }
-  const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
-  const fieldName = sanitizeFieldName(fieldSchema.name);
-  return `	${fieldName}?: ${typeString}`;
 }
 function createSelectOptions(recordName, fields) {
   const selectFields = fields.filter((field) => field.type === "select");
@@ -318,18 +290,12 @@ function getSelectOptionEnumName(val) {
 function generate(results, options2) {
   const collectionNames = [];
   const recordTypes = [];
-  const createTypes = [];
-  const updateTypes = [];
   const responseTypes = [RESPONSE_TYPE_COMMENT];
   results.sort((a, b) => a.name <= b.name ? -1 : 1).forEach((row) => {
     if (row.name)
       collectionNames.push(row.name);
     if (row.fields) {
       recordTypes.push(createRecordType(row.name, row.fields));
-      if (!NOT_COMMON_COLLECTIONS.includes(row.name)) {
-        createTypes.push(createCreateType(row));
-        updateTypes.push(createUpdateType(row));
-      }
       responseTypes.push(createResponseType(row));
     }
   });
@@ -347,18 +313,12 @@ function generate(results, options2) {
     AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
-    CREATE_TYPE_COMMENT,
-    ...createTypes,
-    UPDATE_TYPE_COMMENT,
-    ...updateTypes,
     responseTypes.join("\n"),
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
-    createCollectionCreates(sortedCollectionNames),
-    createCollectionUpdates(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
     options2.sdk && TYPED_POCKETBASE_COMMENT,
-    options2.sdk && createTypedPocketbase(sortedCollectionNames)
+    UTILITY_TYPES
   ];
   return fileParts.filter(Boolean).join("\n\n") + "\n";
 }
@@ -372,30 +332,6 @@ function createRecordType(name, schema) {
   return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = ${fields ? `{
 ${fields}
 }` : "never"}`;
-}
-function createCreateType(collectionSchemaEntry) {
-  const { name, fields, type } = collectionSchemaEntry;
-  const typeName = toPascalCase(name);
-  const genericArgs = getGenericArgStringWithDefault(fields, {
-    includeExpand: false
-  });
-  const systemFields = getSystemCreateFields(type);
-  const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system).map((fieldSchema) => createTypeCreateField(name, fieldSchema)).sort().join("\n");
-  return `export type ${typeName}Create${genericArgs} = ${collectionFields ? `{
-${collectionFields}
-} & ${systemFields}` : systemFields}`;
-}
-function createUpdateType(collectionSchemaEntry) {
-  const { name, fields, type } = collectionSchemaEntry;
-  const typeName = toPascalCase(name);
-  const genericArgs = getGenericArgStringWithDefault(fields, {
-    includeExpand: false
-  });
-  const systemFields = getSystemUpdateFields(type);
-  const collectionFields = fields.filter((fieldSchema) => !fieldSchema.system).map((fieldSchema) => createTypeUpdateField(name, fieldSchema)).sort().join("\n");
-  return `export type ${typeName}Update${genericArgs} = ${collectionFields ? `{
-${collectionFields}
-} & ${systemFields}` : systemFields}`;
 }
 function createResponseType(collectionSchemaEntry) {
   const { name, fields, type } = collectionSchemaEntry;

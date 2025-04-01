@@ -1,4 +1,3 @@
-import { NOT_COMMON_COLLECTIONS } from "./constants"
 import { toPascalCase } from "./utils"
 
 export function createCollectionEnum(collectionNames: Array<string>): string {
@@ -22,30 +21,6 @@ ${nameRecordMap}
 }`
 }
 
-export function createCollectionCreates(
-  collectionNames: Array<string>
-): string {
-  const nameRecordMap = collectionNames
-    .filter((name) => !NOT_COMMON_COLLECTIONS.includes(name))
-    .map((name) => `\t${name}: ${toPascalCase(name)}Create`)
-    .join("\n")
-  return `export type CollectionCreates = {
-${nameRecordMap}
-}`
-}
-
-export function createCollectionUpdates(
-  collectionNames: Array<string>
-): string {
-  const nameRecordMap = collectionNames
-    .filter((name) => !NOT_COMMON_COLLECTIONS.includes(name))
-    .map((name) => `\t${name}: ${toPascalCase(name)}Update`)
-    .join("\n")
-  return `export type CollectionUpdates = {
-${nameRecordMap}
-}`
-}
-
 export function createCollectionResponses(
   collectionNames: Array<string>
 ): string {
@@ -53,20 +28,6 @@ export function createCollectionResponses(
     .map((name) => `\t${name}: ${toPascalCase(name)}Response`)
     .join("\n")
   return `export type CollectionResponses = {
-${nameRecordMap}
-}`
-}
-
-export function createTypedPocketbase(collectionNames: Array<string>): string {
-  const nameRecordMap = collectionNames
-    .map(
-      (name) =>
-        `\tcollection(idOrName: '${name}'): RecordService<${toPascalCase(
-          name
-        )}Response>`
-    )
-    .join("\n")
-  return `export type TypedPocketBase = PocketBase & {
 ${nameRecordMap}
 }`
 }

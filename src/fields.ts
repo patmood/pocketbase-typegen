@@ -1,4 +1,5 @@
 import {
+  AUTODATE_STRING_TYPE_NAME,
   DATE_STRING_TYPE_NAME,
   HTML_STRING_NAME,
   RECORD_ID_STRING_NAME,
@@ -15,7 +16,7 @@ export const pbSchemaTypescriptMap = {
   // Basic fields
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
-  autodate: DATE_STRING_TYPE_NAME,
+  autodate: AUTODATE_STRING_TYPE_NAME,
   editor: HTML_STRING_NAME,
   email: "string",
   text: "string",
@@ -25,11 +26,7 @@ export const pbSchemaTypescriptMap = {
 
   // Dependent on schema
   file: (fieldSchema: FieldSchema) =>
-    fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
-  file_create: (fieldSchema: FieldSchema) =>
-    fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "File[]" : "File",
-  file_update: (fieldSchema: FieldSchema) =>
-    fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "Nullable<File[]>" : "Nullable<File>",
+    fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[] | File[]" : "string | File",
   json: (fieldSchema: FieldSchema) =>
     `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   relation: (fieldSchema: FieldSchema) =>
@@ -80,65 +77,6 @@ export function createTypeField(
   const required = fieldSchema.required ? "" : "?"
 
   return `\t${fieldName}${required}: ${typeString}`
-}
-
-export function createTypeCreateField(
-  collectionName: string,
-  fieldSchema: FieldSchema,
-): string {
-  let typeStringOrFunc:
-    | string
-    | ((fieldSchema: FieldSchema, collectionName: string) => string)
-
-  const fieldType = fieldSchema.type === 'file' ? 'file_create' : fieldSchema.type;
-  if (!(fieldType in pbSchemaTypescriptMap)) {
-    console.log(`WARNING: unknown type "${fieldType}" found in schema`)
-    typeStringOrFunc = "unknown"
-  } else {
-    typeStringOrFunc =
-      pbSchemaTypescriptMap[
-        fieldType as keyof typeof pbSchemaTypescriptMap
-      ]
-  }
-
-  const typeString =
-    typeof typeStringOrFunc === "function"
-      ? typeStringOrFunc(fieldSchema, collectionName)
-      : typeStringOrFunc
-
-  const fieldName = sanitizeFieldName(fieldSchema.name)
-  const required = fieldSchema.required ? "" : "?"
-
-  return `\t${fieldName}${required}: ${typeString}`
-}
-
-export function createTypeUpdateField(
-  collectionName: string,
-  fieldSchema: FieldSchema,
-): string {
-  let typeStringOrFunc:
-    | string
-    | ((fieldSchema: FieldSchema, collectionName: string) => string)
-
-  const fieldType = fieldSchema.type === 'file' ? 'file_update' : fieldSchema.type;
-  if (!(fieldType in pbSchemaTypescriptMap)) {
-    console.log(`WARNING: unknown type "${fieldType}" found in schema`)
-    typeStringOrFunc = "unknown"
-  } else {
-    typeStringOrFunc =
-      pbSchemaTypescriptMap[
-        fieldType as keyof typeof pbSchemaTypescriptMap
-      ]
-  }
-
-  const typeString =
-    typeof typeStringOrFunc === "function"
-      ? typeStringOrFunc(fieldSchema, collectionName)
-      : typeStringOrFunc
-
-  const fieldName = sanitizeFieldName(fieldSchema.name)
-
-  return `\t${fieldName}?: ${typeString}`
 }
 
 export function createSelectOptions(

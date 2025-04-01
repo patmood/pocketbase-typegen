@@ -8,15 +8,15 @@ exports[`createRecordType creates type definition for a record 1`] = `
 
 exports[`createRecordType handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
-	avatars?: string[]
+	avatars?: string[] | File[]
 }"
 `;
 
-exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>"`;
+exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse<Texpand = never> = Required<BooksRecord> & BaseSystemFields<Texpand>"`;
 
 exports[`createResponseType handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
-	avatars?: string[]
+	avatars?: string[] | File[]
 }"
 `;
 
@@ -34,6 +34,7 @@ export enum Collections {
 
 // Alias types for improved usability
 export type IsoDateString = string
+export type IsoAutoDateString = string & { readonly auto: unique symbol }
 export type RecordIdString = string
 export type HTMLString = string
 export type Nullable<T> = T | null | ''
@@ -83,33 +84,13 @@ export type BooksRecord = {
 	title?: string
 }
 
-// Create types for each collection
-
-export type BooksCreate = {
-	title?: string
-} & BaseSystemCreateFields
-
-// Update types for each collection
-
-export type BooksUpdate = {
-	title?: string
-} & BaseSystemUpdateFields
-
 // Response types include system fields and match responses from the PocketBase API
-export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>
+export type BooksResponse<Texpand = never> = Required<BooksRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
 	books: BooksRecord
-}
-
-export type CollectionCreates = {
-	books: BooksCreate
-}
-
-export type CollectionUpdates = {
-	books: BooksUpdate
 }
 
 export type CollectionResponses = {
@@ -119,8 +100,45 @@ export type CollectionResponses = {
 // Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
-export type TypedPocketBase = PocketBase & {
-	collection(idOrName: 'books'): RecordService<BooksResponse>
-}
+export type TypedPocketBase = {
+	collection<T extends keyof CollectionResponses>(
+		idOrName: T
+	): RecordService<CollectionResponses[T]>;
+} & PocketBase;
+
+/** Utility types for PocketBase record operations */
+
+// Helper to determine if a collection is Auth
+type IsAuthCollection<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields ? true : false;
+
+// Utility type that omits fields of type IsoAutoDateString
+type OmitAutodate<T> = {
+	[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
+};
+
+// Create type for Auth collections
+export type CreateAuth<T> = OmitAutodate<Omit<T, 'id'>> & AuthSystemCreateFields;
+
+// Create type for Base collections
+export type CreateBase<T> = OmitAutodate<Omit<T, 'id'>> & BaseSystemCreateFields;
+
+// Update type for Auth collections
+export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & AuthSystemUpdateFields;
+
+// Update type for Base collections
+export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>> & BaseSystemUpdateFields;
+
+// Get the correct create type for any collection
+export type Create<T extends keyof CollectionResponses> =
+	IsAuthCollection<T> extends true
+		? CreateAuth<CollectionRecords[T]>
+		: CreateBase<CollectionRecords[T]>;
+
+// Get the correct update type for any collection
+export type Update<T extends keyof CollectionResponses> =
+	IsAuthCollection<T> extends true
+		? UpdateAuth<CollectionRecords[T]>
+		: UpdateBase<CollectionRecords[T]>;
 "
 `;

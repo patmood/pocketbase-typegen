@@ -1,10 +1,7 @@
 import {
-  createCollectionCreates,
   createCollectionEnum,
   createCollectionRecords,
-  createCollectionResponses,
-  createCollectionUpdates,
-  createTypedPocketbase,
+  createCollectionResponses
 } from "./collections"
 import {
   ALIAS_TYPE_DEFINITIONS,
@@ -15,23 +12,21 @@ import {
   BASE_SYSTEM_CREATE_FIELDS_DEFINITION,
   BASE_SYSTEM_FIELDS_DEFINITION,
   BASE_SYSTEM_UPDATE_FIELDS_DEFINITION,
-  CREATE_TYPE_COMMENT,
   EXPAND_GENERIC_NAME,
   EXPORT_COMMENT,
   IMPORTS,
-  NOT_COMMON_COLLECTIONS,
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
   TYPED_POCKETBASE_COMMENT,
-  UPDATE_TYPE_COMMENT
+  UTILITY_TYPES
 } from "./constants"
-import { createSelectOptions, createTypeCreateField, createTypeField, createTypeUpdateField } from "./fields"
+import { createSelectOptions, createTypeField } from "./fields"
 import {
   getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
 } from "./generics"
 import { CollectionRecord, FieldSchema } from "./types"
-import { getSystemCreateFields, getSystemFields, getSystemUpdateFields, toPascalCase } from "./utils"
+import { getSystemFields, toPascalCase } from "./utils"
 
 type GenerateOptions = {
   sdk: boolean
@@ -43,8 +38,6 @@ export function generate(
 ): string {
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
-  const createTypes: Array<string> = []
-  const updateTypes: Array<string> = []
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
 
   results
@@ -53,10 +46,6 @@ export function generate(
       if (row.name) collectionNames.push(row.name)
       if (row.fields) {
         recordTypes.push(createRecordType(row.name, row.fields))
-        if (!NOT_COMMON_COLLECTIONS.includes(row.name)) {
-          createTypes.push(createCreateType(row))
-          updateTypes.push(createUpdateType(row))
-        }
         responseTypes.push(createResponseType(row))
       }
     })
@@ -75,18 +64,12 @@ export function generate(
     AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
-    CREATE_TYPE_COMMENT,
-    ...createTypes,
-    UPDATE_TYPE_COMMENT,
-    ...updateTypes,
     responseTypes.join("\n"),
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
-    createCollectionCreates(sortedCollectionNames),
-    createCollectionUpdates(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
     options.sdk && TYPED_POCKETBASE_COMMENT,
-    options.sdk && createTypedPocketbase(sortedCollectionNames),
+    UTILITY_TYPES,
   ]
 
   return fileParts.filter(Boolean).join("\n\n") + "\n"
@@ -112,54 +95,6 @@ export function createRecordType(
 ${fields}
 }`
       : "never"
-  }`
-}
-
-export function createCreateType(
-  collectionSchemaEntry: CollectionRecord
-): string {
-  const { name, fields, type } = collectionSchemaEntry
-  const typeName = toPascalCase(name)
-  const genericArgs = getGenericArgStringWithDefault(fields, {
-    includeExpand: false,
-  })
-  const systemFields = getSystemCreateFields(type)
-  const collectionFields = fields
-    .filter((fieldSchema: FieldSchema) => !fieldSchema.system)
-    .map((fieldSchema: FieldSchema) => createTypeCreateField(name, fieldSchema))
-    .sort()
-    .join("\n")
-
-  return `export type ${typeName}Create${genericArgs} = ${
-    collectionFields
-      ? `{
-${collectionFields}
-} & ${systemFields}`
-      : systemFields
-  }`
-}
-
-export function createUpdateType(
-  collectionSchemaEntry: CollectionRecord
-): string {
-  const { name, fields, type } = collectionSchemaEntry
-  const typeName = toPascalCase(name)
-  const genericArgs = getGenericArgStringWithDefault(fields, {
-    includeExpand: false,
-  })
-  const systemFields = getSystemUpdateFields(type)
-  const collectionFields = fields
-    .filter((fieldSchema: FieldSchema) => !fieldSchema.system)
-    .map((fieldSchema: FieldSchema) => createTypeUpdateField(name, fieldSchema))
-    .sort()
-    .join("\n")
-
-  return `export type ${typeName}Update${genericArgs} = ${
-    collectionFields
-      ? `{
-${collectionFields}
-} & ${systemFields}`
-      : systemFields
   }`
 }
 
