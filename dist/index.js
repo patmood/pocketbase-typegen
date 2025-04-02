@@ -141,8 +141,7 @@ var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
 export type ${AUTODATE_STRING_TYPE_NAME} = string & { readonly auto: unique symbol }
 export type ${RECORD_ID_STRING_NAME} = string
-export type ${HTML_STRING_NAME} = string
-export type Nullable<T> = T | null | ''`;
+export type ${HTML_STRING_NAME} = string`;
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = never> = {
 	id: ${RECORD_ID_STRING_NAME}

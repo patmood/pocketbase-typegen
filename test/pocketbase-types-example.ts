@@ -24,7 +24,6 @@ export type IsoDateString = string
 export type IsoAutoDateString = string & { readonly auto: unique symbol }
 export type RecordIdString = string
 export type HTMLString = string
-export type Nullable<T> = T | null | ''
 
 // System fields
 export type BaseSystemFields<T = never> = {
