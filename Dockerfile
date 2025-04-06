@@ -1,7 +1,7 @@
 # Dockerfile to run e2e integration tests against a test PocketBase server
 FROM node:16-alpine3.16
 
-ARG POCKETBASE_VERSION=0.23.1
+ARG POCKETBASE_VERSION=0.26.6
 
 WORKDIR /app/output/
 WORKDIR /app/
@@ -27,8 +27,7 @@ COPY test/integration ./
 COPY test/pocketbase-types-example.ts ./
 COPY dist/index.js ./dist/index.js
 
-RUN chmod +x ./pocketbase
-RUN chmod +x ./run.sh
+RUN chmod +x ./pocketbase ./test.sh ./serve.sh
 EXPOSE 8090
 
-CMD [ "./run.sh" ]
+CMD [ "./test.sh" ]

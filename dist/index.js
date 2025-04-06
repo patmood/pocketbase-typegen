@@ -78,18 +78,22 @@ export type ${DATE_STRING_TYPE_NAME} = string
 export type ${RECORD_ID_STRING_NAME} = string
 export type ${HTML_STRING_NAME} = string`;
 var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
-export type BaseSystemFields<T = never> = {
+export type BaseSystemFields<T = unknown> = {
 	id: ${RECORD_ID_STRING_NAME}
 	collectionId: string
 	collectionName: Collections
-	expand?: T
-}`;
-var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
+} & ExpandType<T>`;
+var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = unknown> = {
 	email: string
 	emailVisibility: boolean
 	username: string
 	verified: boolean
 } & BaseSystemFields<T>`;
+var EXPAND_TYPE_DEFINITION = `type ExpandType<T> = unknown extends T
+	? T extends unknown
+		? { expand?: unknown }
+		: { expand: T }
+	: { expand: T }`;
 
 // src/utils.ts
 import { promises as fs2 } from "fs";
@@ -252,6 +256,7 @@ function generate(results, options2) {
     options2.sdk && IMPORTS,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
+    EXPAND_TYPE_DEFINITION,
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
