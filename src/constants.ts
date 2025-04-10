@@ -6,14 +6,14 @@ import type { RecordService } from 'pocketbase'`
 export const RECORD_TYPE_COMMENT = `// Record types for each collection`
 export const RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`
 export const ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`
-export const TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted PocketBase instance
+export const TYPED_POCKETBASE_TYPE = `// Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 export type TypedPocketBase = {
 \tcollection<T extends keyof CollectionResponses>(
 \t\tidOrName: T
-\t): RecordService<CollectionResponses[T]>;
-} & PocketBase;`
+\t): RecordService<CollectionResponses[T]>
+} & PocketBase`
 export const EXPAND_GENERIC_NAME = "expand"
 export const DATE_STRING_TYPE_NAME = `IsoDateString`
 export const AUTODATE_STRING_TYPE_NAME = `IsoAutoDateString`
@@ -33,12 +33,6 @@ export type BaseSystemFields<T = never> = {
 \texpand?: T
 }`
 
-export const BASE_SYSTEM_CREATE_FIELDS_DEFINITION = `export type BaseSystemCreateFields = {
-\tid?: ${RECORD_ID_STRING_NAME}
-}`
-
-export const BASE_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type BaseSystemUpdateFields = unknown`
-
 export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
 \temail: string
 \temailVisibility: boolean
@@ -46,55 +40,48 @@ export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = n
 \tverified: boolean
 } & BaseSystemFields<T>`
 
-export const AUTH_SYSTEM_CREATE_FIELDS_DEFINITION = `export type AuthSystemCreateFields = {
+export const UTILITY_TYPES = `// Utility types for create/update operations
+
+// Create type for Auth collections
+export type CreateAuth<T> = {
 \tid?: ${RECORD_ID_STRING_NAME}
 \temail: string
 \temailVisibility?: boolean
 \tpassword: string
 \tpasswordConfirm: string
 \tverified?: boolean
-}`
+} & Omit<{
+\t[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
+}, 'id'>
 
-export const AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type AuthSystemUpdateFields = {
+// Create type for Base collections
+export type CreateBase<T> = {
+\tid?: RecordIdString
+} & Omit<{
+\t[K in keyof T as T[K] extends IsoAutoDateString | (IsoAutoDateString | undefined) ? never : K]: T[K]
+}, 'id'>
+
+// Update type for Auth collections
+export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & {
 \temail?: string
 \temailVisibility?: boolean
 \toldPassword?: string
 \tpassword?: string
 \tpasswordConfirm?: string
 \tverified?: boolean
-}`
-
-export const UTILITY_TYPES = `/** Utility types for PocketBase record operations */
-
-// Helper to determine if a collection is Auth
-type IsAuthCollection<T extends keyof CollectionResponses> =
-\tCollectionResponses[T] extends AuthSystemFields ? true : false;
-
-// Utility type that omits fields of type IsoAutoDateString
-type OmitAutodate<T> = {
-\t[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
-};
-
-// Create type for Auth collections
-export type CreateAuth<T> = OmitAutodate<Omit<T, 'id'>> & AuthSystemCreateFields;
-
-// Create type for Base collections
-export type CreateBase<T> = OmitAutodate<Omit<T, 'id'>> & BaseSystemCreateFields;
-
-// Update type for Auth collections
-export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & AuthSystemUpdateFields;
+}
 
 // Update type for Base collections
-export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>> & BaseSystemUpdateFields;
+export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>>
 
 // Get the correct create type for any collection
 export type Create<T extends keyof CollectionResponses> =
-\tIsAuthCollection<T> extends true
+\tCollectionResponses[T] extends AuthSystemFields
 \t\t? CreateAuth<CollectionRecords[T]>
-\t\t: CreateBase<CollectionRecords[T]>;
+\t\t: CreateBase<CollectionRecords[T]>
 
 // Get the correct update type for any collection
 export type Update<T extends keyof CollectionResponses> =
-\tIsAuthCollection<T> extends true
+\tCollectionResponses[T] extends AuthSystemFields
 \t\t? UpdateAuth<CollectionRecords[T]>
-\t\t: UpdateBase<CollectionRecords[T]>;`;
+\t\t: UpdateBase<CollectionRecords[T]>`

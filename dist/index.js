@@ -124,14 +124,14 @@ import type { RecordService } from 'pocketbase'`;
 var RECORD_TYPE_COMMENT = `// Record types for each collection`;
 var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
 var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
-var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted PocketBase instance
+var TYPED_POCKETBASE_TYPE = `// Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 export type TypedPocketBase = {
 	collection<T extends keyof CollectionResponses>(
 		idOrName: T
-	): RecordService<CollectionResponses[T]>;
-} & PocketBase;`;
+	): RecordService<CollectionResponses[T]>
+} & PocketBase`;
 var EXPAND_GENERIC_NAME = "expand";
 var DATE_STRING_TYPE_NAME = `IsoDateString`;
 var AUTODATE_STRING_TYPE_NAME = `IsoAutoDateString`;
@@ -149,66 +149,57 @@ export type BaseSystemFields<T = never> = {
 	collectionName: Collections
 	expand?: T
 }`;
-var BASE_SYSTEM_CREATE_FIELDS_DEFINITION = `export type BaseSystemCreateFields = {
-	id?: ${RECORD_ID_STRING_NAME}
-}`;
-var BASE_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type BaseSystemUpdateFields = unknown`;
 var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
 	email: string
 	emailVisibility: boolean
 	username: string
 	verified: boolean
 } & BaseSystemFields<T>`;
-var AUTH_SYSTEM_CREATE_FIELDS_DEFINITION = `export type AuthSystemCreateFields = {
+var UTILITY_TYPES = `// Utility types for create/update operations
+
+// Create type for Auth collections
+export type CreateAuth<T> = {
 	id?: ${RECORD_ID_STRING_NAME}
 	email: string
 	emailVisibility?: boolean
 	password: string
 	passwordConfirm: string
 	verified?: boolean
-}`;
-var AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION = `export type AuthSystemUpdateFields = {
+} & Omit<{
+	[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
+}, 'id'>
+
+// Create type for Base collections
+export type CreateBase<T> = {
+	id?: RecordIdString
+} & Omit<{
+	[K in keyof T as T[K] extends IsoAutoDateString | (IsoAutoDateString | undefined) ? never : K]: T[K]
+}, 'id'>
+
+// Update type for Auth collections
+export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & {
 	email?: string
 	emailVisibility?: boolean
 	oldPassword?: string
 	password?: string
 	passwordConfirm?: string
 	verified?: boolean
-}`;
-var UTILITY_TYPES = `/** Utility types for PocketBase record operations */
-
-// Helper to determine if a collection is Auth
-type IsAuthCollection<T extends keyof CollectionResponses> =
-	CollectionResponses[T] extends AuthSystemFields ? true : false;
-
-// Utility type that omits fields of type IsoAutoDateString
-type OmitAutodate<T> = {
-	[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
-};
-
-// Create type for Auth collections
-export type CreateAuth<T> = OmitAutodate<Omit<T, 'id'>> & AuthSystemCreateFields;
-
-// Create type for Base collections
-export type CreateBase<T> = OmitAutodate<Omit<T, 'id'>> & BaseSystemCreateFields;
-
-// Update type for Auth collections
-export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & AuthSystemUpdateFields;
+}
 
 // Update type for Base collections
-export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>> & BaseSystemUpdateFields;
+export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>>
 
 // Get the correct create type for any collection
 export type Create<T extends keyof CollectionResponses> =
-	IsAuthCollection<T> extends true
+	CollectionResponses[T] extends AuthSystemFields
 		? CreateAuth<CollectionRecords[T]>
-		: CreateBase<CollectionRecords[T]>;
+		: CreateBase<CollectionRecords[T]>
 
 // Get the correct update type for any collection
 export type Update<T extends keyof CollectionResponses> =
-	IsAuthCollection<T> extends true
+	CollectionResponses[T] extends AuthSystemFields
 		? UpdateAuth<CollectionRecords[T]>
-		: UpdateBase<CollectionRecords[T]>;`;
+		: UpdateBase<CollectionRecords[T]>`;
 
 // src/generics.ts
 function fieldNameToGeneric(name) {
@@ -305,19 +296,15 @@ function generate(results, options2) {
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
     BASE_SYSTEM_FIELDS_DEFINITION,
-    BASE_SYSTEM_CREATE_FIELDS_DEFINITION,
-    BASE_SYSTEM_UPDATE_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
-    AUTH_SYSTEM_CREATE_FIELDS_DEFINITION,
-    AUTH_SYSTEM_UPDATE_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
     responseTypes.join("\n"),
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
-    options2.sdk && TYPED_POCKETBASE_COMMENT,
-    UTILITY_TYPES
+    UTILITY_TYPES,
+    options2.sdk && TYPED_POCKETBASE_TYPE
   ];
   return fileParts.filter(Boolean).join("\n\n") + "\n";
 }

@@ -33,36 +33,12 @@ export type BaseSystemFields<T = never> = {
 	expand?: T
 }
 
-export type BaseSystemCreateFields = {
-	id?: RecordIdString
-}
-
-export type BaseSystemUpdateFields = unknown
-
 export type AuthSystemFields<T = never> = {
 	email: string
 	emailVisibility: boolean
 	username: string
 	verified: boolean
 } & BaseSystemFields<T>
-
-export type AuthSystemCreateFields = {
-	id?: RecordIdString
-	email: string
-	emailVisibility?: boolean
-	password: string
-	passwordConfirm: string
-	verified?: boolean
-}
-
-export type AuthSystemUpdateFields = {
-	email?: string
-	emailVisibility?: boolean
-	oldPassword?: string
-	password?: string
-	passwordConfirm?: string
-	verified?: boolean
-}
 
 // Record types for each collection
 
@@ -236,46 +212,57 @@ export type CollectionResponses = {
 	users: UsersResponse
 }
 
+// Utility types for create/update operations
+
+// Create type for Auth collections
+export type CreateAuth<T> = {
+	id?: RecordIdString
+	email: string
+	emailVisibility?: boolean
+	password: string
+	passwordConfirm: string
+	verified?: boolean
+} & Omit<{
+	[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
+}, 'id'>
+
+// Create type for Base collections
+export type CreateBase<T> = {
+	id?: RecordIdString
+} & Omit<{
+	[K in keyof T as T[K] extends IsoAutoDateString | (IsoAutoDateString | undefined) ? never : K]: T[K]
+}, 'id'>
+
+// Update type for Auth collections
+export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & {
+	email?: string
+	emailVisibility?: boolean
+	oldPassword?: string
+	password?: string
+	passwordConfirm?: string
+	verified?: boolean
+}
+
+// Update type for Base collections
+export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>>
+
+// Get the correct create type for any collection
+export type Create<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields
+		? CreateAuth<CollectionRecords[T]>
+		: CreateBase<CollectionRecords[T]>
+
+// Get the correct update type for any collection
+export type Update<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields
+		? UpdateAuth<CollectionRecords[T]>
+		: UpdateBase<CollectionRecords[T]>
+
 // Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 export type TypedPocketBase = {
 	collection<T extends keyof CollectionResponses>(
 		idOrName: T
-	): RecordService<CollectionResponses[T]>;
-} & PocketBase;
-
-/** Utility types for PocketBase record operations */
-
-// Helper to determine if a collection is Auth
-type IsAuthCollection<T extends keyof CollectionResponses> =
-	CollectionResponses[T] extends AuthSystemFields ? true : false;
-
-// Utility type that omits fields of type IsoAutoDateString
-type OmitAutodate<T> = {
-	[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
-};
-
-// Create type for Auth collections
-export type CreateAuth<T> = OmitAutodate<Omit<T, 'id'>> & AuthSystemCreateFields;
-
-// Create type for Base collections
-export type CreateBase<T> = OmitAutodate<Omit<T, 'id'>> & BaseSystemCreateFields;
-
-// Update type for Auth collections
-export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & AuthSystemUpdateFields;
-
-// Update type for Base collections
-export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>> & BaseSystemUpdateFields;
-
-// Get the correct create type for any collection
-export type Create<T extends keyof CollectionResponses> =
-	IsAuthCollection<T> extends true
-		? CreateAuth<CollectionRecords[T]>
-		: CreateBase<CollectionRecords[T]>;
-
-// Get the correct update type for any collection
-export type Update<T extends keyof CollectionResponses> =
-	IsAuthCollection<T> extends true
-		? UpdateAuth<CollectionRecords[T]>
-		: UpdateBase<CollectionRecords[T]>;
+	): RecordService<CollectionResponses[T]>
+} & PocketBase
