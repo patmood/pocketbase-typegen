@@ -151,16 +151,92 @@ function createCollectionResponses(collectionNames) {
 ${nameRecordMap}
 }`;
 }
-function createTypedPocketbase(collectionNames) {
-  const nameRecordMap = collectionNames.map(
-    (name) => `	collection(idOrName: '${name}'): RecordService<${toPascalCase(
-      name
-    )}Response>`
-  ).join("\n");
-  return `export type TypedPocketBase = PocketBase & {
-${nameRecordMap}
+
+// src/constants.ts
+var EXPORT_COMMENT = `/**
+* This file was @generated using pocketbase-typegen
+*/`;
+var IMPORTS = `import type PocketBase from 'pocketbase'
+import type { RecordService } from 'pocketbase'`;
+var RECORD_TYPE_COMMENT = `// Record types for each collection`;
+var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
+var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
+var TYPED_POCKETBASE_TYPE = `// Type for usage with type asserted PocketBase instance
+// https://github.com/pocketbase/js-sdk#specify-typescript-definitions
+
+export type TypedPocketBase = {
+	collection<T extends keyof CollectionResponses>(
+		idOrName: T
+	): RecordService<CollectionResponses[T]>
+} & PocketBase`;
+var EXPAND_GENERIC_NAME = "expand";
+var DATE_STRING_TYPE_NAME = `IsoDateString`;
+var AUTODATE_STRING_TYPE_NAME = `IsoAutoDateString`;
+var RECORD_ID_STRING_NAME = `RecordIdString`;
+var HTML_STRING_NAME = `HTMLString`;
+var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
+export type ${DATE_STRING_TYPE_NAME} = string
+export type ${AUTODATE_STRING_TYPE_NAME} = string & { readonly auto: unique symbol }
+export type ${RECORD_ID_STRING_NAME} = string
+export type ${HTML_STRING_NAME} = string`;
+var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
+export type BaseSystemFields<T = never> = {
+	id: ${RECORD_ID_STRING_NAME}
+	collectionId: string
+	collectionName: Collections
+	expand?: T
 }`;
+var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
+	email: string
+	emailVisibility: boolean
+	username: string
+	verified: boolean
+} & BaseSystemFields<T>`;
+var UTILITY_TYPES = `// Utility types for create/update operations
+
+// Create type for Auth collections
+export type CreateAuth<T> = {
+	id?: ${RECORD_ID_STRING_NAME}
+	email: string
+	emailVisibility?: boolean
+	password: string
+	passwordConfirm: string
+	verified?: boolean
+} & Omit<{
+	[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
+}, 'id'>
+
+// Create type for Base collections
+export type CreateBase<T> = {
+	id?: RecordIdString
+} & Omit<{
+	[K in keyof T as T[K] extends IsoAutoDateString | (IsoAutoDateString | undefined) ? never : K]: T[K]
+}, 'id'>
+
+// Update type for Auth collections
+export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & {
+	email?: string
+	emailVisibility?: boolean
+	oldPassword?: string
+	password?: string
+	passwordConfirm?: string
+	verified?: boolean
 }
+
+// Update type for Base collections
+export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>>
+
+// Get the correct create type for any collection
+export type Create<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields
+		? CreateAuth<CollectionRecords[T]>
+		: CreateBase<CollectionRecords[T]>
+
+// Get the correct update type for any collection
+export type Update<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields
+		? UpdateAuth<CollectionRecords[T]>
+		: UpdateBase<CollectionRecords[T]>`;
 
 // src/generics.ts
 function fieldNameToGeneric(name) {
@@ -190,14 +266,14 @@ function getGenericArgStringWithDefault(schema, opts) {
 var pbSchemaTypescriptMap = {
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
-  autodate: DATE_STRING_TYPE_NAME,
+  autodate: AUTODATE_STRING_TYPE_NAME,
   editor: HTML_STRING_NAME,
   email: "string",
   text: "string",
   url: "string",
   password: "string",
   number: "number",
-  file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
+  file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[] | File[]" : "string | File",
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   relation: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema, collectionName) => {
@@ -216,7 +292,7 @@ function createTypeField(collectionName, fieldSchema) {
   }
   const typeString = typeof typeStringOrFunc === "function" ? typeStringOrFunc(fieldSchema, collectionName) : typeStringOrFunc;
   const fieldName = sanitizeFieldName(fieldSchema.name);
-  const required = fieldSchema.required ? "" : "?";
+  const required = fieldSchema.type === "autodate" && !fieldSchema.onCreate || fieldSchema.type !== "autodate" && !fieldSchema.required ? "?" : "";
   return `	${fieldName}${required}: ${typeString}`;
 }
 function createSelectOptions(recordName, fields) {
@@ -265,8 +341,8 @@ function generate(results, options2) {
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
-    options2.sdk && TYPED_POCKETBASE_COMMENT,
-    options2.sdk && createTypedPocketbase(sortedCollectionNames)
+    UTILITY_TYPES,
+    options2.sdk && TYPED_POCKETBASE_TYPE
   ];
   return fileParts.filter(Boolean).join("\n\n") + "\n";
 }
