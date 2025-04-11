@@ -26,14 +26,13 @@ export type ${RECORD_ID_STRING_NAME} = string
 export type ${HTML_STRING_NAME} = string`
 
 export const BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
-export type BaseSystemFields<T = never> = {
+export type BaseSystemFields<T = unknown> = {
 \tid: ${RECORD_ID_STRING_NAME}
 \tcollectionId: string
 \tcollectionName: Collections
-\texpand?: T
-}`
+} & ExpandType<T>`
 
-export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
+export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = unknown> = {
 \temail: string
 \temailVisibility: boolean
 \tusername: string

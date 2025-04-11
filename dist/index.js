@@ -58,6 +58,43 @@ async function fromURL(url, email = "", password = "") {
   return collections;
 }
 
+// src/constants.ts
+var EXPORT_COMMENT = `/**
+* This file was @generated using pocketbase-typegen
+*/`;
+var IMPORTS = `import type PocketBase from 'pocketbase'
+import type { RecordService } from 'pocketbase'`;
+var RECORD_TYPE_COMMENT = `// Record types for each collection`;
+var RESPONSE_TYPE_COMMENT = `// Response types include system fields and match responses from the PocketBase API`;
+var ALL_RECORD_RESPONSE_COMMENT = `// Types containing all Records and Responses, useful for creating typing helper functions`;
+var TYPED_POCKETBASE_COMMENT = `// Type for usage with type asserted PocketBase instance
+// https://github.com/pocketbase/js-sdk#specify-typescript-definitions`;
+var EXPAND_GENERIC_NAME = "expand";
+var DATE_STRING_TYPE_NAME = `IsoDateString`;
+var RECORD_ID_STRING_NAME = `RecordIdString`;
+var HTML_STRING_NAME = `HTMLString`;
+var ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
+export type ${DATE_STRING_TYPE_NAME} = string
+export type ${RECORD_ID_STRING_NAME} = string
+export type ${HTML_STRING_NAME} = string`;
+var BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
+export type BaseSystemFields<T = unknown> = {
+	id: ${RECORD_ID_STRING_NAME}
+	collectionId: string
+	collectionName: Collections
+} & ExpandType<T>`;
+var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = unknown> = {
+	email: string
+	emailVisibility: boolean
+	username: string
+	verified: boolean
+} & BaseSystemFields<T>`;
+var EXPAND_TYPE_DEFINITION = `type ExpandType<T> = unknown extends T
+	? T extends unknown
+		? { expand?: unknown }
+		: { expand: T }
+	: { expand: T }`;
+
 // src/utils.ts
 import { promises as fs2 } from "fs";
 function toPascalCase(str) {
@@ -295,6 +332,7 @@ function generate(results, options2) {
     options2.sdk && IMPORTS,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
+    EXPAND_TYPE_DEFINITION,
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,

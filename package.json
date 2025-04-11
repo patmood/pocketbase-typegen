@@ -29,7 +29,8 @@
     "prettier": "prettier src test --check",
     "prettier:fix": "npm run prettier -- --write",
     "format": "npm run prettier:fix && npm run lint:fix",
-    "integration:local": "docker build . -t pocketbase-typegen:latest && docker run --name integration_test pocketbase-typegen:latest"
+    "pocketbase:test": "docker build . -t pocketbase-typegen:latest && docker run --rm --name integration_test -p 8090:8090 pocketbase-typegen:latest",
+    "pocketbase:serve": "docker build . -t pocketbase-typegen:latest && docker run --rm --name integration_test -p 8090:8090 pocketbase-typegen:latest ./serve.sh"
   },
   "author": "@patmood",
   "license": "ISC",

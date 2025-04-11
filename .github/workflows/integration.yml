@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run in docker
         run: |
@@ -25,7 +25,7 @@ jobs:
           docker cp integration_test:/app/output output
 
       - name: Archive generated type results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: generated-types
           path: output/*
