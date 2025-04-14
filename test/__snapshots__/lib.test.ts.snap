@@ -8,7 +8,7 @@ exports[`createRecordType creates type definition for a record 1`] = `
 
 exports[`createRecordType handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
-	avatars?: string[]
+	avatars?: string[] | File[]
 }"
 `;
 
@@ -16,7 +16,7 @@ exports[`createResponseType creates type definition for a response 1`] = `"expor
 
 exports[`createResponseType handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
-	avatars?: string[]
+	avatars?: string[] | File[]
 }"
 `;
 
@@ -34,6 +34,7 @@ export enum Collections {
 
 // Alias types for improved usability
 export type IsoDateString = string
+export type IsoAutoDateString = string & { readonly auto: unique symbol }
 export type RecordIdString = string
 export type HTMLString = string
 
@@ -76,11 +77,59 @@ export type CollectionResponses = {
 	books: BooksResponse
 }
 
+// Utility types for create/update operations
+
+// Create type for Auth collections
+export type CreateAuth<T> = {
+	id?: RecordIdString
+	email: string
+	emailVisibility?: boolean
+	password: string
+	passwordConfirm: string
+	verified?: boolean
+} & Omit<{
+	[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
+}, 'id'>
+
+// Create type for Base collections
+export type CreateBase<T> = {
+	id?: RecordIdString
+} & Omit<{
+	[K in keyof T as T[K] extends IsoAutoDateString | (IsoAutoDateString | undefined) ? never : K]: T[K]
+}, 'id'>
+
+// Update type for Auth collections
+export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & {
+	email?: string
+	emailVisibility?: boolean
+	oldPassword?: string
+	password?: string
+	passwordConfirm?: string
+	verified?: boolean
+}
+
+// Update type for Base collections
+export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>>
+
+// Get the correct create type for any collection
+export type Create<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields
+		? CreateAuth<CollectionRecords[T]>
+		: CreateBase<CollectionRecords[T]>
+
+// Get the correct update type for any collection
+export type Update<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields
+		? UpdateAuth<CollectionRecords[T]>
+		: UpdateBase<CollectionRecords[T]>
+
 // Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
-export type TypedPocketBase = PocketBase & {
-	collection(idOrName: 'books'): RecordService<BooksResponse>
-}
+export type TypedPocketBase = {
+	collection<T extends keyof CollectionResponses>(
+		idOrName: T
+	): RecordService<CollectionResponses[T]>
+} & PocketBase
 "
 `;

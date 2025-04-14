@@ -1,12 +1,13 @@
 import {
+  AUTODATE_STRING_TYPE_NAME,
   DATE_STRING_TYPE_NAME,
   HTML_STRING_NAME,
   RECORD_ID_STRING_NAME,
 } from "./constants"
 import { getOptionEnumName, getOptionValues, sanitizeFieldName } from "./utils"
 
-import { FieldSchema } from "./types"
 import { fieldNameToGeneric } from "./generics"
+import { FieldSchema } from "./types"
 
 /**
  * Convert the pocketbase field type to the equivalent typescript type
@@ -15,7 +16,7 @@ export const pbSchemaTypescriptMap = {
   // Basic fields
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
-  autodate: DATE_STRING_TYPE_NAME,
+  autodate: AUTODATE_STRING_TYPE_NAME,
   editor: HTML_STRING_NAME,
   email: "string",
   text: "string",
@@ -25,7 +26,7 @@ export const pbSchemaTypescriptMap = {
 
   // Dependent on schema
   file: (fieldSchema: FieldSchema) =>
-    fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
+    fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[] | File[]" : "string | File",
   json: (fieldSchema: FieldSchema) =>
     `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   relation: (fieldSchema: FieldSchema) =>
@@ -73,7 +74,8 @@ export function createTypeField(
       : typeStringOrFunc
 
   const fieldName = sanitizeFieldName(fieldSchema.name)
-  const required = fieldSchema.required ? "" : "?"
+  const required = (fieldSchema.type === 'autodate' && !fieldSchema.onCreate) || 
+    (fieldSchema.type !== 'autodate' && !fieldSchema.required) ? "?" : "";
 
   return `\t${fieldName}${required}: ${typeString}`
 }
