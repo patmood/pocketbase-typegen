@@ -26,19 +26,25 @@ export type ${RECORD_ID_STRING_NAME} = string
 export type ${HTML_STRING_NAME} = string`
 
 export const BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
-export type BaseSystemFields<T = never> = {
+export type BaseSystemFields<T = unknown> = {
 \tid: ${RECORD_ID_STRING_NAME}
 \tcollectionId: string
 \tcollectionName: Collections
-\texpand?: T
-}`
+} & ExpandType<T>`
 
-export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = never> = {
+export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = unknown> = {
 \temail: string
 \temailVisibility: boolean
 \tusername: string
 \tverified: boolean
 } & BaseSystemFields<T>`
+
+// Utility type to get expand field. If T is provided, expand is no longer optional
+export const EXPAND_TYPE_DEFINITION = `type ExpandType<T> = unknown extends T
+\t? T extends unknown
+\t\t? { expand?: unknown }
+\t\t: { expand: T }
+\t: { expand: T }`
 
 export const UTILITY_TYPES = `// Utility types for create/update operations
 

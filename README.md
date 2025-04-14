@@ -123,7 +123,7 @@ const result = await pb
   .getOne<CommentsResponse<Metadata, Expand>>("RECORD_ID", { expand: "user" })
 
 // Now you can access the expanded relation with type safety and hints in your IDE
-result.expand?.user.username
+result.expand.user.username
 ```
 
 ## Create/Update types
