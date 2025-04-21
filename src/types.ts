@@ -30,6 +30,15 @@ export type FieldSchema = {
   system: boolean
   required: boolean
   unique: boolean
+  options?: {
+    collectionId?: string;
+    cascadeDelete?: boolean;
+    maxSelect?: number;
+    min?: number;
+    max?: number;
+    pattern?: string;
+    values?: string[];
+  }
 } & RecordOptions
 
 export type CollectionRecord = {

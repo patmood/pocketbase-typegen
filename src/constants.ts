@@ -31,8 +31,6 @@ export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = u
 } & BaseSystemFields<T>`
 
 // Utility type to get expand field. If T is provided, expand is no longer optional
-export const EXPAND_TYPE_DEFINITION = `type ExpandType<T> = unknown extends T
-\t? T extends unknown
-\t\t? { expand?: unknown }
-\t\t: { expand: T }
+export const EXPAND_TYPE_DEFINITION = `type ExpandType<T = unknown> = unknown extends T
+\t? { expand?: Record<string, any> }
 \t: { expand: T }`

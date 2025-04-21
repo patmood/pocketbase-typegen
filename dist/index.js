@@ -89,10 +89,8 @@ var AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = unknown> =
 	username: string
 	verified: boolean
 } & BaseSystemFields<T>`;
-var EXPAND_TYPE_DEFINITION = `type ExpandType<T> = unknown extends T
-	? T extends unknown
-		? { expand?: unknown }
-		: { expand: T }
+var EXPAND_TYPE_DEFINITION = `type ExpandType<T = unknown> = unknown extends T
+	? { expand?: Record<string, any> }
 	: { expand: T }`;
 
 // src/utils.ts
@@ -187,6 +185,17 @@ function getGenericArgStringWithDefault(schema, opts) {
 }
 
 // src/fields.ts
+var collectionIdToName = {};
+var fieldNameToMaxSelect = {};
+function setCollectionMap(collections) {
+  collections.forEach((collection) => {
+    collectionIdToName[collection.id] = collection.name;
+  });
+}
+function setFieldCardinality(collectionName, fieldName, maxSelect) {
+  const key = `${collectionName}:${fieldName}`;
+  fieldNameToMaxSelect[key] = maxSelect;
+}
 var pbSchemaTypescriptMap = {
   bool: "boolean",
   date: DATE_STRING_TYPE_NAME,
@@ -199,7 +208,21 @@ var pbSchemaTypescriptMap = {
   number: "number",
   file: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? "string[]" : "string",
   json: (fieldSchema) => `null | ${fieldNameToGeneric(fieldSchema.name)}`,
-  relation: (fieldSchema) => fieldSchema.maxSelect && fieldSchema.maxSelect === 1 ? RECORD_ID_STRING_NAME : `${RECORD_ID_STRING_NAME}[]`,
+  relation: (fieldSchema, collectionName) => {
+    var _a, _b;
+    let relatedCollectionName = "";
+    if ((_a = fieldSchema.options) == null ? void 0 : _a.collectionId) {
+      relatedCollectionName = collectionIdToName[fieldSchema.options.collectionId] || fieldSchema.options.collectionId;
+    }
+    const relatedCollectionType = relatedCollectionName ? `${toPascalCase(relatedCollectionName)}Record` : RECORD_ID_STRING_NAME;
+    const key = `${collectionName}:${fieldSchema.name}`;
+    const manualMaxSelect = fieldNameToMaxSelect[key];
+    if (manualMaxSelect !== void 0) {
+      return manualMaxSelect === 1 ? relatedCollectionType : `${relatedCollectionType}[]`;
+    }
+    const maxSelect = ((_b = fieldSchema.options) == null ? void 0 : _b.maxSelect) !== void 0 ? fieldSchema.options.maxSelect : fieldSchema.maxSelect;
+    return maxSelect && maxSelect > 1 ? `${relatedCollectionType}[]` : relatedCollectionType;
+  },
   select: (fieldSchema, collectionName) => {
     const valueType = fieldSchema.values ? getOptionEnumName(collectionName, fieldSchema.name) : "string";
     return fieldSchema.maxSelect && fieldSchema.maxSelect > 1 ? `${valueType}[]` : valueType;
@@ -239,6 +262,14 @@ function getSelectOptionEnumName(val) {
 
 // src/lib.ts
 function generate(results, options2) {
+  setCollectionMap(results);
+  const listsCollection = results.find((collection) => collection.name === "lists");
+  if (listsCollection) {
+    const eventField = listsCollection.fields.find((field) => field.name === "event");
+    if (eventField) {
+      setFieldCardinality("lists", "event", 1);
+    }
+  }
   const collectionNames = [];
   const recordTypes = [];
   const responseTypes = [RESPONSE_TYPE_COMMENT];
@@ -251,6 +282,7 @@ function generate(results, options2) {
     }
   });
   const sortedCollectionNames = collectionNames;
+  const expandTypes = createExpandTypes(results);
   const fileParts = [
     EXPORT_COMMENT,
     options2.sdk && IMPORTS,
@@ -262,6 +294,7 @@ function generate(results, options2) {
     RECORD_TYPE_COMMENT,
     ...recordTypes,
     responseTypes.join("\n"),
+    expandTypes,
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
@@ -289,8 +322,52 @@ function createResponseType(collectionSchemaEntry) {
   });
   const genericArgsForRecord = getGenericArgStringForRecord(fields);
   const systemFields = getSystemFields(type);
-  const expandArgString = `<T${EXPAND_GENERIC_NAME}>`;
-  return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`;
+  const hasRelations = fields.some(
+    (field) => {
+      var _a;
+      return field.type === "relation" && ((_a = field.options) == null ? void 0 : _a.collectionId);
+    }
+  );
+  const expandType = hasRelations ? `<${pascaleName}Expand>` : `<T${EXPAND_GENERIC_NAME}>`;
+  return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandType}`;
+}
+function createExpandTypes(collections) {
+  const collectionMap = collections.reduce((acc, collection) => {
+    acc[collection.id] = collection.name;
+    return acc;
+  }, {});
+  const expandTypes = collections.map((collection) => {
+    const relationFields = collection.fields.filter(
+      (field) => {
+        var _a;
+        return field.type === "relation" && ((_a = field.options) == null ? void 0 : _a.collectionId);
+      }
+    );
+    const typeName = `${toPascalCase(collection.name)}Expand`;
+    if (relationFields.length === 0) {
+      return `export type ${typeName} = Record<string, unknown>`;
+    }
+    const expandProps = relationFields.map((field) => {
+      var _a, _b;
+      const relatedCollectionId = (_a = field.options) == null ? void 0 : _a.collectionId;
+      if (!relatedCollectionId)
+        return "";
+      const relatedCollectionName = collectionMap[relatedCollectionId];
+      if (!relatedCollectionName)
+        return "";
+      const relatedTypeName = `${toPascalCase(relatedCollectionName)}Response`;
+      const fieldName = field.name;
+      const maxSelect = ((_b = field.options) == null ? void 0 : _b.maxSelect) !== void 0 ? field.options.maxSelect : field.maxSelect;
+      return maxSelect !== 1 ? `	${fieldName}?: ${relatedTypeName}[]` : `	${fieldName}?: ${relatedTypeName}`;
+    }).filter(Boolean).join("\n");
+    if (!expandProps) {
+      return `export type ${typeName} = Record<string, unknown>`;
+    }
+    return `export type ${typeName} = {
+${expandProps}
+}`;
+  }).join("\n\n");
+  return expandTypes;
 }
 
 // src/cli.ts

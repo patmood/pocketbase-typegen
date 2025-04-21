@@ -73,6 +73,7 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
 - `[CollectionName]Record` One type for each collection (eg ProfilesRecord).
 - `[CollectionName]Response` One response type for each collection (eg ProfilesResponse) which includes system fields. This is what is returned from the PocketBase API.
   - `[CollectionName][FieldName]Options` If the collection contains a select field with set values, an enum of the options will be generated.
+- `[CollectionName]Expand` Types for expanded relations in each collection.
 - `CollectionRecords` A type mapping each collection name to the record type.
 - `CollectionResponses` A type mapping each collection name to the response type.
 - `TypedPocketBase` A type for usage with type asserted PocketBase instance.
@@ -96,6 +97,29 @@ Alternatively, you can use generic types for each request, eg:
 import { Collections, TasksResponse } from "./pocketbase-types"
 
 await pb.collection(Collections.Tasks).getOne<TasksResponse>("RECORD_ID") // -> results in TaskResponse
+```
+
+## Relation Types
+
+Relations between collections are now properly typed. When a collection has a relation field, the type will use the actual related collection type instead of just a string ID. 
+
+For example, if you have an "events" collection with a relation field to "users", the type will look like this:
+
+```typescript
+type EventsRecord = {
+  user: UsersRecord  // Single relation
+  attendees: UsersRecord[]  // Multiple relations
+}
+```
+
+When expanding relations, the expanded fields will be properly typed using the related collection's response type:
+
+```typescript
+// When fetching an event with expanded user relation
+const event = await pb.collection('events').getOne('EVENT_ID', { expand: 'user' })
+
+// event.expand.user will be properly typed as UsersResponse
+console.log(event.expand.user.username)
 ```
 
 ## Example Advanced Usage
