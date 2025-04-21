@@ -24,7 +24,26 @@ async function fromJSON(path) {
   const schemaStr = await fs.readFile(path, { encoding: "utf8" });
   return JSON.parse(schemaStr);
 }
-async function fromURL(url, email = "", password = "") {
+async function fromURLWithToken(url, token = "") {
+  let collections = [];
+  try {
+    const result = await fetch(`${url}/api/collections?perPage=200`, {
+      headers: {
+        Authorization: token
+      }
+    }).then((res) => {
+      if (!res.ok)
+        throw res;
+      return res.json();
+    });
+    collections = result.items;
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+  return collections;
+}
+async function fromURLWithPassword(url, email = "", password = "") {
   const formData = new FormData();
   formData.append("identity", email);
   formData.append("password", password);
@@ -41,16 +60,7 @@ async function fromURL(url, email = "", password = "") {
         throw res;
       return res.json();
     });
-    const result = await fetch(`${url}/api/collections?perPage=200`, {
-      headers: {
-        Authorization: token
-      }
-    }).then((res) => {
-      if (!res.ok)
-        throw res;
-      return res.json();
-    });
-    collections = result.items;
+    collections = await fromURLWithToken(url, token);
   } catch (error) {
     console.error(error);
     process.exit(1);
@@ -301,7 +311,15 @@ async function main(options2) {
   } else if (options2.json) {
     schema = await fromJSON(options2.json);
   } else if (options2.url) {
-    schema = await fromURL(options2.url, options2.email, options2.password);
+    if (options2.token) {
+      schema = await fromURLWithToken(options2.url, options2.token);
+    } else {
+      schema = await fromURLWithPassword(
+        options2.url,
+        options2.email,
+        options2.password
+      );
+    }
   } else if (options2.env) {
     const path = typeof options2.env === "string" ? options2.env : ".env";
     dotenv.config({ path });
@@ -310,7 +328,7 @@ async function main(options2) {
         "Missing environment variables. Check options: pocketbase-typegen --help"
       );
     }
-    schema = await fromURL(
+    schema = await fromURLWithPassword(
       process.env.PB_TYPEGEN_URL,
       process.env.PB_TYPEGEN_EMAIL,
       process.env.PB_TYPEGEN_PASSWORD
@@ -341,13 +359,16 @@ program.name("Pocketbase Typegen").version(version).description(
   "path to JSON schema exported from pocketbase admin UI"
 ).option(
   "-u, --url <char>",
-  "URL to your hosted pocketbase instance. When using this options you must also provide email and password options."
+  "URL to your hosted pocketbase instance. When using this options you must also provide email and password options or auth token option."
 ).option(
   "--email <char>",
-  "email for an admin pocketbase user. Use this with the --url option"
+  "email for a pocketbase superuser. Use this with the --url option"
 ).option(
   "-p, --password <char>",
-  "password for an admin pocketbase user. Use this with the --url option"
+  "password for a pocketbase superuser. Use this with the --url option"
+).option(
+  "-t, --token <char>",
+  "auth token for a pocketbase superuser. Use this with the --url option"
 ).option(
   "-o, --out <char>",
   "path to save the typescript output file",

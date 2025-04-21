@@ -18,15 +18,19 @@ program
   )
   .option(
     "-u, --url <char>",
-    "URL to your hosted pocketbase instance. When using this options you must also provide email and password options."
+    "URL to your hosted pocketbase instance. When using this options you must also provide email and password options or auth token option."
   )
   .option(
     "--email <char>",
-    "email for an admin pocketbase user. Use this with the --url option"
+    "email for a pocketbase superuser. Use this with the --url option"
   )
   .option(
     "-p, --password <char>",
-    "password for an admin pocketbase user. Use this with the --url option"
+    "password for a pocketbase superuser. Use this with the --url option"
+  )
+  .option(
+    "-t, --token <char>",
+    "auth token for a pocketbase superuser. Use this with the --url option"
   )
   .option(
     "-o, --out <char>",
