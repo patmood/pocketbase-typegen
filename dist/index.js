@@ -15,28 +15,10 @@ async function fromDatabase(dbPath) {
     filename: dbPath
   });
   const result = await db.all("SELECT * FROM _collections");
-  return result.map((collection) => {
-    // Handle both old format (fields) and new format (schema)
-    let fields;
-    try {
-      if (collection.fields) {
-        fields = JSON.parse(collection.fields);
-      } else if (collection.schema) {
-        fields = JSON.parse(collection.schema);
-      } else {
-        console.error(`Warning: Collection ${collection.name} has no fields or schema property`);
-        fields = [];
-      }
-    } catch (error) {
-      console.error(`Error parsing schema for collection ${collection.name}:`, error);
-      fields = [];
-    }
-    
-    return {
-      ...collection,
-      fields: fields
-    };
-  });
+  return result.map((collection) => ({
+    ...collection,
+    fields: JSON.parse(collection.fields ?? collection.schema ?? "{}")
+  }));
 }
 async function fromJSON(path) {
   const schemaStr = await fs.readFile(path, { encoding: "utf8" });
