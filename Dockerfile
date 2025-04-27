@@ -13,16 +13,16 @@ RUN apk add --no-cache \
   zip \
   zlib-dev
 
-# Download Pocketbase and install it
-ADD https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip /tmp/pocketbase.zip
-RUN unzip /tmp/pocketbase.zip -d /app/
-
 # Build project
 COPY . .
 RUN npm ci
 RUN npm run build
 
-RUN chmod +x ./pocketbase ./test/integration/test.sh ./test/integration/serve.sh
+# Download Pocketbase and install it
+ADD https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip /tmp/pocketbase.zip
+RUN unzip /tmp/pocketbase.zip -d /app/test/integration
+
+RUN chmod +x ./test/integration/pocketbase ./test/integration/test.sh ./test/integration/serve.sh
 EXPOSE 8090
 
 CMD [ "./test/integration/test.sh" ]
