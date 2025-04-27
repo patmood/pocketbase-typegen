@@ -1,6 +1,6 @@
 {
   "name": "pocketbase-typegen",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Generate pocketbase record types from your database",
   "main": "dist/index.js",
   "bin": {
