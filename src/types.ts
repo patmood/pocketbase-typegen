@@ -28,6 +28,7 @@ export type FieldSchema = {
     | "relation"
     | "user"
     | "editor"
+    | "geoPoint"
   system: boolean
   required: boolean
   unique: boolean

@@ -44,3 +44,9 @@ export function getOptionValues(field: FieldSchema) {
   if (!values) return []
   return values.filter((val, i) => values.indexOf(val) === i)
 }
+
+export function containsGeoPoint(collections: CollectionRecord[]) {
+  return collections.some((collection) =>
+    collection.fields.some((field) => field.type === "geoPoint")
+  )
+}

@@ -24,6 +24,11 @@ export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
 
+export type GeoPoint = {
+	lon: number
+	lat: number
+}
+
 type ExpandType<T> = unknown extends T
 	? T extends unknown
 		? { expand?: unknown }
@@ -130,6 +135,7 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	date_field?: IsoDateString
 	email_field?: string
 	file_field?: string
+	geopoint_field?: GeoPoint
 	id: string
 	json_field?: null | Tjson_field
 	number_field?: number
