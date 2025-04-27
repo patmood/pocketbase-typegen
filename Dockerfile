@@ -3,7 +3,6 @@ FROM node:16-alpine3.16
 
 ARG POCKETBASE_VERSION=0.27.1
 
-WORKDIR /app/output/
 WORKDIR /app/
 
 # Install the dependencies
@@ -18,16 +17,12 @@ RUN apk add --no-cache \
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip /tmp/pocketbase.zip
 RUN unzip /tmp/pocketbase.zip -d /app/
 
-# Install dependencies for the pocketbase-typegen package
-COPY package.json package-lock.json ./
+# Build project
+COPY . .
 RUN npm ci
+RUN npm run build
 
-# Copy test files
-COPY test/integration ./
-COPY test/pocketbase-types-example.ts ./
-COPY dist/index.js ./dist/index.js
-
-RUN chmod +x ./pocketbase ./test.sh ./serve.sh
+RUN chmod +x ./pocketbase ./test/integration/test.sh ./test/integration/serve.sh
 EXPOSE 8090
 
-CMD [ "./test.sh" ]
+CMD [ "./test/integration/test.sh" ]
