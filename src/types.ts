@@ -5,6 +5,7 @@ export type Options = {
   json?: string
   email?: string
   password?: string
+  token?: string
   sdk?: boolean
   env?: boolean | string
 }

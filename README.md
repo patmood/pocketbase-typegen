@@ -24,9 +24,10 @@ Options:
   -V, --version          output the version number
   -d, --db <char>        path to the pocketbase SQLite database
   -j, --json <char>      path to JSON schema exported from pocketbase admin UI
-  -u, --url <char>       URL to your hosted pocketbase instance. When using this options you must also provide email and password options.
-  --email <char>     email for an admin pocketbase user. Use this with the --url option
-  -p, --password <char>  password for an admin pocketbase user. Use this with the --url option
+  -u, --url <char>       URL to your hosted pocketbase instance. When using this options you must also provide email and password options or auth token option
+  --email <char>         email for a pocketbase superuser. Use this with the --url option
+  -p, --password <char>  password for a pocketbase superuser. Use this with the --url option
+  -t, --token <char>     auth token for a pocketbase superuser. Alternative to email and password authentication. Use this with the --url option
   -o, --out <char>       path to save the typescript output file (default: "pocketbase-types.ts")
   --no-sdk               remove the pocketbase package dependency. A typed version of the SDK will not be generated.
   --env [path]       flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file
@@ -41,9 +42,15 @@ JSON example (export JSON schema from the pocketbase admin dashboard):
 
 `npx pocketbase-typegen --json ./pb_schema.json`
 
-URL example:
+URL example with email and password:
 
 `npx pocketbase-typegen --url https://myproject.pockethost.io --email admin@myproject.com --password 'secr3tp@ssword!'`
+
+URL example with auth token:
+
+You can generate such token via the above impersonate API or from the Dashboard > Collections > _superusers > {select superuser} > "Impersonate" dropdown option.
+
+`npx pocketbase-typegen --url https://myproject.pockethost.io --token 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'`
 
 ENV example (add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL and PB_TYPEGEN_PASSWORD to your .env file):
 
