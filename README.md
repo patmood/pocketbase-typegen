@@ -48,6 +48,8 @@ URL example with email and password:
 
 URL example with auth token:
 
+You can generate such token via the above impersonate API or from the Dashboard > Collections > _superusers > {select superuser} > "Impersonate" dropdown option.
+
 `npx pocketbase-typegen --url https://myproject.pockethost.io --token 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'`
 
 ENV example (add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL and PB_TYPEGEN_PASSWORD to your .env file):
