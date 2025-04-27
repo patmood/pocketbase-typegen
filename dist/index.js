@@ -17,7 +17,7 @@ async function fromDatabase(dbPath) {
   const result = await db.all("SELECT * FROM _collections");
   return result.map((collection) => ({
     ...collection,
-    fields: JSON.parse(collection.fields)
+    fields: JSON.parse(collection.fields ?? collection.schema ?? "{}")
   }));
 }
 async function fromJSON(path) {
