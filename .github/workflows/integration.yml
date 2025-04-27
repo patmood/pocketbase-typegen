@@ -16,6 +16,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Setup
+        run: npm ci
+        run: npm run build        
 
       - name: Run in docker
         run: |
