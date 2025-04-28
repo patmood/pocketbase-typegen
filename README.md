@@ -22,17 +22,17 @@ This will produce types for all your PocketBase collections to use in your front
 ```
 Options:
   -V, --version              output the version number
-  -d, --db <path>            Path to the pocketbase SQLite database.
-  -j, --json <path>          Path to JSON schema exported from pocketbase admin UI.
   -u, --url <url>            URL to your hosted pocketbase instance. When using this options you must also provide email and
                              password options or auth token option.
   --email <email>            Email for a pocketbase superuser. Use this with the --url option.
   -p, --password <password>  Password for a pocketbase superuser. Use this with the --url option.
   -t, --token <token>        Auth token for a pocketbase superuser. Use this with the --url option.
+  -d, --db <path>            Path to the pocketbase SQLite database.
+  -j, --json <path>          Path to JSON schema exported from pocketbase admin UI.
+  --env [dir]                Use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD
+                             to your .env file. Optionally provide a path to a directory containing a .env file (default: true)
   -o, --out <path>           Path to save the typescript output file. (default: "pocketbase-types.ts")
   --no-sdk                   Removes the pocketbase package dependency. A typed version of the SDK will not be generated.
-  --env <dir>                Use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD
-                             to your .env file. Optionally provide a path to a directory containing a .env file
   -h, --help                 display help for command
 ```
 
