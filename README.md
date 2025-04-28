@@ -34,27 +34,23 @@ Options:
   -h, --help             display help for command
 ```
 
-DB example:
-
-`npx pocketbase-typegen --db ./pb_data/data.db`
-
-JSON example (export JSON schema from the pocketbase admin dashboard):
-
-`npx pocketbase-typegen --json ./pb_schema.json`
-
-URL example with email and password:
+### URL example with email and password:
 
 `npx pocketbase-typegen --url https://myproject.pockethost.io --email admin@myproject.com --password 'secr3tp@ssword!'`
 
-URL example with auth token:
+### URL example with auth token:
 
-You can generate such token via the above impersonate API or from the Dashboard > Collections > _superusers > {select superuser} > "Impersonate" dropdown option.
+You can generate such token via the above impersonate API or from the Dashboard > Collections > \_superusers > {select superuser} > "Impersonate" dropdown option.
 
 `npx pocketbase-typegen --url https://myproject.pockethost.io --token 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'`
 
-ENV example (add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL and PB_TYPEGEN_PASSWORD to your .env file):
+### ENV example:
+
+Also supports environment specific files such as .env.local
 
 `npx pocketbase-typegen --env`
+or
+`npx pocketbase-typegen --env path/to/.env`
 
 .env:
 
@@ -64,11 +60,21 @@ PB_TYPEGEN_EMAIL=admin@myproject.com
 PB_TYPEGEN_PASSWORD=secr3tp@ssword!
 ```
 
+### Database example:
+
+`npx pocketbase-typegen --db ./pb_data/data.db`
+
+### JSON example (export JSON schema from the pocketbase admin dashboard):
+
+`npx pocketbase-typegen --json ./pb_schema.json`
+
+### Shortcut
+
 Add it to your projects `package.json`:
 
 ```
 "scripts": {
-  "typegen": "pocketbase-typegen --db ./pb_data/data.db",
+  "typegen": "pocketbase-typegen --env",
 },
 ```
 

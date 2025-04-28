@@ -1,4 +1,4 @@
-import dotenv from "dotenv"
+import dotenv from "dotenv-flow"
 
 import type { CollectionRecord, Options } from "./types"
 import {
@@ -26,8 +26,9 @@ export async function main(options: Options) {
       options.password
     )
   } else if (options.env) {
-    const path: string = typeof options.env === "string" ? options.env : ".env"
-    dotenv.config({ path: path })
+    dotenv.config(
+      typeof options.env === "string" ? { path: options.env } : undefined
+    )
     if (
       !process.env.PB_TYPEGEN_URL ||
       !process.env.PB_TYPEGEN_EMAIL ||
