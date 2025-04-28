@@ -1,4 +1,4 @@
-import dotenv from "dotenv"
+import dotenv from "dotenv-flow"
 
 import type { CollectionRecord, Options } from "./types"
 import {
@@ -26,22 +26,31 @@ export async function main(options: Options) {
       options.password
     )
   } else if (options.env) {
-    const path: string = typeof options.env === "string" ? options.env : ".env"
-    dotenv.config({ path: path })
-    if (
-      !process.env.PB_TYPEGEN_URL ||
-      !process.env.PB_TYPEGEN_EMAIL ||
-      !process.env.PB_TYPEGEN_PASSWORD
+    dotenv.config(
+      typeof options.env === "string" ? { path: options.env } : undefined
+    )
+    if (!process.env.PB_TYPEGEN_URL) {
+      return console.error("Missing PB_TYPEGEN_URL environment variable")
+    }
+    if (process.env.PB_TYPEGEN_TOKEN) {
+      schema = await fromURLWithToken(
+        process.env.PB_TYPEGEN_URL,
+        process.env.PB_TYPEGEN_TOKEN
+      )
+    } else if (
+      process.env.PB_TYPEGEN_EMAIL &&
+      process.env.PB_TYPEGEN_PASSWORD
     ) {
+      schema = await fromURLWithPassword(
+        process.env.PB_TYPEGEN_URL,
+        process.env.PB_TYPEGEN_EMAIL,
+        process.env.PB_TYPEGEN_PASSWORD
+      )
+    } else {
       return console.error(
-        "Missing environment variables. Check options: pocketbase-typegen --help"
+        "Missing PB_TYPEGEN_URL or PB_TYPEGEN_TOKEN environment variables"
       )
     }
-    schema = await fromURLWithPassword(
-      process.env.PB_TYPEGEN_URL,
-      process.env.PB_TYPEGEN_EMAIL,
-      process.env.PB_TYPEGEN_PASSWORD
-    )
   } else {
     return console.error(
       "Missing schema path. Check options: pocketbase-typegen --help"

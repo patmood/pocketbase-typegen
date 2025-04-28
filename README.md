@@ -4,7 +4,7 @@ Generate typescript definitions from your [pocketbase.io](https://pocketbase.io/
 
 ## Quickstart
 
-`npx pocketbase-typegen --db ./pb_data/data.db --out pocketbase-types.ts`
+`npx pocketbase-typegen --url https://myproject.pockethost.io --email admin@myproject.com --password 'secr3tp@ssword!'`
 
 This will produce types for all your PocketBase collections to use in your frontend typescript codebase.
 
@@ -21,54 +21,61 @@ This will produce types for all your PocketBase collections to use in your front
 
 ```
 Options:
-  -V, --version          output the version number
-  -d, --db <char>        path to the pocketbase SQLite database
-  -j, --json <char>      path to JSON schema exported from pocketbase admin UI
-  -u, --url <char>       URL to your hosted pocketbase instance. When using this options you must also provide email and password options or auth token option
-  --email <char>         email for a pocketbase superuser. Use this with the --url option
-  -p, --password <char>  password for a pocketbase superuser. Use this with the --url option
-  -t, --token <char>     auth token for a pocketbase superuser. Alternative to email and password authentication. Use this with the --url option
-  -o, --out <char>       path to save the typescript output file (default: "pocketbase-types.ts")
-  --no-sdk               remove the pocketbase package dependency. A typed version of the SDK will not be generated.
-  --env [path]       flag to use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD to your .env file. Optionally provide a path to your .env file
-  -h, --help             display help for command
+  -V, --version              output the version number
+  -u, --url <url>            URL to your hosted pocketbase instance. When using this options you must also provide email and
+                             password options or auth token option.
+  --email <email>            Email for a pocketbase superuser. Use this with the --url option.
+  -p, --password <password>  Password for a pocketbase superuser. Use this with the --url option.
+  -t, --token <token>        Auth token for a pocketbase superuser. Use this with the --url option.
+  -d, --db <path>            Path to the pocketbase SQLite database.
+  -j, --json <path>          Path to JSON schema exported from pocketbase admin UI.
+  --env [dir]                Use environment variables for configuration. Add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL, PB_TYPEGEN_PASSWORD
+                             to your .env file. Optionally provide a path to a directory containing a .env file (default: true)
+  -o, --out <path>           Path to save the typescript output file. (default: "pocketbase-types.ts")
+  --no-sdk                   Removes the pocketbase package dependency. A typed version of the SDK will not be generated.
+  -h, --help                 display help for command
 ```
 
-DB example:
-
-`npx pocketbase-typegen --db ./pb_data/data.db`
-
-JSON example (export JSON schema from the pocketbase admin dashboard):
-
-`npx pocketbase-typegen --json ./pb_schema.json`
-
-URL example with email and password:
+### URL example with email and password:
 
 `npx pocketbase-typegen --url https://myproject.pockethost.io --email admin@myproject.com --password 'secr3tp@ssword!'`
 
-URL example with auth token:
+### URL example with auth token:
 
-You can generate such token via the above impersonate API or from the Dashboard > Collections > _superusers > {select superuser} > "Impersonate" dropdown option.
+You can generate such token via the above impersonate API or from the Dashboard > Collections > \_superusers > {select superuser} > "Impersonate" dropdown option.
 
 `npx pocketbase-typegen --url https://myproject.pockethost.io --token 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'`
 
-ENV example (add PB_TYPEGEN_URL, PB_TYPEGEN_EMAIL and PB_TYPEGEN_PASSWORD to your .env file):
+### ENV example:
 
-`npx pocketbase-typegen --env`
+Also supports environment specific files such as .env.local (uses [dotenv-flow](https://www.npmjs.com/package/dotenv-flow))
 
-.env:
+`npx pocketbase-typegen --env` or `npx pocketbase-typegen --env path/to/dir`
+
+.env variables include:
 
 ```
 PB_TYPEGEN_URL=https://myproject.pockethost.io
 PB_TYPEGEN_EMAIL=admin@myproject.com
 PB_TYPEGEN_PASSWORD=secr3tp@ssword!
+PB_TYPEGEN_TOKEN=eyJhbGciOiJI...ozhyQVfYm24
 ```
+
+### Database example:
+
+`npx pocketbase-typegen --db ./pb_data/data.db`
+
+### JSON example (export JSON schema from the pocketbase admin dashboard):
+
+`npx pocketbase-typegen --json ./pb_schema.json`
+
+### Shortcut
 
 Add it to your projects `package.json`:
 
 ```
 "scripts": {
-  "typegen": "pocketbase-typegen --db ./pb_data/data.db",
+  "typegen": "pocketbase-typegen --env",
 },
 ```
 
