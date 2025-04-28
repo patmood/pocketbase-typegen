@@ -5,3 +5,7 @@ tsconfig.json
 build.js
 fixtures
 examples
+.github
+Dockerfile
+.eslintrc
+.prettierignore
