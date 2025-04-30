@@ -1,6 +1,7 @@
 import {
   AUTODATE_STRING_TYPE_NAME,
   DATE_STRING_TYPE_NAME,
+  GEOPOINT_TYPE_NAME,
   HTML_STRING_NAME,
   RECORD_ID_STRING_NAME,
 } from "./constants"
@@ -19,6 +20,7 @@ export const pbSchemaTypescriptMap = {
   autodate: AUTODATE_STRING_TYPE_NAME,
   editor: HTML_STRING_NAME,
   email: "string",
+  geoPoint: GEOPOINT_TYPE_NAME,
   text: "string",
   url: "string",
   password: "string",

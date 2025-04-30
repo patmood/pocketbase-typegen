@@ -5,6 +5,7 @@ export type Options = {
   json?: string
   email?: string
   password?: string
+  token?: string
   sdk?: boolean
   env?: boolean | string
 }
@@ -27,6 +28,7 @@ export type FieldSchema = {
     | "relation"
     | "user"
     | "editor"
+    | "geoPoint"
   system: boolean
   required: boolean
   unique: boolean

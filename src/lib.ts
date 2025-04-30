@@ -11,6 +11,7 @@ import {
   EXPAND_GENERIC_NAME,
   EXPAND_TYPE_DEFINITION,
   EXPORT_COMMENT,
+  GEOPOINT_TYPE_DEFINITION,
   IMPORTS,
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
@@ -23,7 +24,7 @@ import {
   getGenericArgStringWithDefault,
 } from "./generics"
 import { CollectionRecord, FieldSchema } from "./types"
-import { getSystemFields, toPascalCase } from "./utils"
+import { containsGeoPoint, getSystemFields, toPascalCase } from "./utils"
 
 type GenerateOptions = {
   sdk: boolean
@@ -47,12 +48,14 @@ export function generate(
       }
     })
   const sortedCollectionNames = collectionNames
+  const includeGeoPoint = containsGeoPoint(results)
 
   const fileParts = [
     EXPORT_COMMENT,
     options.sdk && IMPORTS,
     createCollectionEnum(sortedCollectionNames),
     ALIAS_TYPE_DEFINITIONS,
+    includeGeoPoint && GEOPOINT_TYPE_DEFINITION,
     EXPAND_TYPE_DEFINITION,
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,

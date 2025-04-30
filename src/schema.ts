@@ -16,7 +16,7 @@ export async function fromDatabase(
   const result = await db.all("SELECT * FROM _collections")
   return result.map((collection) => ({
     ...collection,
-    fields: JSON.parse(collection.fields),
+    fields: JSON.parse(collection.fields ?? collection.schema  ?? "{}"),
   }))
 }
 
@@ -25,30 +25,12 @@ export async function fromJSON(path: string): Promise<Array<CollectionRecord>> {
   return JSON.parse(schemaStr)
 }
 
-export async function fromURL(
+export async function fromURLWithToken(
   url: string,
-  email = "",
-  password = ""
+  token: string = ""
 ): Promise<Array<CollectionRecord>> {
-  const formData = new FormData()
-  formData.append("identity", email)
-  formData.append("password", password)
   let collections: Array<CollectionRecord> = []
   try {
-    // Login
-    const { token } = await fetch(
-      `${url}/api/collections/_superusers/auth-with-password`,
-      {
-        // @ts-ignore
-        body: formData,
-        method: "post",
-      }
-    ).then((res) => {
-      if (!res.ok) throw res
-      return res.json()
-    })
-
-    // Get the collections
     const result = await fetch(`${url}/api/collections?perPage=200`, {
       headers: {
         Authorization: token,
@@ -64,4 +46,37 @@ export async function fromURL(
   }
 
   return collections
+}
+
+export async function fromURLWithPassword(
+  url: string,
+  email = "",
+  password = ""
+): Promise<Array<CollectionRecord>> {
+  const formData = new FormData()
+  formData.append("identity", email)
+  formData.append("password", password)
+
+  let token: string
+  try {
+    // Login
+    const response = await fetch(
+      `${url}/api/collections/_superusers/auth-with-password`,
+      {
+        // @ts-ignore
+        body: formData,
+        method: "post",
+      }
+    ).then((res) => {
+      if (!res.ok) throw res
+      return res.json()
+    })
+
+    token = response.token
+  } catch (error) {
+    console.error(error)
+    process.exit(1)
+  }
+
+  return await fromURLWithToken(url, token)
 }

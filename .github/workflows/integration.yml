@@ -22,7 +22,7 @@ jobs:
           docker build . -t pocketbase-typegen:latest
           docker run --name integration_test pocketbase-typegen:latest
           mkdir -p output
-          docker cp integration_test:/app/output output
+          docker cp integration_test:/app/test/integration/output output
 
       - name: Archive generated type results
         uses: actions/upload-artifact@v4
