@@ -21,8 +21,9 @@ export enum Collections {
 
 // Alias types for improved usability
 export type IsoDateString = string
-export type IsoAutoDateString = string & { readonly auto: unique symbol }
+export type IsoAutoDateString = string & { readonly autodate: unique symbol }
 export type RecordIdString = string
+export type FileNameString = string & { readonly filename: unique symbol }
 export type HTMLString = string
 
 export type GeoPoint = {
@@ -135,7 +136,7 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	custom_relation_field?: RecordIdString[]
 	date_field?: IsoDateString
 	email_field?: string
-	file_field?: string | File
+	file_field?: FileNameString
 	geopoint_field?: GeoPoint
 	id: string
 	json_field?: null | Tjson_field
@@ -145,7 +146,7 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	select_field?: EverythingSelectFieldOptions
 	select_field_no_values?: string
 	text_field?: string
-	three_files_field?: string[] | File[]
+	three_files_field?: FileNameString[]
 	updated?: IsoAutoDateString
 	url_field?: string
 	user_relation_field?: RecordIdString
@@ -168,7 +169,7 @@ export type PostsRecord = {
 }
 
 export type UsersRecord = {
-	avatar?: string | File
+	avatar?: FileNameString
 	created: IsoAutoDateString
 	email: string
 	emailVisibility?: boolean
@@ -225,6 +226,17 @@ export type CollectionResponses = {
 
 // Utility types for create/update operations
 
+type ProcessCreateAndUpdateFields<T> = Omit<{
+	// Omit AutoDate fields
+	[K in keyof T as Extract<T[K], IsoAutoDateString> extends never ? K : never]: 
+		// Convert FileNameString to File
+		T[K] extends infer U ? 
+			U extends (FileNameString | FileNameString[]) ? 
+				U extends any[] ? File[] : File 
+			: U
+		: never
+}, 'id'>
+
 // Create type for Auth collections
 export type CreateAuth<T> = {
 	id?: RecordIdString
@@ -233,19 +245,17 @@ export type CreateAuth<T> = {
 	password: string
 	passwordConfirm: string
 	verified?: boolean
-} & Omit<{
-	[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
-}, 'id'>
+} & ProcessCreateAndUpdateFields<T>
 
 // Create type for Base collections
 export type CreateBase<T> = {
 	id?: RecordIdString
-} & Omit<{
-	[K in keyof T as T[K] extends IsoAutoDateString | (IsoAutoDateString | undefined) ? never : K]: T[K]
-}, 'id'>
+} & ProcessCreateAndUpdateFields<T>
 
 // Update type for Auth collections
-export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & {
+export type UpdateAuth<T> = Partial<
+	Omit<ProcessCreateAndUpdateFields<T>, keyof AuthSystemFields>
+> & {
 	email?: string
 	emailVisibility?: boolean
 	oldPassword?: string
@@ -255,7 +265,9 @@ export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & {
 }
 
 // Update type for Base collections
-export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>>
+export type UpdateBase<T> = Partial<
+	Omit<ProcessCreateAndUpdateFields<T>, keyof BaseSystemFields>
+>
 
 // Get the correct create type for any collection
 export type Create<T extends keyof CollectionResponses> =

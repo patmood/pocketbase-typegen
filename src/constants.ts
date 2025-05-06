@@ -18,12 +18,14 @@ export const EXPAND_GENERIC_NAME = "expand"
 export const DATE_STRING_TYPE_NAME = `IsoDateString`
 export const AUTODATE_STRING_TYPE_NAME = `IsoAutoDateString`
 export const RECORD_ID_STRING_NAME = `RecordIdString`
+export const FILE_NAME_STRING_NAME = `FileNameString`
 export const HTML_STRING_NAME = `HTMLString`
 export const GEOPOINT_TYPE_NAME = `GeoPoint`
 export const ALIAS_TYPE_DEFINITIONS = `// Alias types for improved usability
 export type ${DATE_STRING_TYPE_NAME} = string
-export type ${AUTODATE_STRING_TYPE_NAME} = string & { readonly auto: unique symbol }
+export type ${AUTODATE_STRING_TYPE_NAME} = string & { readonly autodate: unique symbol }
 export type ${RECORD_ID_STRING_NAME} = string
+export type ${FILE_NAME_STRING_NAME} = string & { readonly filename: unique symbol }
 export type ${HTML_STRING_NAME} = string`
 
 export const BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
@@ -54,6 +56,17 @@ export const GEOPOINT_TYPE_DEFINITION = `export type ${GEOPOINT_TYPE_NAME} = {
 
 export const UTILITY_TYPES = `// Utility types for create/update operations
 
+type ProcessCreateAndUpdateFields<T> = Omit<{
+\t// Omit AutoDate fields
+\t[K in keyof T as Extract<T[K], IsoAutoDateString> extends never ? K : never]: 
+\t\t// Convert FileNameString to File
+\t\tT[K] extends infer U ? 
+\t\t\tU extends (FileNameString | FileNameString[]) ? 
+\t\t\t\tU extends any[] ? File[] : File 
+\t\t\t: U
+\t\t: never
+}, 'id'>
+
 // Create type for Auth collections
 export type CreateAuth<T> = {
 \tid?: ${RECORD_ID_STRING_NAME}
@@ -62,19 +75,17 @@ export type CreateAuth<T> = {
 \tpassword: string
 \tpasswordConfirm: string
 \tverified?: boolean
-} & Omit<{
-\t[K in keyof T as T[K] extends IsoAutoDateString ? never : K]: T[K]
-}, 'id'>
+} & ProcessCreateAndUpdateFields<T>
 
 // Create type for Base collections
 export type CreateBase<T> = {
 \tid?: RecordIdString
-} & Omit<{
-\t[K in keyof T as T[K] extends IsoAutoDateString | (IsoAutoDateString | undefined) ? never : K]: T[K]
-}, 'id'>
+} & ProcessCreateAndUpdateFields<T>
 
 // Update type for Auth collections
-export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & {
+export type UpdateAuth<T> = Partial<
+\tOmit<ProcessCreateAndUpdateFields<T>, keyof AuthSystemFields>
+> & {
 \temail?: string
 \temailVisibility?: boolean
 \toldPassword?: string
@@ -84,7 +95,9 @@ export type UpdateAuth<T> = Partial<Omit<T, keyof AuthSystemFields>> & {
 }
 
 // Update type for Base collections
-export type UpdateBase<T> = Partial<Omit<T, keyof BaseSystemFields>>
+export type UpdateBase<T> = Partial<
+\tOmit<ProcessCreateAndUpdateFields<T>, keyof BaseSystemFields>
+>
 
 // Get the correct create type for any collection
 export type Create<T extends keyof CollectionResponses> =
