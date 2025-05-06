@@ -140,6 +140,77 @@ const result = await pb
 result.expand.user.username
 ```
 
+## Create/Update types
+
+You can also type the create/update operations in two ways.
+
+1. Using collection model directly (you need to know if your collection is base/auth, but you can use your own custom models):
+
+```typescript
+import { Collections, CreateAuth, CreateBase, PostsRecord, UpdateAuth, UpdateBase, UsersRecord } from "./pocketbase-types"
+
+// For base collections
+const newPost: CreateBase<PostsRecord> = {
+  title: 'Post title',
+  description: 'Post description',
+  creator: 'USER_ID',
+  active: true
+}
+await pb.collection(Collections.Posts).create(newPost)
+
+const updatedPost: UpdateBase<PostsRecord> = {
+  title: 'New post title',
+  description: 'Updated post description',
+  active: false
+}
+await pb.collection(Collections.Posts).update('RECORD_ID', updatedPost)
+
+// For auth collections
+const newUser: CreateAuth<UsersRecord> = {
+  name: 'Name',
+  username: 'username',
+  password: 'password',
+  passwordConfirm: 'password',
+  email: 'user@mail.com',
+  emailVisibility: true,
+  verified: false
+}
+await pb.collection(Collections.Users).create(newUser)
+
+const updatedUser: UpdateAuth<UsersRecord> = {
+  name: 'Name',
+  email: 'user@mail.com',
+  verified: false
+}
+await pb.collection(Collections.Users).update('RECORD_ID', updatedUser)
+```
+
+2. Using Collections enum (type auto-infer if collection is base/auth):
+
+```typescript
+import { Collections, Create, Update } from "./pocketbase-types"
+
+// Create
+const newUser: Create<Collections.Users> = {
+  name: 'Name',
+  username: 'username',
+  password: 'password',
+  passwordConfirm: 'password',
+  email: 'user@mail.com',
+  emailVisibility: true,
+  verified: false
+}
+await pb.collection(Collections.Users).create(newUser)
+
+// Update
+const updatedUser: Update<Collections.Users> = {
+  name: 'Updated name',
+  email: 'user@email.com',
+  verified: false
+}
+await pb.collection(Collections.Users).update('RECORD_ID', updatedUser)
+```
+
 ## Status
 
 ![](https://github.com/patmood/pocketbase-typegen/actions/workflows/test.yml/badge.svg?branch=main) ![](https://github.com/patmood/pocketbase-typegen/actions/workflows/integration.yml/badge.svg?branch=main)

@@ -1,29 +1,29 @@
 import {
+  createCollectionEnum,
+  createCollectionRecords,
+  createCollectionResponses
+} from "./collections"
+import {
   ALIAS_TYPE_DEFINITIONS,
   ALL_RECORD_RESPONSE_COMMENT,
-  TYPED_POCKETBASE_COMMENT,
   AUTH_SYSTEM_FIELDS_DEFINITION,
   BASE_SYSTEM_FIELDS_DEFINITION,
   EXPAND_GENERIC_NAME,
+  EXPAND_TYPE_DEFINITION,
   EXPORT_COMMENT,
+  GEOPOINT_TYPE_DEFINITION,
+  IMPORTS,
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
-  IMPORTS,
-  EXPAND_TYPE_DEFINITION,
-  GEOPOINT_TYPE_DEFINITION,
+  TYPED_POCKETBASE_TYPE,
+  UTILITY_TYPES
 } from "./constants"
-import { CollectionRecord, FieldSchema } from "./types"
-import {
-  createCollectionEnum,
-  createCollectionRecords,
-  createCollectionResponses,
-  createTypedPocketbase,
-} from "./collections"
 import { createSelectOptions, createTypeField } from "./fields"
 import {
   getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
 } from "./generics"
+import { CollectionRecord, FieldSchema } from "./types"
 import { containsGeoPoint, getSystemFields, toPascalCase } from "./utils"
 
 type GenerateOptions = {
@@ -65,8 +65,8 @@ export function generate(
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(sortedCollectionNames),
     createCollectionResponses(sortedCollectionNames),
-    options.sdk && TYPED_POCKETBASE_COMMENT,
-    options.sdk && createTypedPocketbase(sortedCollectionNames),
+    UTILITY_TYPES,
+    options.sdk && TYPED_POCKETBASE_TYPE,
   ]
 
   return fileParts.filter(Boolean).join("\n\n") + "\n"
