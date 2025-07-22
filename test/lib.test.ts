@@ -180,26 +180,20 @@ describe("createResponseType", () => {
 })
 
 describe("createRelationshipGraph", () => {
-  const mockField = ({
-    id,
-    name,
-    type,
-    ...rest
-  }: Pick<FieldSchema, "id" | "name" | "type"> &
-    Partial<Omit<FieldSchema, "id" | "name" | "type">>): FieldSchema => ({
-    id,
-    name,
-    type,
+  const mockField = (overrides: Partial<FieldSchema>): FieldSchema => ({
+    id: crypto.randomUUID(),
+    name: "default_name",
+    type: "text",
     required: false,
     system: false,
     unique: false,
-    ...rest,
+    ...overrides,
   })
 
   const mockCollection = (
     overrides: Partial<CollectionRecord>
   ): CollectionRecord => ({
-    id: "default_id",
+    id: crypto.randomUUID(),
     name: "default_name",
     type: "base",
     system: false,
@@ -219,54 +213,84 @@ describe("createRelationshipGraph", () => {
 
   it("creates graph with no relationships for standalone collections", () => {
     const collections = [
-      mockCollection({ id: "1", name: "users" }),
-      mockCollection({ id: "2", name: "posts" }),
+      mockCollection({ name: "users" }),
+      mockCollection({ name: "posts" }),
     ]
     const graph = createRelationshipGraph(collections)
 
     expect(graph).toHaveLength(2)
     expect(graph[0].children.size).toBe(0)
-    expect(graph[0].owners.size).toBe(0)
+    expect(graph[0].parents.size).toBe(0)
     expect(graph[1].children.size).toBe(0)
-    expect(graph[1].owners.size).toBe(0)
+    expect(graph[1].parents.size).toBe(0)
   })
 
   it("creates parent-child relationships correctly", () => {
-    const authorCollection = mockCollection({
-      id: "collection1",
+    const authors = mockCollection({
       name: "authors",
-      fields: [mockField({ id: "1", name: "name", type: "text" })],
+      fields: [mockField({ name: "name", type: "text" })],
     })
-    const bookCollection = mockCollection({
-      id: "collection2",
-      name: "books",
+    const courses = mockCollection({
+      name: "courses",
       fields: [
-        mockField({ id: "1", name: "title", type: "text" }),
+        mockField({ name: "name", type: "text" }),
         mockField({
-          id: "1",
           name: "author",
           type: "relation",
-          options: {
-            collectionId: "collection1",
-          },
+          options: { collectionId: authors.id },
         }),
       ],
     })
-    const graph = createRelationshipGraph([authorCollection, bookCollection])
-    console.log("🤖 graph", graph[1].fields)
+    const chaptersId = crypto.randomUUID()
+    const chapters = mockCollection({
+      id: chaptersId,
+      name: "chapters",
+      fields: [
+        mockField({ name: "title", type: "text" }),
+        mockField({
+          name: "course",
+          type: "relation",
+          options: { collectionId: courses.id },
+        }),
+        mockField({
+          name: "parent",
+          type: "relation",
+          options: { collectionId: chaptersId },
+        }),
+      ],
+    })
+    const graph = createRelationshipGraph([courses, chapters, authors])
 
-    const authorNode = graph.find((n) => n.id === authorCollection.id)!
-    const bookNode = graph.find((n) => n.id === bookCollection.id)!
+    const authorNode = graph.find((n) => n.id === authors.id)!
+    const chapterNode = graph.find((n) => n.id === chapters.id)!
+    const courseNode = graph.find((n) => n.id === courses.id)!
 
-    expect(bookNode.children.size).toBe(0)
+    expect(chapterNode.children.size).toBe(1)
+    expect(chapterNode.parents.size).toBe(2)
+    const [[chapterChildrenField, chapterChildrenCollection]] = chapterNode.children
+    expect(chapterChildrenField.name).toBe("parent")
+    expect(chapterChildrenCollection).toBe(chapterNode)
+    const [[chapterOwnerField1, chapterOwner1], [chapterOwnerField2,chapterOwner2]] = chapterNode.parents
+    expect(chapterOwner1).toBe(courseNode)
+    expect(chapterOwnerField1.name).toBe('course')
+    expect(chapterOwner2).toBe(chapterNode)
+    expect(chapterOwnerField2.name).toBe('parent')
+
+    expect(courseNode.children.size).toBe(1)
+    expect(courseNode.parents.size).toBe(1)
+    const [[courseChildrenField, courseChildrenCollection]] = courseNode.children
+    expect(courseChildrenField.name).toBe("course")
+    expect(courseChildrenCollection).toBe(chapterNode)
+    const [[courseOwnerField1, courseOwner1]] = courseNode.parents
+    expect(courseOwner1).toBe(authorNode)
+    expect(courseOwnerField1.name).toBe('author')
 
     expect(authorNode.children.size).toBe(1)
-    const [[, authorChildrenCollection]] = authorNode.children
-    expect(authorChildrenCollection).toBe(bookNode)
+    expect(authorNode.parents.size).toBe(0)
+    const [[authorChildrenField, authorChildrenCollection]] = authorNode.children
+    expect(authorChildrenField.name).toBe("author")
+    expect(authorChildrenCollection).toBe(courseNode)
 
-    expect(bookNode.owners.size).toBe(1)
-    const [[, bookOwnerCollection]] = bookNode.owners
-    expect(bookOwnerCollection).toBe(authorNode)
   })
 
   it("handles broken relationship references gracefully", () => {
@@ -288,7 +312,7 @@ describe("createRelationshipGraph", () => {
     ]
 
     const graph = createRelationshipGraph(collections)
-    expect(graph[0].owners.size).toBe(0)
+    expect(graph[0].parents.size).toBe(0)
     expect(graph[0].children.size).toBe(0)
   })
 })

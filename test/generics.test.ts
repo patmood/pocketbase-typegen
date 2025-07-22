@@ -6,20 +6,14 @@ import {
 } from "../src/generics"
 import { FieldSchema, RelationNode, CollectionRecord } from "../src/types"
 
-const mockField = ({
-  id,
-  name,
-  type,
-  ...rest
-}: Pick<FieldSchema, "id" | "name" | "type"> &
-  Partial<Omit<FieldSchema, "id" | "name" | "type">>): FieldSchema => ({
-  id,
-  name,
-  type,
+const mockField = (overrides: Partial<FieldSchema>): FieldSchema => ({
+  id: crypto.randomUUID(),
+  name: "default_name",
+  type: "text",
   required: false,
   system: false,
   unique: false,
-  ...rest,
+  ...overrides,
 })
 
 const textField = mockField({
@@ -137,7 +131,7 @@ describe("getGenericArgForExpand", () => {
   const mockCollection = (
     overrides: Partial<CollectionRecord>
   ): CollectionRecord => ({
-    id: "default_id",
+    id: crypto.randomUUID(),
     name: "default_name",
     type: "base",
     system: false,
@@ -151,13 +145,29 @@ describe("getGenericArgForExpand", () => {
   })
 
   const mockRelationNode = (
-    opts: Pick<RelationNode, "name" | "id"> & Partial<RelationNode>
+    opts: Pick<RelationNode, "name"> & Partial<RelationNode>
   ): RelationNode => ({
-    ...opts,
     children: new Map(),
-    owners: new Map(),
+    parents: new Map(),
     ...mockCollection(opts),
   })
+
+  const addRelationship = (
+    parentNode: RelationNode,
+    childNode: RelationNode,
+    fieldName: string
+  ) => {
+    const field = mockField({
+      name: fieldName,
+      type: "relation",
+      options: {
+        collectionId: parentNode.id,
+      },
+    })
+    childNode.fields.push(field)
+    parentNode.children.set(field, childNode)
+    childNode.parents.set(field, parentNode)
+  }
 
   it("returns unknown for non-existent collection", () => {
     const result = getGenericArgForExpand("non-existent", [])
@@ -165,91 +175,61 @@ describe("getGenericArgForExpand", () => {
   })
 
   it("returns unknown for collection with no relationships", () => {
-    const node = mockRelationNode({ id: "collection1", name: "books" })
+    const node = mockRelationNode({ name: "books" })
     const result = getGenericArgForExpand("collection1", [node])
     expect(result).toBe("unknown")
   })
 
-  it("generates expand type for collection with owner relationships", () => {
-    const authorField = mockField({
-      id: "field1",
-      name: "author_field",
-      type: "relation",
-    })
-    const authorNode = mockRelationNode({
-      id: "author1",
+  describe("for defined relationships", () => {
+    const authors = mockRelationNode({
       name: "authors_collection",
     })
-    const bookNode = mockRelationNode({
-      id: "book1",
-      name: "books",
-      children: new Map(),
-      owners: new Map([[authorField, authorNode]]),
+    const courses = mockRelationNode({
+      name: "courses_collection",
+    })
+    const chapters = mockRelationNode({
+      name: "chapters_collection",
     })
 
-    const result = getGenericArgForExpand("book1", [authorNode, bookNode])
-    expect(result).toBe(`{
-\tauthor_field?: AuthorsCollectionRecord
-}`)
-  })
+    addRelationship(authors, courses, "author_field")
+    addRelationship(courses, chapters, "course_field")
+    addRelationship(chapters, chapters, "parent_chapter")
 
-  it("generates expand type for collection with child relationships", () => {
-    const booksField = mockField({
-      id: "field2",
-      name: "books_field",
-      type: "relation",
-    })
-    const bookNode = mockRelationNode({
-      id: "book1",
-      name: "books_collection",
-    })
-    const authorNode = mockRelationNode({
-      id: "author1",
-      name: "authors_collection",
-      children: new Map([[booksField, bookNode]]),
-    })
+    it("generates expand type for collection with owner relationships", () => {
+      const result = getGenericArgForExpand(courses.id, [
+        courses,
+        chapters,
+        authors,
+      ])
 
-    const result = getGenericArgForExpand("author1", [authorNode, bookNode])
-    expect(result).toBe(`{
-\tbooks_collection_via_books_field?: BooksCollectionRecord[]
-}`)
-  })
-
-  it("generates expand type with both owner and child relationships", () => {
-    const authorField = mockField({
-      id: "field1",
-      name: "author_field",
-      type: "relation",
-    })
-    const reviewField = mockField({
-      id: "field3",
-      name: "reviews_field",
-      type: "relation",
-    })
-    const bookNode = mockRelationNode({
-      id: "book1",
-      name: "books_collection",
-    })
-    const authorNode = mockRelationNode({
-      id: "author1",
-      name: "authors_collection",
-    })
-    const reviewNode = mockRelationNode({
-      id: "review1",
-      name: "reviews_collection",
-    })
-
-    bookNode.children = new Map([[reviewField, reviewNode]])
-    bookNode.owners = new Map([[authorField, authorNode]])
-
-    const result = getGenericArgForExpand("book1", [
-      authorNode,
-      bookNode,
-      reviewNode,
-    ])
-    expect(result).toBe(`{
+      expect(result).toBe(`{
 \tauthor_field?: AuthorsCollectionRecord,
-\treviews_collection_via_reviews_field?: ReviewsCollectionRecord[]
+\tchapters_collection_via_course_field?: ChaptersCollectionRecord[]
 }`)
+
+      const result2 = getGenericArgForExpand(authors.id, [
+        courses,
+        chapters,
+        authors,
+      ])
+
+      expect(result2).toBe(`{
+\tcourses_collection_via_author_field?: CoursesCollectionRecord[]
+}`)
+    })
+
+    it("generates expand type for hierarchical relationships", () => {
+      const result = getGenericArgForExpand(chapters.id, [
+        courses,
+        chapters,
+        authors,
+      ])
+
+      expect(result).toBe(`{
+\tcourse_field?: CoursesCollectionRecord,
+\tparent_chapter?: ChaptersCollectionRecord,
+\tchapters_collection_via_parent_chapter?: ChaptersCollectionRecord[]
+}`)
+    })
   })
 })

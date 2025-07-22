@@ -127,11 +127,11 @@ export function createRelationshipGraph(
   const relationNodes = collections.map<RelationNode>((collection) => ({
     ...collection,
     children: new Map(),
-    owners: new Map(),
+    parents: new Map(),
   }))
 
-  relationNodes.forEach((node) => {
-    node.fields.forEach((field) => {
+  relationNodes.forEach((childNode) => {
+    childNode.fields.forEach((field) => {
       const parentId =
         field.type === "relation" ? field.options?.collectionId : undefined
 
@@ -143,8 +143,8 @@ export function createRelationshipGraph(
         return
       }
 
-      parentNode.children.set(field, node)
-      node.owners.set(field, parentNode)
+      parentNode.children.set(field, childNode)
+      childNode.parents.set(field, parentNode)
     })
   })
 

@@ -50,26 +50,26 @@ export function getGenericArgForExpand(
   collectionId: CollectionRecord["id"],
   relationGraph: RelationGraph
 ): string {
-  const node = relationGraph.find((some) => some.id === collectionId)
+  const lookupNode = relationGraph.find((some) => some.id === collectionId)
 
-  if (!node) {
+  if (!lookupNode) {
     return "unknown"
   }
 
-  if (node.children.size === 0 && node.owners.size === 0) {
+  if (lookupNode.children.size === 0 && lookupNode.parents.size === 0) {
     return "unknown"
   }
 
-  const ownerFields = [...node.owners.entries()].map(([field, collection]) => {
-    const value = `${toPascalCase(collection.name)}Record`
+  const ownerFields = [...lookupNode.parents.entries()].map(([field, parentNode]) => {
+    const value = `${toPascalCase(parentNode.name)}Record`
 
     return `\t${field.name}?: ${value}`
   })
 
-  const childrenFields = [...node.children.entries()].map(
-    ([field, collection]) => {
-      const name = `${collection.name}_via_${field.name}`
-      const value = `${toPascalCase(collection.name)}Record[]`
+  const childrenFields = [...lookupNode.children.entries()].map(
+    ([field, childNode]) => {
+      const name = `${childNode.name}_via_${field.name}`
+      const value = `${toPascalCase(childNode.name)}Record[]`
 
       return `\t${name}?: ${value}`
     }

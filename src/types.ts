@@ -59,7 +59,7 @@ export type RecordOptions = {
 
 export type RelationNode = CollectionRecord & {
   children: Map<FieldSchema, RelationNode>
-  owners: Map<FieldSchema, RelationNode>
+  parents: Map<FieldSchema, RelationNode>
 }
 
 export type RelationGraph = RelationNode[]
