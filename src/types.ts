@@ -32,6 +32,7 @@ export type FieldSchema = {
   system: boolean
   required: boolean
   unique: boolean
+  options?: { collectionId?: string }
 } & RecordOptions
 
 export type CollectionRecord = {
@@ -55,3 +56,10 @@ export type RecordOptions = {
   pattern?: string
   values?: string[]
 }
+
+export type RelationNode = CollectionRecord & {
+  children: Map<FieldSchema, RelationNode>
+  owners: Map<FieldSchema, RelationNode>
+}
+
+export type RelationGraph = RelationNode[]
