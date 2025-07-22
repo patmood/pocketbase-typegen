@@ -267,30 +267,35 @@ describe("createRelationshipGraph", () => {
 
     expect(chapterNode.children.size).toBe(1)
     expect(chapterNode.parents.size).toBe(2)
-    const [[chapterChildrenField, chapterChildrenCollection]] = chapterNode.children
+    const [[chapterChildrenField, chapterChildrenCollection]] =
+      chapterNode.children
     expect(chapterChildrenField.name).toBe("parent")
     expect(chapterChildrenCollection).toBe(chapterNode)
-    const [[chapterOwnerField1, chapterOwner1], [chapterOwnerField2,chapterOwner2]] = chapterNode.parents
+    const [
+      [chapterOwnerField1, chapterOwner1],
+      [chapterOwnerField2, chapterOwner2],
+    ] = chapterNode.parents
     expect(chapterOwner1).toBe(courseNode)
-    expect(chapterOwnerField1.name).toBe('course')
+    expect(chapterOwnerField1.name).toBe("course")
     expect(chapterOwner2).toBe(chapterNode)
-    expect(chapterOwnerField2.name).toBe('parent')
+    expect(chapterOwnerField2.name).toBe("parent")
 
     expect(courseNode.children.size).toBe(1)
     expect(courseNode.parents.size).toBe(1)
-    const [[courseChildrenField, courseChildrenCollection]] = courseNode.children
+    const [[courseChildrenField, courseChildrenCollection]] =
+      courseNode.children
     expect(courseChildrenField.name).toBe("course")
     expect(courseChildrenCollection).toBe(chapterNode)
     const [[courseOwnerField1, courseOwner1]] = courseNode.parents
     expect(courseOwner1).toBe(authorNode)
-    expect(courseOwnerField1.name).toBe('author')
+    expect(courseOwnerField1.name).toBe("author")
 
     expect(authorNode.children.size).toBe(1)
     expect(authorNode.parents.size).toBe(0)
-    const [[authorChildrenField, authorChildrenCollection]] = authorNode.children
+    const [[authorChildrenField, authorChildrenCollection]] =
+      authorNode.children
     expect(authorChildrenField.name).toBe("author")
     expect(authorChildrenCollection).toBe(courseNode)
-
   })
 
   it("handles broken relationship references gracefully", () => {

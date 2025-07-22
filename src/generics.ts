@@ -60,11 +60,13 @@ export function getGenericArgForExpand(
     return "unknown"
   }
 
-  const ownerFields = [...lookupNode.parents.entries()].map(([field, parentNode]) => {
-    const value = `${toPascalCase(parentNode.name)}Record`
+  const ownerFields = [...lookupNode.parents.entries()].map(
+    ([field, parentNode]) => {
+      const value = `${toPascalCase(parentNode.name)}Record`
 
-    return `\t${field.name}?: ${value}`
-  })
+      return `\t${field.name}?: ${value}`
+    }
+  )
 
   const childrenFields = [...lookupNode.children.entries()].map(
     ([field, childNode]) => {
