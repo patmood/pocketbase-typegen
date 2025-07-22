@@ -66,12 +66,14 @@ export function getGenericArgForExpand(
     return `\t${field.name}?: ${value}`
   })
 
-  const childrenFields = [...node.children.entries()].map(([field, collection]) => {
-    const name = `${collection.name}_via_${field.name}`
-    const value = `${toPascalCase(collection.name)}Record[]`
+  const childrenFields = [...node.children.entries()].map(
+    ([field, collection]) => {
+      const name = `${collection.name}_via_${field.name}`
+      const value = `${toPascalCase(collection.name)}Record[]`
 
-    return `\t${name}?: ${value}`
-  })
+      return `\t${name}?: ${value}`
+    }
+  )
 
   return `{
 ${[...ownerFields, ...childrenFields].join(",\n")}
