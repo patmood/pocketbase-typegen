@@ -155,13 +155,15 @@ describe("getGenericArgForExpand", () => {
   const addRelationship = (
     parentNode: RelationNode,
     childNode: RelationNode,
-    fieldName: string
+    fieldName: string,
+    maxSelect?: number
   ) => {
     const field = mockField({
       name: fieldName,
       type: "relation",
       options: {
         collectionId: parentNode.id,
+        maxSelect: maxSelect ?? null,
       },
     })
     childNode.fields.push(field)
@@ -193,7 +195,7 @@ describe("getGenericArgForExpand", () => {
 
     addRelationship(authors, courses, "author_field")
     addRelationship(courses, chapters, "course_field")
-    addRelationship(chapters, chapters, "parent_chapter")
+    addRelationship(chapters, chapters, "parent_chapter", 1)
 
     it("generates expand type for collection with owner relationships", () => {
       const result = getGenericArgForExpand(courses.id, [
@@ -228,7 +230,7 @@ describe("getGenericArgForExpand", () => {
       expect(result).toBe(`{
 \tcourse_field?: CoursesCollectionRecord,
 \tparent_chapter?: ChaptersCollectionRecord,
-\tchapters_collection_via_parent_chapter?: ChaptersCollectionRecord[]
+\tchapters_collection_via_parent_chapter?: ChaptersCollectionRecord
 }`)
     })
   })
