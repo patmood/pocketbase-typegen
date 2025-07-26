@@ -26,7 +26,6 @@ import {
 } from "./collections"
 import { createSelectOptions, createTypeField } from "./fields"
 import {
-  getGenericArgForExpand,
   getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
 } from "./generics"

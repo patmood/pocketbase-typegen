@@ -203,8 +203,8 @@ describe("getGenericArgForExpand", () => {
       ])
 
       expect(result).toBe(`{
-\tauthor_field?: AuthorsCollectionRecord,
-\tchapters_collection_via_course_field?: ChaptersCollectionRecord[]
+\tauthor_field?: AuthorsCollectionResponse,
+\tchapters_collection_via_course_field?: ChaptersCollectionResponse[]
 }`)
 
       const result2 = getGenericArgForExpand(authors.id, [
@@ -214,7 +214,7 @@ describe("getGenericArgForExpand", () => {
       ])
 
       expect(result2).toBe(`{
-\tcourses_collection_via_author_field?: CoursesCollectionRecord[]
+\tcourses_collection_via_author_field?: CoursesCollectionResponse[]
 }`)
     })
 
@@ -226,9 +226,9 @@ describe("getGenericArgForExpand", () => {
       ])
 
       expect(result).toBe(`{
-\tcourse_field?: CoursesCollectionRecord,
-\tparent_chapter?: ChaptersCollectionRecord,
-\tchapters_collection_via_parent_chapter?: ChaptersCollectionRecord[]
+\tcourse_field?: CoursesCollectionResponse,
+\tparent_chapter?: ChaptersCollectionResponse,
+\tchapters_collection_via_parent_chapter?: ChaptersCollectionResponse[]
 }`)
     })
   })
