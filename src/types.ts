@@ -32,7 +32,7 @@ export type FieldSchema = {
   system: boolean
   required: boolean
   unique: boolean
-  options?: { collectionId?: string; maxSelect?: number | null }
+  options?: { collectionId?: string }
 } & RecordOptions
 
 export type CollectionRecord = {

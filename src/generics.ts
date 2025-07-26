@@ -70,9 +70,8 @@ export function getGenericArgForExpand(
 
   const childrenFields = [...lookupNode.children.entries()].map(
     ([field, childNode]) => {
-      const maybeArray = field.options?.maxSelect !== 1 ? "[]" : ""
       const name = `${childNode.name}_via_${field.name}`
-      const value = `${toPascalCase(childNode.name)}Record${maybeArray}`
+      const value = `${toPascalCase(childNode.name)}Record[]`
 
       return `\t${name}?: ${value}`
     }
