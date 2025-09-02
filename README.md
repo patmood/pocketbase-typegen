@@ -140,6 +140,30 @@ const result = await pb
 result.expand.user.username
 ```
 
+## Automatic Type Generation
+
+Pocketbase [hooks](https://pocketbase.io/docs/js-event-hooks/) can be used to generate new types every time a collections is created/updated/deleted. Create a file `generateHooks.pb.js` and place it in a directory called `pb_hooks` along side your pocketbase executable.
+
+```javascript
+/// <reference path="../pb_data/types.d.ts" />
+
+const generateTypes = ((e) => {
+  console.log("Collection changed - Running type generation...")
+  const cmd = $os.cmd(
+    "npx", "pocketbase-typegen", '--db', "pb_data/data.db", "--out", "../client/src/pocketbase-types.ts", 
+    )
+  const result = toString(cmd.output());
+  console.log(result)
+
+  e.next()
+})
+
+
+onCollectionAfterCreateSuccess(generateTypes)
+onCollectionAfterUpdateSuccess(generateTypes)
+onCollectionAfterDeleteSuccess(generateTypes)
+```
+
 ## Status
 
 ![](https://github.com/patmood/pocketbase-typegen/actions/workflows/test.yml/badge.svg?branch=main) ![](https://github.com/patmood/pocketbase-typegen/actions/workflows/integration.yml/badge.svg?branch=main)
