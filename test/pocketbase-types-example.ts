@@ -33,7 +33,7 @@ type ExpandType<T> = unknown extends T
 	? T extends unknown
 		? { expand?: unknown }
 		: { expand: T }
-	: { expand: T }
+	: { expand?: T }
 
 // System fields
 export type BaseSystemFields<T = unknown> = {

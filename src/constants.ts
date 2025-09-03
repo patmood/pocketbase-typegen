@@ -36,7 +36,7 @@ export const EXPAND_TYPE_DEFINITION = `type ExpandType<T> = unknown extends T
 \t? T extends unknown
 \t\t? { expand?: unknown }
 \t\t: { expand: T }
-\t: { expand: T }`
+\t: { expand?: T }`
 
 export const GEOPOINT_TYPE_DEFINITION = `export type ${GEOPOINT_TYPE_NAME} = {
 \tlon: number

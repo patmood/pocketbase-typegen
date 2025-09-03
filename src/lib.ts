@@ -12,7 +12,12 @@ import {
   EXPAND_TYPE_DEFINITION,
   GEOPOINT_TYPE_DEFINITION,
 } from "./constants"
-import { CollectionRecord, FieldSchema } from "./types"
+import {
+  CollectionRecord,
+  FieldSchema,
+  RelationGraph,
+  RelationNode,
+} from "./types"
 import {
   createCollectionEnum,
   createCollectionRecords,
@@ -37,6 +42,7 @@ export function generate(
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
+  const relationGraph = createRelationshipGraph(results)
 
   results
     .sort((a, b) => (a.name <= b.name ? -1 : 1))
@@ -44,9 +50,10 @@ export function generate(
       if (row.name) collectionNames.push(row.name)
       if (row.fields) {
         recordTypes.push(createRecordType(row.name, row.fields))
-        responseTypes.push(createResponseType(row))
+        responseTypes.push(createResponseType(row, relationGraph))
       }
     })
+
   const sortedCollectionNames = collectionNames
   const includeGeoPoint = containsGeoPoint(results)
 
@@ -96,16 +103,49 @@ ${fields}
 }
 
 export function createResponseType(
-  collectionSchemaEntry: CollectionRecord
+  collectionSchemaEntry: CollectionRecord,
+  relationGraph: RelationGraph
 ): string {
   const { name, fields, type } = collectionSchemaEntry
   const pascaleName = toPascalCase(name)
   const genericArgsWithDefaults = getGenericArgStringWithDefault(fields, {
     includeExpand: true,
+    relationGraph,
+    collectionId: collectionSchemaEntry.id,
   })
   const genericArgsForRecord = getGenericArgStringForRecord(fields)
   const systemFields = getSystemFields(type)
   const expandArgString = `<T${EXPAND_GENERIC_NAME}>`
 
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`
+}
+
+export function createRelationshipGraph(
+  collections: Array<CollectionRecord>
+): RelationGraph {
+  const relationNodes = collections.map<RelationNode>((collection) => ({
+    ...collection,
+    children: new Map(),
+    parents: new Map(),
+  }))
+
+  relationNodes.forEach((childNode) => {
+    childNode.fields.forEach((field) => {
+      const parentId =
+        field.type === "relation" ? field.options?.collectionId : undefined
+
+      const parentNode = parentId
+        ? relationNodes.find((collection) => collection.id === parentId)
+        : undefined
+
+      if (!parentNode) {
+        return
+      }
+
+      parentNode.children.set(field, childNode)
+      childNode.parents.set(field, parentNode)
+    })
+  })
+
+  return relationNodes
 }

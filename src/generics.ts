@@ -1,5 +1,6 @@
 import { EXPAND_GENERIC_NAME } from "./constants"
-import { FieldSchema } from "./types"
+import { CollectionRecord, FieldSchema, RelationGraph } from "./types"
+import { toPascalCase } from "./utils"
 
 export function fieldNameToGeneric(name: string) {
   return `T${name}`
@@ -21,14 +22,62 @@ export function getGenericArgStringForRecord(schema: FieldSchema[]): string {
 
 export function getGenericArgStringWithDefault(
   schema: FieldSchema[],
-  opts: { includeExpand: boolean }
+  opts:
+    | { includeExpand: false; relationGraph?: never; collectionId?: never }
+    | {
+        includeExpand: true
+        relationGraph: RelationGraph
+        collectionId: CollectionRecord["id"]
+      }
 ): string {
-  const argList = getGenericArgList(schema)
+  const argList = getGenericArgList(schema).map((name) => `${name} = unknown`)
 
   if (opts.includeExpand) {
-    argList.push(fieldNameToGeneric(EXPAND_GENERIC_NAME))
+    const expandArg = getGenericArgForExpand(
+      opts.collectionId,
+      opts.relationGraph
+    )
+
+    argList.push(`${fieldNameToGeneric(EXPAND_GENERIC_NAME)} = ${expandArg}`)
   }
 
   if (argList.length === 0) return ""
-  return `<${argList.map((name) => `${name} = unknown`).join(", ")}>`
+
+  return `<${argList.join(", ")}>`
+}
+
+export function getGenericArgForExpand(
+  collectionId: CollectionRecord["id"],
+  relationGraph: RelationGraph
+): string {
+  const lookupNode = relationGraph.find((some) => some.id === collectionId)
+
+  if (!lookupNode) {
+    return "unknown"
+  }
+
+  if (lookupNode.children.size === 0 && lookupNode.parents.size === 0) {
+    return "unknown"
+  }
+
+  const parentFields = [...lookupNode.parents.entries()].map(
+    ([field, parentNode]) => {
+      const value = `${toPascalCase(parentNode.name)}Response`
+
+      return `\t${field.name}?: ${value}`
+    }
+  )
+
+  const childrenFields = [...lookupNode.children.entries()].map(
+    ([field, childNode]) => {
+      const name = `${childNode.name}_via_${field.name}`
+      const value = `${toPascalCase(childNode.name)}Response[]`
+
+      return `\t${name}?: ${value}`
+    }
+  )
+
+  return `{
+${[...parentFields, ...childrenFields].join(",\n")}
+}`
 }
