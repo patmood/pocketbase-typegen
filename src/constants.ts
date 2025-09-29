@@ -40,3 +40,37 @@ export const GEOPOINT_TYPE_DEFINITION = `export type ${GEOPOINT_TYPE_NAME} = {
 \tlon: number
 \tlat: number
 }`
+
+export const ENHANCED_RECORD_SERVICE_DEFINITION = `// Enhanced RecordService type with dynamic expand typing
+interface EnhancedRecordService<TCollection extends Collections> {
+	getOne<TExpand extends string = ''>(
+		id: string,
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+
+	getList<TExpand extends string = ''>(
+		page?: number,
+		perPage?: number,
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
+	): Promise<ListResult<GetResponseType<TCollection, TExpand>>>
+
+	getFullList<TExpand extends string = ''>(
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
+	): Promise<Array<GetResponseType<TCollection, TExpand>>>
+
+	getFirstListItem<TExpand extends string = ''>(
+		filter: string,
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+
+	create<TBody = Record<string, unknown>, TExpand extends string = ''>(
+		body: TBody,
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+
+	update<TBody = Record<string, unknown>, TExpand extends string = ''>(
+		id: string,
+		body: TBody,
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+}`

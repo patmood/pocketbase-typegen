@@ -87,7 +87,7 @@ export function generate(
     AUTH_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
-    responseTypes.join("\n\n"),
+    responseTypes.join("\n"),
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(schemaWithRelations),
     createCollectionResponses(collectionNames),
@@ -133,8 +133,8 @@ export function createResponseType(
   let systemFieldsGeneric: string;
 
   if (hasRelations) {
-    allGenericParams.push(`ExpandString extends string = ""`);
-    systemFieldsGeneric = `<${pascaleName}Expand<ExpandString>>`;
+    allGenericParams.push(`Texpand extends string = ""`);
+    systemFieldsGeneric = `<${pascaleName}Expand<Texpand>>`;
   } else {
     allGenericParams.push(`Texpand = unknown`);
     systemFieldsGeneric = `<Texpand>`;

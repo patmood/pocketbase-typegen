@@ -63,7 +63,6 @@ export type BooksRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
-
 export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -92,33 +91,33 @@ type GetResponseType<
 interface EnhancedRecordService<TCollection extends Collections> {
 	getOne<TExpand extends string = ''>(
 		id: string,
-		options?: RecordOptions & { expand?: TExpand },
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
 	): Promise<GetResponseType<TCollection, TExpand>>
 
 	getList<TExpand extends string = ''>(
 		page?: number,
 		perPage?: number,
-		options?: RecordListOptions & { expand?: TExpand },
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
 	): Promise<ListResult<GetResponseType<TCollection, TExpand>>>
 
 	getFullList<TExpand extends string = ''>(
-		options?: RecordListOptions & { expand?: TExpand },
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
 	): Promise<Array<GetResponseType<TCollection, TExpand>>>
 
 	getFirstListItem<TExpand extends string = ''>(
 		filter: string,
-		options?: RecordOptions & { expand?: TExpand },
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
 	): Promise<GetResponseType<TCollection, TExpand>>
 
 	create<TBody = Record<string, unknown>, TExpand extends string = ''>(
 		body: TBody,
-		options?: RecordOptions & { expand?: TExpand },
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
 	): Promise<GetResponseType<TCollection, TExpand>>
 
 	update<TBody = Record<string, unknown>, TExpand extends string = ''>(
 		id: string,
 		body: TBody,
-		options?: RecordOptions & { expand?: TExpand },
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
 	): Promise<GetResponseType<TCollection, TExpand>>
 }
 

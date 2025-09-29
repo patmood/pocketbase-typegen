@@ -259,31 +259,18 @@ export type UsersRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
-
 export type AuthoriginsResponse<Texpand = unknown> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
-
 export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
-
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
-
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
-
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-
 export type BaseResponse<Texpand = unknown> = Required<BaseRecord> & BaseSystemFields<Texpand>
-
 export type CustomAuthResponse<Texpand = unknown> = Required<CustomAuthRecord> & AuthSystemFields<Texpand>
-
-export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, ExpandString extends string = ""> = Required<EverythingRecord<Tanother_json_field, Tjson_field>> & BaseSystemFields<EverythingExpand<ExpandString>>
-
+export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, Texpand extends string = ""> = Required<EverythingRecord<Tanother_json_field, Tjson_field>> & BaseSystemFields<EverythingExpand<Texpand>>
 export type ImagesResponse<Texpand = unknown> = Required<ImagesRecord> & BaseSystemFields<Texpand>
-
-export type MyViewResponse<Tjson_field = unknown, ExpandString extends string = ""> = Required<MyViewRecord<Tjson_field>> & BaseSystemFields<MyViewExpand<ExpandString>>
-
-export type PostsResponse<ExpandString extends string = ""> = Required<PostsRecord> & BaseSystemFields<PostsExpand<ExpandString>>
-
-export type TagsResponse<ExpandString extends string = ""> = Required<TagsRecord> & BaseSystemFields<TagsExpand<ExpandString>>
-
+export type MyViewResponse<Tjson_field = unknown, Texpand extends string = ""> = Required<MyViewRecord<Tjson_field>> & BaseSystemFields<MyViewExpand<Texpand>>
+export type PostsResponse<Texpand extends string = ""> = Required<PostsRecord> & BaseSystemFields<PostsExpand<Texpand>>
+export type TagsResponse<Texpand extends string = ""> = Required<TagsRecord> & BaseSystemFields<TagsExpand<Texpand>>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -360,33 +347,33 @@ type GetResponseType<
 interface EnhancedRecordService<TCollection extends Collections> {
 	getOne<TExpand extends string = ''>(
 		id: string,
-		options?: RecordOptions & { expand?: TExpand },
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
 	): Promise<GetResponseType<TCollection, TExpand>>
 
 	getList<TExpand extends string = ''>(
 		page?: number,
 		perPage?: number,
-		options?: RecordListOptions & { expand?: TExpand },
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
 	): Promise<ListResult<GetResponseType<TCollection, TExpand>>>
 
 	getFullList<TExpand extends string = ''>(
-		options?: RecordListOptions & { expand?: TExpand },
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
 	): Promise<Array<GetResponseType<TCollection, TExpand>>>
 
 	getFirstListItem<TExpand extends string = ''>(
 		filter: string,
-		options?: RecordOptions & { expand?: TExpand },
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
 	): Promise<GetResponseType<TCollection, TExpand>>
 
 	create<TBody = Record<string, unknown>, TExpand extends string = ''>(
 		body: TBody,
-		options?: RecordOptions & { expand?: TExpand },
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
 	): Promise<GetResponseType<TCollection, TExpand>>
 
 	update<TBody = Record<string, unknown>, TExpand extends string = ''>(
 		id: string,
 		body: TBody,
-		options?: RecordOptions & { expand?: TExpand },
+		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
 	): Promise<GetResponseType<TCollection, TExpand>>
 }
 

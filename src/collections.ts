@@ -1,6 +1,7 @@
 import { CollectionRecordWithRelations } from "./types"
 import { getGenericArgList } from "./generics"
 import { toPascalCase } from "./utils"
+import { ENHANCED_RECORD_SERVICE_DEFINITION } from "./constants"
 
 export function createCollectionEnum(collectionNames: Array<string>): string {
   const collections = collectionNames
@@ -170,39 +171,7 @@ type GetResponseType<
 > = ${responseTypeCases}
 	: never
 
-// Enhanced RecordService type with dynamic expand typing
-interface EnhancedRecordService<TCollection extends Collections> {
-	getOne<TExpand extends string = ''>(
-		id: string,
-		options?: RecordOptions & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
-
-	getList<TExpand extends string = ''>(
-		page?: number,
-		perPage?: number,
-		options?: RecordListOptions & { expand?: TExpand },
-	): Promise<ListResult<GetResponseType<TCollection, TExpand>>>
-
-	getFullList<TExpand extends string = ''>(
-		options?: RecordListOptions & { expand?: TExpand },
-	): Promise<Array<GetResponseType<TCollection, TExpand>>>
-
-	getFirstListItem<TExpand extends string = ''>(
-		filter: string,
-		options?: RecordOptions & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
-
-	create<TBody = Record<string, unknown>, TExpand extends string = ''>(
-		body: TBody,
-		options?: RecordOptions & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
-
-	update<TBody = Record<string, unknown>, TExpand extends string = ''>(
-		id: string,
-		body: TBody,
-		options?: RecordOptions & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
-}
+${ENHANCED_RECORD_SERVICE_DEFINITION}
 
 // Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
