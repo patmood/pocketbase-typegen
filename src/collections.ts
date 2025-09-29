@@ -1,7 +1,7 @@
 import { CollectionRecordWithRelations } from "./types"
 import { getGenericArgList } from "./generics"
 import { toPascalCase } from "./utils"
-import { ENHANCED_RECORD_SERVICE_DEFINITION } from "./constants"
+import { ENHANCED_RECORD_SERVICE_DEFINITION, TYPED_POCKETBASE_COMMENT } from "./constants"
 
 export function createCollectionEnum(collectionNames: Array<string>): string {
   const collections = collectionNames
@@ -85,12 +85,12 @@ function generateTypesForCollection(
   // Using template strings makes the overall structure clearer.
   const relationMappingsType = `
 // Expand Helper Types for "${collection.name}"
-export type ${collectionName}RelationMappings<Trest extends string = ""> = {
+type ${collectionName}RelationMappings<Trest extends string = ""> = {
 ${relationMappings}
 }`;
 
   const expandHelperType = `
-export type ${collectionName}Expand<T extends string> = 
+type ${collectionName}Expand<T extends string> = 
 	// 1. Handle comma-separated expands, e.g., "author,tags"
 	T extends \`\${infer F},\${infer R}\`
 		? ${collectionName}Expand<F> & ${collectionName}Expand<R>
@@ -103,8 +103,10 @@ export type ${collectionName}Expand<T extends string> =
 	: T extends keyof ${collectionName}RelationMappings
 		? { [K in T]: ${collectionName}RelationMappings[K] }
 	
-	// 4. If none of the above match, the type is never.
-	: never;
+	// 4. If not empty and none of the above match, the type is never.
+	: T extends ""
+		? undefined
+		: never;
 `;
   // Remove all single-line comments (//...) from the generated string.
   const expandHelperTypeWithoutComments = expandHelperType.replace(/\s*\/\/.*$/gm, '');
@@ -173,8 +175,7 @@ type GetResponseType<
 
 ${ENHANCED_RECORD_SERVICE_DEFINITION}
 
-// Type for usage with type asserted PocketBase instance
-// https://github.com/pocketbase/js-sdk#specify-typescript-definitions
+${TYPED_POCKETBASE_COMMENT}
 export type TypedPocketBase = {
 ${collectionOverloads}
 } & PocketBase

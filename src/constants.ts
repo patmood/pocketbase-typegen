@@ -16,10 +16,6 @@ export type ${DATE_STRING_TYPE_NAME} = string
 export type ${RECORD_ID_STRING_NAME} = string
 export type ${HTML_STRING_NAME} = string`
 
-export const CONDITIONAL_EXPAND_HELPER = `// A type helper to check if the expand object is empty
-type IsEmptyObject<T> = T extends Record<string, never> ? (keyof T extends never ? true : false) : false;`
-
-
 export const BASE_SYSTEM_FIELDS_DEFINITION = `// System fields
 export type BaseSystemFields<T = unknown> = {
 \tid: ${RECORD_ID_STRING_NAME}
@@ -27,7 +23,7 @@ export type BaseSystemFields<T = unknown> = {
 \tcollectionName: Collections
 \tcreated: ${DATE_STRING_TYPE_NAME}
 \tupdated: ${DATE_STRING_TYPE_NAME}
-} & (IsEmptyObject<T> extends true ? { expand?: T } : { expand: T })`
+} & (T extends never ? never : { expand: T })`
 
 export const AUTH_SYSTEM_FIELDS_DEFINITION = `export type AuthSystemFields<T = unknown> = {
 \temail: string

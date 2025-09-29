@@ -144,6 +144,15 @@ async function testTypeInference(pb: TypedPocketBase) {
   // This should be valid and type-checked
   const isNonEmpty: boolean | undefined = postFromView?.nonempty_bool
 
+  // Test 6: Testing an invalid expand
+  const recordWithInvalidExpand = await pb.collection(Collections.Everything).getOne("RECORD_ID", {
+    expand: "user_relation_field.invalid_field",
+  })
+  if (recordWithInvalidExpand.expand) {
+    // Never executes
+    console.log(recordWithInvalidExpand.expand)
+  }
+
   console.log("Type inference tests passed:", { userEmail, isNonEmpty })
 }
 

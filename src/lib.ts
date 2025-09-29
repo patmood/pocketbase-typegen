@@ -8,8 +8,6 @@ import {
   RESPONSE_TYPE_COMMENT,
   IMPORTS,
   GEOPOINT_TYPE_DEFINITION,
-  TYPED_POCKETBASE_COMMENT,
-  CONDITIONAL_EXPAND_HELPER,
 } from "./constants"
 import {
   CollectionRecord,
@@ -81,7 +79,6 @@ export function generate(
     createCollectionEnum(collectionNames),
     ALIAS_TYPE_DEFINITIONS,
     includeGeoPoint && GEOPOINT_TYPE_DEFINITION,
-    options.sdk && CONDITIONAL_EXPAND_HELPER,
     options.sdk && createExpandHelpers(schemaWithRelations),
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
@@ -91,7 +88,6 @@ export function generate(
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(schemaWithRelations),
     createCollectionResponses(collectionNames),
-    options.sdk && TYPED_POCKETBASE_COMMENT,
     options.sdk && createEnhancedPocketBase(schemaWithRelations),
   ]
 
@@ -132,12 +128,11 @@ export function createResponseType(
 
   let systemFieldsGeneric: string;
 
+  allGenericParams.push(`Texpand extends string = ""`);
   if (hasRelations) {
-    allGenericParams.push(`Texpand extends string = ""`);
     systemFieldsGeneric = `<${pascaleName}Expand<Texpand>>`;
   } else {
-    allGenericParams.push(`Texpand = unknown`);
-    systemFieldsGeneric = `<Texpand>`;
+    systemFieldsGeneric = `<Texpand extends "" ? undefined : never>`;
   }
   const genericParamsString = allGenericParams.length > 0 ? `<${allGenericParams.join(", ")}>` : "";
 

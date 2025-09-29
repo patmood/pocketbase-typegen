@@ -12,7 +12,7 @@ exports[`createRecordType handles file fields with multiple files 1`] = `
 }"
 `;
 
-exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>"`;
+exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse<Texpand extends string = ""> = Required<BooksRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>"`;
 
 exports[`createResponseType handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
@@ -37,9 +37,6 @@ export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
 
-// A type helper to check if the expand object is empty
-type IsEmptyObject<T> = T extends Record<string, never> ? (keyof T extends never ? true : false) : false;
-
 // System fields
 export type BaseSystemFields<T = unknown> = {
 	id: RecordIdString
@@ -47,7 +44,7 @@ export type BaseSystemFields<T = unknown> = {
 	collectionName: Collections
 	created: IsoDateString
 	updated: IsoDateString
-} & (IsEmptyObject<T> extends true ? { expand?: T } : { expand: T })
+} & (T extends never ? never : { expand: T })
 
 export type AuthSystemFields<T = unknown> = {
 	email: string
@@ -63,7 +60,7 @@ export type BooksRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
-export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>
+export type BooksResponse<Texpand extends string = ""> = Required<BooksRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -74,9 +71,6 @@ export type CollectionRecords = {
 export type CollectionResponses = {
 	books: BooksResponse
 }
-
-// Type for usage with type asserted PocketBase instance
-// https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 
 // Helper type for dynamic response based on passed generics

@@ -34,70 +34,75 @@ export type GeoPoint = {
 	lat: number
 }
 
-// A type helper to check if the expand object is empty
-type IsEmptyObject<T> = T extends Record<string, never> ? (keyof T extends never ? true : false) : false;
-
 
 // Expand Helper Types for "everything"
-export type EverythingRelationMappings<Trest extends string = ""> = {
+type EverythingRelationMappings<Trest extends string = ""> = {
 	"user_relation_field"?: UsersResponse<Trest>
 	"custom_relation_field"?: CustomAuthResponse<Trest>[]
 	"post_relation_field"?: PostsResponse<Trest>
 }
 
-export type EverythingExpand<T extends string> =
+type EverythingExpand<T extends string> =
 	T extends \`\${infer F},\${infer R}\`
 		? EverythingExpand<F> & EverythingExpand<R>
 	: T extends \`\${infer K extends keyof EverythingRelationMappings}.\${infer Rest}\`
 		? { [P in K]: EverythingRelationMappings<Rest>[P] }
 	: T extends keyof EverythingRelationMappings
 		? { [K in T]: EverythingRelationMappings[K] }
-	: never;
+	: T extends ""
+		? undefined
+		: never;
 
 
 // Expand Helper Types for "my_view"
-export type MyViewRelationMappings<Trest extends string = ""> = {
+type MyViewRelationMappings<Trest extends string = ""> = {
 	"post_relation_field"?: PostsResponse<Trest>
 }
 
-export type MyViewExpand<T extends string> =
+type MyViewExpand<T extends string> =
 	T extends \`\${infer F},\${infer R}\`
 		? MyViewExpand<F> & MyViewExpand<R>
 	: T extends \`\${infer K extends keyof MyViewRelationMappings}.\${infer Rest}\`
 		? { [P in K]: MyViewRelationMappings<Rest>[P] }
 	: T extends keyof MyViewRelationMappings
 		? { [K in T]: MyViewRelationMappings[K] }
-	: never;
+	: T extends ""
+		? undefined
+		: never;
 
 
 // Expand Helper Types for "posts"
-export type PostsRelationMappings<Trest extends string = ""> = {
+type PostsRelationMappings<Trest extends string = ""> = {
 	"tags"?: TagsResponse<Trest>[]
 }
 
-export type PostsExpand<T extends string> =
+type PostsExpand<T extends string> =
 	T extends \`\${infer F},\${infer R}\`
 		? PostsExpand<F> & PostsExpand<R>
 	: T extends \`\${infer K extends keyof PostsRelationMappings}.\${infer Rest}\`
 		? { [P in K]: PostsRelationMappings<Rest>[P] }
 	: T extends keyof PostsRelationMappings
 		? { [K in T]: PostsRelationMappings[K] }
-	: never;
+	: T extends ""
+		? undefined
+		: never;
 
 
 // Expand Helper Types for "tags"
-export type TagsRelationMappings<Trest extends string = ""> = {
+type TagsRelationMappings<Trest extends string = ""> = {
 	"images": ImagesResponse<Trest>[]
 }
 
-export type TagsExpand<T extends string> =
+type TagsExpand<T extends string> =
 	T extends \`\${infer F},\${infer R}\`
 		? TagsExpand<F> & TagsExpand<R>
 	: T extends \`\${infer K extends keyof TagsRelationMappings}.\${infer Rest}\`
 		? { [P in K]: TagsRelationMappings<Rest>[P] }
 	: T extends keyof TagsRelationMappings
 		? { [K in T]: TagsRelationMappings[K] }
-	: never;
+	: T extends ""
+		? undefined
+		: never;
 
 
 // System fields
@@ -107,7 +112,7 @@ export type BaseSystemFields<T = unknown> = {
 	collectionName: Collections
 	created: IsoDateString
 	updated: IsoDateString
-} & (IsEmptyObject<T> extends true ? { expand?: T } : { expand: T })
+} & (T extends never ? never : { expand: T })
 
 export type AuthSystemFields<T = unknown> = {
 	email: string
@@ -262,19 +267,19 @@ export type UsersRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
-export type AuthoriginsResponse<Texpand = unknown> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
-export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
-export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
-export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
-export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type BaseResponse<Texpand = unknown> = Required<BaseRecord> & BaseSystemFields<Texpand>
-export type CustomAuthResponse<Texpand = unknown> = Required<CustomAuthRecord> & AuthSystemFields<Texpand>
+export type AuthoriginsResponse<Texpand extends string = ""> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type ExternalauthsResponse<Texpand extends string = ""> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type MfasResponse<Texpand extends string = ""> = Required<MfasRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type OtpsResponse<Texpand extends string = ""> = Required<OtpsRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type SuperusersResponse<Texpand extends string = ""> = Required<SuperusersRecord> & AuthSystemFields<Texpand extends "" ? undefined : never>
+export type BaseResponse<Texpand extends string = ""> = Required<BaseRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type CustomAuthResponse<Texpand extends string = ""> = Required<CustomAuthRecord> & AuthSystemFields<Texpand extends "" ? undefined : never>
 export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, Texpand extends string = ""> = Required<EverythingRecord<Tanother_json_field, Tjson_field>> & BaseSystemFields<EverythingExpand<Texpand>>
-export type ImagesResponse<Texpand = unknown> = Required<ImagesRecord> & BaseSystemFields<Texpand>
+export type ImagesResponse<Texpand extends string = ""> = Required<ImagesRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
 export type MyViewResponse<Tjson_field = unknown, Texpand extends string = ""> = Required<MyViewRecord<Tjson_field>> & BaseSystemFields<MyViewExpand<Texpand>>
 export type PostsResponse<Texpand extends string = ""> = Required<PostsRecord> & BaseSystemFields<PostsExpand<Texpand>>
 export type TagsResponse<Texpand extends string = ""> = Required<TagsRecord> & BaseSystemFields<TagsExpand<Texpand>>
-export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type UsersResponse<Texpand extends string = ""> = Required<UsersRecord> & AuthSystemFields<Texpand extends "" ? undefined : never>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -309,9 +314,6 @@ export type CollectionResponses = {
 	tags: TagsResponse
 	users: UsersResponse
 }
-
-// Type for usage with type asserted PocketBase instance
-// https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 
 // Helper type for dynamic response based on passed generics
