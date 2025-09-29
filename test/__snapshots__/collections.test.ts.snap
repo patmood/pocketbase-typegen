@@ -21,9 +21,57 @@ exports[`createCollectionResponses creates mapping of collection name to respons
 }"
 `;
 
-exports[`createTypedPocketBase creates typed variant of PocketBase client 1`] = `
-"export type TypedPocketBase = PocketBase & {
-	collection(idOrName: 'book'): RecordService<BookResponse>
-	collection(idOrName: 'magazine'): RecordService<MagazineResponse>
-}"
+exports[`createEnhancedPocketBase creates typed variant of PocketBase client 1`] = `
+"
+// Helper type for dynamic response based on passed generics
+type GetResponseType<
+	TCollection extends Collections,
+	TExpand extends string,
+> = TCollection extends Collections.Book
+		? BookResponse
+	: TCollection extends Collections.Magazine
+		? MagazineResponse
+	: never
+
+// Enhanced RecordService type with dynamic expand typing
+interface EnhancedRecordService<TCollection extends Collections> {
+	getOne<TExpand extends string = ''>(
+		id: string,
+		options?: RecordOptions & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+
+	getList<TExpand extends string = ''>(
+		page?: number,
+		perPage?: number,
+		options?: RecordListOptions & { expand?: TExpand },
+	): Promise<ListResult<GetResponseType<TCollection, TExpand>>>
+
+	getFullList<TExpand extends string = ''>(
+		options?: RecordListOptions & { expand?: TExpand },
+	): Promise<Array<GetResponseType<TCollection, TExpand>>>
+
+	getFirstListItem<TExpand extends string = ''>(
+		filter: string,
+		options?: RecordOptions & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+
+	create<TBody = Record<string, unknown>, TExpand extends string = ''>(
+		body: TBody,
+		options?: RecordOptions & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+
+	update<TBody = Record<string, unknown>, TExpand extends string = ''>(
+		id: string,
+		body: TBody,
+		options?: RecordOptions & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+}
+
+// Type for usage with type asserted PocketBase instance
+// https://github.com/pocketbase/js-sdk#specify-typescript-definitions
+export type TypedPocketBase = {
+	collection(idOrName: Collections.Book): EnhancedRecordService<Collections.Book> & RecordService
+	collection(idOrName: Collections.Magazine): EnhancedRecordService<Collections.Magazine> & RecordService
+} & PocketBase
+"
 `;

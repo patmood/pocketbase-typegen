@@ -5,6 +5,21 @@ import { promises as fs } from "fs"
 import { open } from "sqlite"
 import sqlite3 from "sqlite3"
 
+function parseCollection(collection: any): CollectionRecord {
+  const fieldsData = typeof collection.fields === 'string'
+    ? JSON.parse(collection.fields ?? collection.schema ?? "[]")
+    : (collection.fields ?? collection.schema ?? []);
+
+  return {
+    ...collection,
+    fields: (fieldsData ?? []).map((field: any) => ({
+      ...field,
+      options: field.options ?? {},
+    }))
+  }
+}
+
+
 export async function fromDatabase(
   dbPath: string
 ): Promise<Array<CollectionRecord>> {
@@ -14,15 +29,12 @@ export async function fromDatabase(
   })
 
   const result = await db.all("SELECT * FROM _collections")
-  return result.map((collection) => ({
-    ...collection,
-    fields: JSON.parse(collection.fields ?? collection.schema  ?? "{}"),
-  }))
+  return result.map(parseCollection)
 }
 
 export async function fromJSON(path: string): Promise<Array<CollectionRecord>> {
   const schemaStr = await fs.readFile(path, { encoding: "utf8" })
-  return JSON.parse(schemaStr)
+  return (JSON.parse(schemaStr) as any[]).map(parseCollection)
 }
 
 export async function fromURLWithToken(
@@ -45,7 +57,7 @@ export async function fromURLWithToken(
     process.exit(1)
   }
 
-  return collections
+  return collections.map(parseCollection)
 }
 
 export async function fromURLWithPassword(

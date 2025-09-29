@@ -125,7 +125,9 @@
     },
     "passwordAuth": {
       "enabled": true,
-      "identityFields": ["email"]
+      "identityFields": [
+        "email"
+      ]
     },
     "mfa": {
       "enabled": false,
@@ -310,7 +312,9 @@
     },
     "passwordAuth": {
       "enabled": true,
-      "identityFields": ["email"]
+      "identityFields": [
+        "email"
+      ]
     },
     "mfa": {
       "enabled": false,
@@ -515,7 +519,9 @@
     },
     "passwordAuth": {
       "enabled": true,
-      "identityFields": ["email"]
+      "identityFields": [
+        "email"
+      ]
     },
     "mfa": {
       "enabled": false,
@@ -1014,7 +1020,9 @@
         "type": "autodate"
       }
     ],
-    "indexes": ["CREATE INDEX `idx_77jkB2zihL` ON `base` (`created`)"],
+    "indexes": [
+      "CREATE INDEX `idx_77jkB2zihL` ON `base` (`created`)"
+    ],
     "system": false
   },
   {
@@ -1274,6 +1282,54 @@
     "system": false
   },
   {
+    "id": "pbc_3607937828",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "images",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "system": false
+  },
+  {
     "id": "pbc_1125843985",
     "listRule": null,
     "viewRule": null,
@@ -1333,6 +1389,94 @@
         "type": "number"
       },
       {
+        "cascadeDelete": false,
+        "collectionId": "pbc_1219621782",
+        "hidden": false,
+        "id": "relation1874629670",
+        "maxSelect": 999,
+        "minSelect": 0,
+        "name": "tags",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "system": false
+  },
+  {
+    "id": "pbc_1219621782",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "tags",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text1579384326",
+        "max": 0,
+        "min": 0,
+        "name": "name",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": true,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "pbc_3607937828",
+        "hidden": false,
+        "id": "relation3760176746",
+        "maxSelect": 999,
+        "minSelect": 0,
+        "name": "images",
+        "presentable": false,
+        "required": true,
+        "system": false,
+        "type": "relation"
+      },
+      {
         "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
@@ -1384,7 +1528,7 @@
         "cascadeDelete": false,
         "collectionId": "pbc_1125843985",
         "hidden": false,
-        "id": "_clone_sKQA",
+        "id": "_clone_YQwT",
         "maxSelect": 1,
         "minSelect": 0,
         "name": "post_relation_field",
@@ -1396,7 +1540,7 @@
       {
         "autogeneratePattern": "",
         "hidden": false,
-        "id": "_clone_LIwJ",
+        "id": "_clone_uH4V",
         "max": 0,
         "min": 0,
         "name": "text_field",
@@ -1409,7 +1553,7 @@
       },
       {
         "hidden": false,
-        "id": "_clone_wOsb",
+        "id": "_clone_8Q7y",
         "maxSize": 2000000,
         "name": "json_field",
         "presentable": false,

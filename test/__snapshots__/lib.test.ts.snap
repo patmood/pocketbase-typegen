@@ -26,7 +26,7 @@ exports[`generate generates correct output given db input 1`] = `
 */
 
 import type PocketBase from 'pocketbase'
-import type { RecordService } from 'pocketbase'
+import type { RecordService, RecordOptions, RecordListOptions, ListResult } from 'pocketbase'
 
 export enum Collections {
 	Books = "books",
@@ -37,18 +37,17 @@ export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
 
-type ExpandType<T> = unknown extends T
-	? T extends unknown
-		? { expand?: unknown }
-		: { expand: T }
-	: { expand: T }
+// A type helper to check if the expand object is empty
+type IsEmptyObject<T> = T extends Record<string, never> ? (keyof T extends never ? true : false) : false;
 
 // System fields
 export type BaseSystemFields<T = unknown> = {
 	id: RecordIdString
 	collectionId: string
 	collectionName: Collections
-} & ExpandType<T>
+	created: IsoDateString
+	updated: IsoDateString
+} & (IsEmptyObject<T> extends true ? { expand?: T } : { expand: T })
 
 export type AuthSystemFields<T = unknown> = {
 	email: string
@@ -64,6 +63,7 @@ export type BooksRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
+
 export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -79,8 +79,54 @@ export type CollectionResponses = {
 // Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
-export type TypedPocketBase = PocketBase & {
-	collection(idOrName: 'books'): RecordService<BooksResponse>
+
+// Helper type for dynamic response based on passed generics
+type GetResponseType<
+	TCollection extends Collections,
+	TExpand extends string,
+> = TCollection extends Collections.Books
+		? BooksResponse
+	: never
+
+// Enhanced RecordService type with dynamic expand typing
+interface EnhancedRecordService<TCollection extends Collections> {
+	getOne<TExpand extends string = ''>(
+		id: string,
+		options?: RecordOptions & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+
+	getList<TExpand extends string = ''>(
+		page?: number,
+		perPage?: number,
+		options?: RecordListOptions & { expand?: TExpand },
+	): Promise<ListResult<GetResponseType<TCollection, TExpand>>>
+
+	getFullList<TExpand extends string = ''>(
+		options?: RecordListOptions & { expand?: TExpand },
+	): Promise<Array<GetResponseType<TCollection, TExpand>>>
+
+	getFirstListItem<TExpand extends string = ''>(
+		filter: string,
+		options?: RecordOptions & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+
+	create<TBody = Record<string, unknown>, TExpand extends string = ''>(
+		body: TBody,
+		options?: RecordOptions & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
+
+	update<TBody = Record<string, unknown>, TExpand extends string = ''>(
+		id: string,
+		body: TBody,
+		options?: RecordOptions & { expand?: TExpand },
+	): Promise<GetResponseType<TCollection, TExpand>>
 }
+
+// Type for usage with type asserted PocketBase instance
+// https://github.com/pocketbase/js-sdk#specify-typescript-definitions
+export type TypedPocketBase = {
+	collection(idOrName: Collections.Books): EnhancedRecordService<Collections.Books> & RecordService
+} & PocketBase
+
 "
 `;

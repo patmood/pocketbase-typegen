@@ -1,28 +1,32 @@
 import {
   ALIAS_TYPE_DEFINITIONS,
   ALL_RECORD_RESPONSE_COMMENT,
-  TYPED_POCKETBASE_COMMENT,
   AUTH_SYSTEM_FIELDS_DEFINITION,
   BASE_SYSTEM_FIELDS_DEFINITION,
-  EXPAND_GENERIC_NAME,
   EXPORT_COMMENT,
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
   IMPORTS,
-  EXPAND_TYPE_DEFINITION,
   GEOPOINT_TYPE_DEFINITION,
+  TYPED_POCKETBASE_COMMENT,
+  CONDITIONAL_EXPAND_HELPER,
 } from "./constants"
-import { CollectionRecord, FieldSchema } from "./types"
+import {
+  CollectionRecord,
+  CollectionRecordWithRelations,
+  FieldSchema,
+} from "./types"
 import {
   createCollectionEnum,
   createCollectionRecords,
   createCollectionResponses,
-  createTypedPocketbase,
+  createEnhancedPocketBase,
+  createExpandHelpers,
 } from "./collections"
 import { createSelectOptions, createTypeField } from "./fields"
 import {
+  getGenericArgList,
   getGenericArgStringForRecord,
-  getGenericArgStringWithDefault,
 } from "./generics"
 import { containsGeoPoint, getSystemFields, toPascalCase } from "./utils"
 
@@ -31,81 +35,111 @@ type GenerateOptions = {
 }
 
 export function generate(
-  results: Array<CollectionRecord>,
+  schema: Array<CollectionRecord>,
   options: GenerateOptions
 ): string {
-  const collectionNames: Array<string> = []
+  const collectionNames = schema
+    .map((c) => c.name)
+    .sort((a, b) => (a <= b ? -1 : 1))
+
+  const collectionIdToNameMap = new Map<string, string>(
+    schema.map((c) => [c.id, c.name])
+  )
+
+  const schemaWithRelations: CollectionRecordWithRelations[] = schema
+    .map((c) => {
+      const relations: CollectionRecordWithRelations["relations"] = {}
+      c.fields
+        .filter((f) => f.type === "relation")
+        .forEach((f) => {
+          const collectionId = f.collectionId
+          if (collectionId && collectionIdToNameMap.has(collectionId)) {
+            relations[f.name] = {
+              collectionName: collectionIdToNameMap.get(collectionId)!,
+              isMultiple: f.maxSelect !== 1,
+              required: f.required,
+            }
+          }
+        })
+      return { ...c, relations }
+    })
+    .sort((a, b) => (a.name <= b.name ? -1 : 1))
+
   const recordTypes: Array<string> = []
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
 
-  results
-    .sort((a, b) => (a.name <= b.name ? -1 : 1))
-    .forEach((row) => {
-      if (row.name) collectionNames.push(row.name)
-      if (row.fields) {
-        recordTypes.push(createRecordType(row.name, row.fields))
-        responseTypes.push(createResponseType(row))
-      }
-    })
-  const sortedCollectionNames = collectionNames
-  const includeGeoPoint = containsGeoPoint(results)
+  schemaWithRelations.forEach((row) => {
+    recordTypes.push(createRecordType(row))
+    responseTypes.push(createResponseType(row))
+  })
+
+  const includeGeoPoint = containsGeoPoint(schema)
 
   const fileParts = [
     EXPORT_COMMENT,
     options.sdk && IMPORTS,
-    createCollectionEnum(sortedCollectionNames),
+    createCollectionEnum(collectionNames),
     ALIAS_TYPE_DEFINITIONS,
     includeGeoPoint && GEOPOINT_TYPE_DEFINITION,
-    EXPAND_TYPE_DEFINITION,
+    options.sdk && CONDITIONAL_EXPAND_HELPER,
+    options.sdk && createExpandHelpers(schemaWithRelations),
     BASE_SYSTEM_FIELDS_DEFINITION,
     AUTH_SYSTEM_FIELDS_DEFINITION,
     RECORD_TYPE_COMMENT,
     ...recordTypes,
-    responseTypes.join("\n"),
+    responseTypes.join("\n\n"),
     ALL_RECORD_RESPONSE_COMMENT,
-    createCollectionRecords(sortedCollectionNames),
-    createCollectionResponses(sortedCollectionNames),
+    createCollectionRecords(schemaWithRelations),
+    createCollectionResponses(collectionNames),
     options.sdk && TYPED_POCKETBASE_COMMENT,
-    options.sdk && createTypedPocketbase(sortedCollectionNames),
+    options.sdk && createEnhancedPocketBase(schemaWithRelations),
   ]
 
   return fileParts.filter(Boolean).join("\n\n") + "\n"
 }
 
 export function createRecordType(
-  name: string,
-  schema: Array<FieldSchema>
+  collection: CollectionRecordWithRelations
 ): string {
-  const selectOptionEnums = createSelectOptions(name, schema)
+  const { name, fields } = collection
+  const selectOptionEnums = createSelectOptions(name, fields)
   const typeName = toPascalCase(name)
-  const genericArgs = getGenericArgStringWithDefault(schema, {
-    includeExpand: false,
-  })
-  const fields = schema
+  const genericArgs = getGenericArgStringForRecord(collection)
+  const fieldStrings = fields
     .map((fieldSchema: FieldSchema) => createTypeField(name, fieldSchema))
     .sort()
     .join("\n")
 
-  return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = ${
-    fields
-      ? `{
-${fields}
+  return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = {
+${fieldStrings}
 }`
-      : "never"
-  }`
 }
 
 export function createResponseType(
-  collectionSchemaEntry: CollectionRecord
+  collection: CollectionRecordWithRelations
 ): string {
-  const { name, fields, type } = collectionSchemaEntry
+  const { name, type } = collection
   const pascaleName = toPascalCase(name)
-  const genericArgsWithDefaults = getGenericArgStringWithDefault(fields, {
-    includeExpand: true,
-  })
-  const genericArgsForRecord = getGenericArgStringForRecord(fields)
-  const systemFields = getSystemFields(type)
-  const expandArgString = `<T${EXPAND_GENERIC_NAME}>`
+  const responseTypeName = `${pascaleName}Response`
+  const recordTypeName = `${pascaleName}Record`
+  const systemFieldsName = getSystemFields(type)
+  const hasRelations = collection.relations && Object.keys(collection.relations).length > 0
 
-  return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`
+  const genericArgsForRecord = getGenericArgStringForRecord(collection)
+
+  const jsonGenerics = getGenericArgList(collection).map(g => `${g} = unknown`);
+  const allGenericParams = [...jsonGenerics];
+
+  let systemFieldsGeneric: string;
+
+  if (hasRelations) {
+    allGenericParams.push(`ExpandString extends string = ""`);
+    systemFieldsGeneric = `<${pascaleName}Expand<ExpandString>>`;
+  } else {
+    allGenericParams.push(`Texpand = unknown`);
+    systemFieldsGeneric = `<Texpand>`;
+  }
+  const genericParamsString = allGenericParams.length > 0 ? `<${allGenericParams.join(", ")}>` : "";
+
+  return `export type ${responseTypeName}${genericParamsString} = Required<${recordTypeName}${genericArgsForRecord}> & ${systemFieldsName}${systemFieldsGeneric}`
 }

@@ -2,8 +2,38 @@ import {
   createCollectionEnum,
   createCollectionRecords,
   createCollectionResponses,
-  createTypedPocketbase,
+  createEnhancedPocketBase,
 } from "../src/collections"
+import { CollectionRecordWithRelations } from "../src/types"
+
+const mockCollections: CollectionRecordWithRelations[] = [
+  {
+    id: "1",
+    name: "book",
+    type: "base",
+    system: false,
+    fields: [],
+    relations: {},
+    listRule: null,
+    viewRule: null,
+    createRule: null,
+    updateRule: null,
+    deleteRule: null,
+  },
+  {
+    id: "2",
+    name: "magazine",
+    type: "base",
+    system: false,
+    fields: [],
+    relations: {},
+    listRule: null,
+    viewRule: null,
+    createRule: null,
+    updateRule: null,
+    deleteRule: null,
+  },
+]
 
 describe("createCollectionEnum", () => {
   it("creates enum of collection names", () => {
@@ -14,8 +44,7 @@ describe("createCollectionEnum", () => {
 
 describe("createCollectionRecords", () => {
   it("creates mapping of collection name to record type", () => {
-    const names = ["book", "magazine"]
-    expect(createCollectionRecords(names)).toMatchSnapshot()
+    expect(createCollectionRecords(mockCollections)).toMatchSnapshot()
   })
 })
 
@@ -26,9 +55,8 @@ describe("createCollectionResponses", () => {
   })
 })
 
-describe("createTypedPocketBase", () => {
+describe("createEnhancedPocketBase", () => {
   it("creates typed variant of PocketBase client", () => {
-    const names = ["book", "magazine"]
-    expect(createTypedPocketbase(names)).toMatchSnapshot()
+    expect(createEnhancedPocketBase(mockCollections)).toMatchSnapshot()
   })
 })

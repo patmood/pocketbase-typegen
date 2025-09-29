@@ -35,7 +35,7 @@ export const pbSchemaTypescriptMap = {
       ? RECORD_ID_STRING_NAME
       : `${RECORD_ID_STRING_NAME}[]`,
   select: (fieldSchema: FieldSchema, collectionName: string) => {
-    // pocketbase v0.8+ values are required
+    // pocketbase v0.8+ values are required and are correctly in options
     const valueType = fieldSchema.values
       ? getOptionEnumName(collectionName, fieldSchema.name)
       : "string"
@@ -65,7 +65,7 @@ export function createTypeField(
   } else {
     typeStringOrFunc =
       pbSchemaTypescriptMap[
-        fieldSchema.type as keyof typeof pbSchemaTypescriptMap
+      fieldSchema.type as keyof typeof pbSchemaTypescriptMap
       ]
   }
 
@@ -89,8 +89,8 @@ export function createSelectOptions(
     .map(
       (field) => `export enum ${getOptionEnumName(recordName, field.name)} {
 ${getOptionValues(field)
-  .map((val) => `\t"${getSelectOptionEnumName(val)}" = "${val}",`)
-  .join("\n")}
+          .map((val) => `\t"${getSelectOptionEnumName(val)}" = "${val}",`)
+          .join("\n")}
 }\n`
     )
     .join("\n")
