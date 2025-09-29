@@ -50,8 +50,7 @@ describe("createCollectionRecords", () => {
 
 describe("createCollectionResponses", () => {
   it("creates mapping of collection name to response type", () => {
-    const names = ["book", "magazine"]
-    expect(createCollectionResponses(names)).toMatchSnapshot()
+    expect(createCollectionResponses(mockCollections)).toMatchSnapshot()
   })
 })
 

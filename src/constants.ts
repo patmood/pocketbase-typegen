@@ -38,35 +38,35 @@ export const GEOPOINT_TYPE_DEFINITION = `export type ${GEOPOINT_TYPE_NAME} = {
 }`
 
 export const ENHANCED_RECORD_SERVICE_DEFINITION = `// Enhanced RecordService type with dynamic expand typing
-interface EnhancedRecordService<TCollection extends Collections> {
-	getOne<TExpand extends string = ''>(
+interface EnhancedRecordService<Tcollection extends Collections> {
+	getOne<Texpand extends string = ''>(
 		id: string,
-		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
 
-	getList<TExpand extends string = ''>(
+	getList<Texpand extends string = ''>(
 		page?: number,
 		perPage?: number,
-		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
-	): Promise<ListResult<GetResponseType<TCollection, TExpand>>>
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: Texpand },
+	): Promise<ListResult<CollectionResponses<Texpand>[Tcollection]>>
 
-	getFullList<TExpand extends string = ''>(
-		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
-	): Promise<Array<GetResponseType<TCollection, TExpand>>>
+	getFullList<Texpand extends string = ''>(
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: Texpand },
+	): Promise<Array<CollectionResponses<Texpand>[Tcollection]>>
 
-	getFirstListItem<TExpand extends string = ''>(
+	getFirstListItem<Texpand extends string = ''>(
 		filter: string,
-		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
 
-	create<TBody = Record<string, unknown>, TExpand extends string = ''>(
+	create<TBody = Record<string, unknown>, Texpand extends string = ''>(
 		body: TBody,
-		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
 
-	update<TBody = Record<string, unknown>, TExpand extends string = ''>(
+	update<TBody = Record<string, unknown>, Texpand extends string = ''>(
 		id: string,
 		body: TBody,
-		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
 }`

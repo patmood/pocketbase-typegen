@@ -87,7 +87,7 @@ export function generate(
     responseTypes.join("\n"),
     ALL_RECORD_RESPONSE_COMMENT,
     createCollectionRecords(schemaWithRelations),
-    createCollectionResponses(collectionNames),
+    createCollectionResponses(schemaWithRelations),
     options.sdk && createEnhancedPocketBase(schemaWithRelations),
   ]
 
@@ -100,13 +100,14 @@ export function createRecordType(
   const { name, fields } = collection
   const selectOptionEnums = createSelectOptions(name, fields)
   const typeName = toPascalCase(name)
-  const genericArgs = getGenericArgStringForRecord(collection)
+  const genericArgs = getGenericArgList(collection).map(g => `${g} = unknown`)
+  const genericArgsString = genericArgs.length > 0 ? `<${genericArgs.join(", ")}>` : "";
   const fieldStrings = fields
     .map((fieldSchema: FieldSchema) => createTypeField(name, fieldSchema))
     .sort()
     .join("\n")
 
-  return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = {
+  return `${selectOptionEnums}export type ${typeName}Record${genericArgsString} = {
 ${fieldStrings}
 }`
 }

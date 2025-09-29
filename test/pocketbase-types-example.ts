@@ -196,7 +196,7 @@ export enum EverythingSelectFieldOptions {
 	"option with space" = "option with space",
 	"sy?mb@!$" = "sy?mb@!$",
 }
-export type EverythingRecord<Tanother_json_field, Tjson_field> = {
+export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknown> = {
 	another_json_field?: null | Tanother_json_field
 	bool_field?: boolean
 	created?: IsoDateString
@@ -225,7 +225,7 @@ export type ImagesRecord = {
 	updated?: IsoDateString
 }
 
-export type MyViewRecord<Tjson_field> = {
+export type MyViewRecord<Tjson_field = unknown> = {
 	id: string
 	json_field?: null | Tjson_field
 	post_relation_field?: RecordIdString
@@ -288,15 +288,15 @@ export type CollectionRecords = {
 	_superusers: SuperusersRecord
 	base: BaseRecord
 	custom_auth: CustomAuthRecord
-	everything: EverythingRecord<unknown, unknown>
+	everything: EverythingRecord
 	images: ImagesRecord
-	my_view: MyViewRecord<unknown>
+	my_view: MyViewRecord
 	posts: PostsRecord
 	tags: TagsRecord
 	users: UsersRecord
 }
 
-export type CollectionResponses = {
+export type CollectionResponses<Texpand extends string> = {
 	_authOrigins: AuthoriginsResponse
 	_externalAuths: ExternalauthsResponse
 	_mfas: MfasResponse
@@ -304,96 +304,63 @@ export type CollectionResponses = {
 	_superusers: SuperusersResponse
 	base: BaseResponse
 	custom_auth: CustomAuthResponse
-	everything: EverythingResponse
+	everything: EverythingResponse<unknown, unknown, Texpand>
 	images: ImagesResponse
-	my_view: MyViewResponse
-	posts: PostsResponse
-	tags: TagsResponse
+	my_view: MyViewResponse<unknown, Texpand>
+	posts: PostsResponse<Texpand>
+	tags: TagsResponse<Texpand>
 	users: UsersResponse
 }
 
-
-// Helper type for dynamic response based on passed generics
-type GetResponseType<
-	TCollection extends Collections,
-	TExpand extends string,
-> = TCollection extends Collections.Authorigins
-		? AuthoriginsResponse
-	: TCollection extends Collections.Externalauths
-		? ExternalauthsResponse
-	: TCollection extends Collections.Mfas
-		? MfasResponse
-	: TCollection extends Collections.Otps
-		? OtpsResponse
-	: TCollection extends Collections.Superusers
-		? SuperusersResponse
-	: TCollection extends Collections.Base
-		? BaseResponse
-	: TCollection extends Collections.CustomAuth
-		? CustomAuthResponse
-	: TCollection extends Collections.Everything
-		? EverythingResponse<unknown, unknown, TExpand>
-	: TCollection extends Collections.Images
-		? ImagesResponse
-	: TCollection extends Collections.MyView
-		? MyViewResponse<unknown, TExpand>
-	: TCollection extends Collections.Posts
-		? PostsResponse<TExpand>
-	: TCollection extends Collections.Tags
-		? TagsResponse<TExpand>
-	: TCollection extends Collections.Users
-		? UsersResponse
-	: never
-
 // Enhanced RecordService type with dynamic expand typing
-interface EnhancedRecordService<TCollection extends Collections> {
-	getOne<TExpand extends string = ''>(
+interface EnhancedRecordService<Tcollection extends Collections> {
+	getOne<Texpand extends string = ''>(
 		id: string,
-		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
 
-	getList<TExpand extends string = ''>(
+	getList<Texpand extends string = ''>(
 		page?: number,
 		perPage?: number,
-		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
-	): Promise<ListResult<GetResponseType<TCollection, TExpand>>>
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: Texpand },
+	): Promise<ListResult<CollectionResponses<Texpand>[Tcollection]>>
 
-	getFullList<TExpand extends string = ''>(
-		options?: Omit<RecordListOptions, 'expand'> & { expand?: TExpand },
-	): Promise<Array<GetResponseType<TCollection, TExpand>>>
+	getFullList<Texpand extends string = ''>(
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: Texpand },
+	): Promise<Array<CollectionResponses<Texpand>[Tcollection]>>
 
-	getFirstListItem<TExpand extends string = ''>(
+	getFirstListItem<Texpand extends string = ''>(
 		filter: string,
-		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
 
-	create<TBody = Record<string, unknown>, TExpand extends string = ''>(
+	create<TBody = Record<string, unknown>, Texpand extends string = ''>(
 		body: TBody,
-		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
 
-	update<TBody = Record<string, unknown>, TExpand extends string = ''>(
+	update<TBody = Record<string, unknown>, Texpand extends string = ''>(
 		id: string,
 		body: TBody,
-		options?: Omit<RecordOptions, 'expand'> & { expand?: TExpand },
-	): Promise<GetResponseType<TCollection, TExpand>>
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
 }
 
 // Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 export type TypedPocketBase = {
-	collection(idOrName: Collections.Authorigins): EnhancedRecordService<Collections.Authorigins> & RecordService
-	collection(idOrName: Collections.Externalauths): EnhancedRecordService<Collections.Externalauths> & RecordService
-	collection(idOrName: Collections.Mfas): EnhancedRecordService<Collections.Mfas> & RecordService
-	collection(idOrName: Collections.Otps): EnhancedRecordService<Collections.Otps> & RecordService
-	collection(idOrName: Collections.Superusers): EnhancedRecordService<Collections.Superusers> & RecordService
-	collection(idOrName: Collections.Base): EnhancedRecordService<Collections.Base> & RecordService
-	collection(idOrName: Collections.CustomAuth): EnhancedRecordService<Collections.CustomAuth> & RecordService
-	collection(idOrName: Collections.Everything): EnhancedRecordService<Collections.Everything> & RecordService
-	collection(idOrName: Collections.Images): EnhancedRecordService<Collections.Images> & RecordService
-	collection(idOrName: Collections.MyView): EnhancedRecordService<Collections.MyView> & RecordService
-	collection(idOrName: Collections.Posts): EnhancedRecordService<Collections.Posts> & RecordService
-	collection(idOrName: Collections.Tags): EnhancedRecordService<Collections.Tags> & RecordService
-	collection(idOrName: Collections.Users): EnhancedRecordService<Collections.Users> & RecordService
+	collection(idOrName: "_authOrigins"): EnhancedRecordService<Collections.Authorigins> & RecordService
+	collection(idOrName: "_externalAuths"): EnhancedRecordService<Collections.Externalauths> & RecordService
+	collection(idOrName: "_mfas"): EnhancedRecordService<Collections.Mfas> & RecordService
+	collection(idOrName: "_otps"): EnhancedRecordService<Collections.Otps> & RecordService
+	collection(idOrName: "_superusers"): EnhancedRecordService<Collections.Superusers> & RecordService
+	collection(idOrName: "base"): EnhancedRecordService<Collections.Base> & RecordService
+	collection(idOrName: "custom_auth"): EnhancedRecordService<Collections.CustomAuth> & RecordService
+	collection(idOrName: "everything"): EnhancedRecordService<Collections.Everything> & RecordService
+	collection(idOrName: "images"): EnhancedRecordService<Collections.Images> & RecordService
+	collection(idOrName: "my_view"): EnhancedRecordService<Collections.MyView> & RecordService
+	collection(idOrName: "posts"): EnhancedRecordService<Collections.Posts> & RecordService
+	collection(idOrName: "tags"): EnhancedRecordService<Collections.Tags> & RecordService
+	collection(idOrName: "users"): EnhancedRecordService<Collections.Users> & RecordService
 } & PocketBase
 

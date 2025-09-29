@@ -17,15 +17,7 @@ export function createCollectionRecords(
   collections: CollectionRecordWithRelations[]
 ): string {
   const nameRecordMap = collections
-    .map((c) => {
-      const recordName = toPascalCase(c.name) + "Record"
-      const generics = getGenericArgList(c)
-      if (generics.length > 0) {
-        const unknownGenerics = generics.map(() => "unknown").join(", ")
-        return `\t${c.name}: ${recordName}<${unknownGenerics}>`
-      }
-      return `\t${c.name}: ${recordName}`
-    })
+    .map((c) => `\t${c.name}: ${toPascalCase(c.name)}Record`)
     .join("\n")
   return `export type CollectionRecords = {
 ${nameRecordMap}
@@ -33,12 +25,28 @@ ${nameRecordMap}
 }
 
 export function createCollectionResponses(
-  collectionNames: Array<string>
+  collections: CollectionRecordWithRelations[]
 ): string {
-  const nameRecordMap = collectionNames
-    .map((name) => `\t${name}: ${toPascalCase(name)}Response`)
+  const nameRecordMap = collections
+    .map((c) => {
+
+      const responseType = toPascalCase(c.name) + "Response"
+
+      const jsonGenerics = getGenericArgList(c).map(() => "unknown")
+      const hasRelations = c.relations && Object.keys(c.relations).length > 0
+
+      const allGenerics: string[] = [...jsonGenerics]
+      if (hasRelations) {
+        allGenerics.push("Texpand")
+      }
+
+      const genericsString = allGenerics.length > 0
+        ? `<${allGenerics.join(", ")}>`
+        : ""
+     return `\t${c.name}: ${responseType}${genericsString}`
+    })
     .join("\n")
-  return `export type CollectionResponses = {
+  return `export type CollectionResponses<Texpand extends string> = {
 ${nameRecordMap}
 }`
 }
@@ -53,10 +61,10 @@ function generateRelationProperty(
 ): string {
   const targetCollectionName = toPascalCase(relation.collectionName);
   const responseType = `${targetCollectionName}Response<Trest>`;
-  
+
   const isOptional = !relation.required ? "?" : "";
   const isArray = relation.isMultiple ? "[]" : "";
-  
+
   return `\t"${fieldName}"${isOptional}: ${responseType}${isArray}`;
 }
 
@@ -67,7 +75,7 @@ function generateRelationMappings(
   relations: CollectionRecordWithRelations['relations']
 ): string {
   if (!relations) return "";
-  
+
   return Object.entries(relations)
     .map(([fieldName, relation]) => generateRelationProperty(fieldName, relation))
     .join("\n");
@@ -110,7 +118,7 @@ type ${collectionName}Expand<T extends string> =
 `;
   // Remove all single-line comments (//...) from the generated string.
   const expandHelperTypeWithoutComments = expandHelperType.replace(/\s*\/\/.*$/gm, '');
-  
+
   return `${relationMappingsType}\n${expandHelperTypeWithoutComments}`;
 }
 
@@ -136,44 +144,13 @@ export function createExpandHelpers(
 export function createEnhancedPocketBase(
   collections: CollectionRecordWithRelations[]
 ): string {
-  const responseTypeCases = collections
-    .map((c, i) => {
-      const responseType = toPascalCase(c.name) + "Response"
-
-      const jsonGenerics = getGenericArgList(c).map(() => "unknown")
-      const hasRelations = c.relations && Object.keys(c.relations).length > 0
-
-      const allGenerics: string[] = [...jsonGenerics]
-      if (hasRelations) {
-        allGenerics.push("TExpand")
-      }
-
-      const prefix = i === 0 ? "" : "\t: "
-
-      const genericsString = allGenerics.length > 0
-        ? `<${allGenerics.join(", ")}>`
-        : ""
-
-      return `${prefix}TCollection extends Collections.${toPascalCase(c.name)}
-		? ${responseType}${genericsString}`
-    })
-    .join("\n")
-
   const collectionOverloads = collections.map(c => {
     const collectionEnumName = toPascalCase(c.name);
-    return `\tcollection(idOrName: Collections.${collectionEnumName}): EnhancedRecordService<Collections.${collectionEnumName}> & RecordService`
+    return `\tcollection(idOrName: "${c.name}"): EnhancedRecordService<Collections.${collectionEnumName}> & RecordService`
   }).join("\n")
 
 
-  return `
-// Helper type for dynamic response based on passed generics
-type GetResponseType<
-	TCollection extends Collections,
-	TExpand extends string,
-> = ${responseTypeCases}
-	: never
-
-${ENHANCED_RECORD_SERVICE_DEFINITION}
+  return `${ENHANCED_RECORD_SERVICE_DEFINITION}
 
 ${TYPED_POCKETBASE_COMMENT}
 export type TypedPocketBase = {
