@@ -14,21 +14,20 @@ export type FieldSchema = {
   id: string
   name: string
   type:
-    | "text"
-    | "file"
-    | "text"
-    | "number"
-    | "bool"
-    | "email"
-    | "url"
-    | "date"
-    | "autodate"
-    | "select"
-    | "json"
-    | "relation"
-    | "user"
-    | "editor"
-    | "geoPoint"
+  | "text"
+  | "file"
+  | "number"
+  | "bool"
+  | "email"
+  | "url"
+  | "date"
+  | "autodate"
+  | "select"
+  | "json"
+  | "relation"
+  | "user"
+  | "editor"
+  | "geoPoint"
   system: boolean
   required: boolean
   unique: boolean
@@ -47,6 +46,17 @@ export type CollectionRecord = {
   deleteRule: string | null
 }
 
+export type Relation = {
+  collectionName: string
+  isMultiple: boolean
+  required: boolean
+}
+
+export type CollectionRecordWithRelations = CollectionRecord & {
+  relations: Record<string, Relation>
+}
+
+
 // Every field is optional
 export type RecordOptions = {
   maxSelect?: number | null
@@ -54,4 +64,5 @@ export type RecordOptions = {
   max?: number | null
   pattern?: string
   values?: string[]
+  collectionId?: string
 }

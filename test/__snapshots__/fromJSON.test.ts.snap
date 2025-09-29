@@ -6,7 +6,7 @@ exports[`creates a type file from json schema 1`] = `
 */
 
 import type PocketBase from 'pocketbase'
-import type { RecordService } from 'pocketbase'
+import type { RecordService, RecordOptions, RecordListOptions, ListResult } from 'pocketbase'
 
 export enum Collections {
 	Authorigins = "_authOrigins",
@@ -17,8 +17,10 @@ export enum Collections {
 	Base = "base",
 	CustomAuth = "custom_auth",
 	Everything = "everything",
+	Images = "images",
 	MyView = "my_view",
 	Posts = "posts",
+	Tags = "tags",
 	Users = "users",
 }
 
@@ -32,18 +34,85 @@ export type GeoPoint = {
 	lat: number
 }
 
-type ExpandType<T> = unknown extends T
-	? T extends unknown
-		? { expand?: unknown }
-		: { expand: T }
-	: { expand: T }
+
+// Expand Helper Types for "everything"
+type EverythingRelationMappings<Trest extends string = ""> = {
+	"user_relation_field"?: UsersResponse<Trest>
+	"custom_relation_field"?: CustomAuthResponse<Trest>[]
+	"post_relation_field"?: PostsResponse<Trest>
+}
+
+type EverythingExpand<T extends string> =
+	T extends \`\${infer F},\${infer R}\`
+		? EverythingExpand<F> & EverythingExpand<R>
+	: T extends \`\${infer K extends keyof EverythingRelationMappings}.\${infer Rest}\`
+		? { [P in K]: EverythingRelationMappings<Rest>[P] }
+	: T extends keyof EverythingRelationMappings
+		? { [K in T]: EverythingRelationMappings[K] }
+	: T extends ""
+		? undefined
+		: never;
+
+
+// Expand Helper Types for "my_view"
+type MyViewRelationMappings<Trest extends string = ""> = {
+	"post_relation_field"?: PostsResponse<Trest>
+}
+
+type MyViewExpand<T extends string> =
+	T extends \`\${infer F},\${infer R}\`
+		? MyViewExpand<F> & MyViewExpand<R>
+	: T extends \`\${infer K extends keyof MyViewRelationMappings}.\${infer Rest}\`
+		? { [P in K]: MyViewRelationMappings<Rest>[P] }
+	: T extends keyof MyViewRelationMappings
+		? { [K in T]: MyViewRelationMappings[K] }
+	: T extends ""
+		? undefined
+		: never;
+
+
+// Expand Helper Types for "posts"
+type PostsRelationMappings<Trest extends string = ""> = {
+	"tags"?: TagsResponse<Trest>[]
+}
+
+type PostsExpand<T extends string> =
+	T extends \`\${infer F},\${infer R}\`
+		? PostsExpand<F> & PostsExpand<R>
+	: T extends \`\${infer K extends keyof PostsRelationMappings}.\${infer Rest}\`
+		? { [P in K]: PostsRelationMappings<Rest>[P] }
+	: T extends keyof PostsRelationMappings
+		? { [K in T]: PostsRelationMappings[K] }
+	: T extends ""
+		? undefined
+		: never;
+
+
+// Expand Helper Types for "tags"
+type TagsRelationMappings<Trest extends string = ""> = {
+	"images": ImagesResponse<Trest>[]
+}
+
+type TagsExpand<T extends string> =
+	T extends \`\${infer F},\${infer R}\`
+		? TagsExpand<F> & TagsExpand<R>
+	: T extends \`\${infer K extends keyof TagsRelationMappings}.\${infer Rest}\`
+		? { [P in K]: TagsRelationMappings<Rest>[P] }
+	: T extends keyof TagsRelationMappings
+		? { [K in T]: TagsRelationMappings[K] }
+	: T extends ""
+		? undefined
+		: never;
+
 
 // System fields
 export type BaseSystemFields<T = unknown> = {
 	id: RecordIdString
 	collectionId: string
 	collectionName: Collections
-} & ExpandType<T>
+	created: IsoDateString
+	updated: IsoDateString
+} & (T extends never ? never : { expand: T })
 
 export type AuthSystemFields<T = unknown> = {
 	email: string
@@ -153,6 +222,12 @@ export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknow
 	user_relation_field?: RecordIdString
 }
 
+export type ImagesRecord = {
+	created?: IsoDateString
+	id: string
+	updated?: IsoDateString
+}
+
 export type MyViewRecord<Tjson_field = unknown> = {
 	id: string
 	json_field?: null | Tjson_field
@@ -166,6 +241,15 @@ export type PostsRecord = {
 	id: string
 	nonempty_bool: boolean
 	nonempty_field: string
+	tags?: RecordIdString[]
+	updated?: IsoDateString
+}
+
+export type TagsRecord = {
+	created?: IsoDateString
+	id: string
+	images: RecordIdString[]
+	name: string
 	updated?: IsoDateString
 }
 
@@ -183,17 +267,19 @@ export type UsersRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
-export type AuthoriginsResponse<Texpand = unknown> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
-export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
-export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
-export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
-export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type BaseResponse<Texpand = unknown> = Required<BaseRecord> & BaseSystemFields<Texpand>
-export type CustomAuthResponse<Texpand = unknown> = Required<CustomAuthRecord> & AuthSystemFields<Texpand>
-export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, Texpand = unknown> = Required<EverythingRecord<Tanother_json_field, Tjson_field>> & BaseSystemFields<Texpand>
-export type MyViewResponse<Tjson_field = unknown, Texpand = unknown> = Required<MyViewRecord<Tjson_field>> & BaseSystemFields<Texpand>
-export type PostsResponse<Texpand = unknown> = Required<PostsRecord> & BaseSystemFields<Texpand>
-export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type AuthoriginsResponse<Texpand extends string = ""> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type ExternalauthsResponse<Texpand extends string = ""> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type MfasResponse<Texpand extends string = ""> = Required<MfasRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type OtpsResponse<Texpand extends string = ""> = Required<OtpsRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type SuperusersResponse<Texpand extends string = ""> = Required<SuperusersRecord> & AuthSystemFields<Texpand extends "" ? undefined : never>
+export type BaseResponse<Texpand extends string = ""> = Required<BaseRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type CustomAuthResponse<Texpand extends string = ""> = Required<CustomAuthRecord> & AuthSystemFields<Texpand extends "" ? undefined : never>
+export type EverythingResponse<Tanother_json_field = unknown, Tjson_field = unknown, Texpand extends string = ""> = Required<EverythingRecord<Tanother_json_field, Tjson_field>> & BaseSystemFields<EverythingExpand<Texpand>>
+export type ImagesResponse<Texpand extends string = ""> = Required<ImagesRecord> & BaseSystemFields<Texpand extends "" ? undefined : never>
+export type MyViewResponse<Tjson_field = unknown, Texpand extends string = ""> = Required<MyViewRecord<Tjson_field>> & BaseSystemFields<MyViewExpand<Texpand>>
+export type PostsResponse<Texpand extends string = ""> = Required<PostsRecord> & BaseSystemFields<PostsExpand<Texpand>>
+export type TagsResponse<Texpand extends string = ""> = Required<TagsRecord> & BaseSystemFields<TagsExpand<Texpand>>
+export type UsersResponse<Texpand extends string = ""> = Required<UsersRecord> & AuthSystemFields<Texpand extends "" ? undefined : never>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -206,12 +292,14 @@ export type CollectionRecords = {
 	base: BaseRecord
 	custom_auth: CustomAuthRecord
 	everything: EverythingRecord
+	images: ImagesRecord
 	my_view: MyViewRecord
 	posts: PostsRecord
+	tags: TagsRecord
 	users: UsersRecord
 }
 
-export type CollectionResponses = {
+export type CollectionResponses<Texpand extends string> = {
 	_authOrigins: AuthoriginsResponse
 	_externalAuths: ExternalauthsResponse
 	_mfas: MfasResponse
@@ -219,27 +307,65 @@ export type CollectionResponses = {
 	_superusers: SuperusersResponse
 	base: BaseResponse
 	custom_auth: CustomAuthResponse
-	everything: EverythingResponse
-	my_view: MyViewResponse
-	posts: PostsResponse
+	everything: EverythingResponse<unknown, unknown, Texpand>
+	images: ImagesResponse
+	my_view: MyViewResponse<unknown, Texpand>
+	posts: PostsResponse<Texpand>
+	tags: TagsResponse<Texpand>
 	users: UsersResponse
+}
+
+// Enhanced RecordService type with dynamic expand typing
+interface EnhancedRecordService<Tcollection extends Collections> {
+	getOne<Texpand extends string = ''>(
+		id: string,
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
+
+	getList<Texpand extends string = ''>(
+		page?: number,
+		perPage?: number,
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: Texpand },
+	): Promise<ListResult<CollectionResponses<Texpand>[Tcollection]>>
+
+	getFullList<Texpand extends string = ''>(
+		options?: Omit<RecordListOptions, 'expand'> & { expand?: Texpand },
+	): Promise<Array<CollectionResponses<Texpand>[Tcollection]>>
+
+	getFirstListItem<Texpand extends string = ''>(
+		filter: string,
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
+
+	create<TBody = Record<string, unknown>, Texpand extends string = ''>(
+		body: TBody,
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
+
+	update<TBody = Record<string, unknown>, Texpand extends string = ''>(
+		id: string,
+		body: TBody,
+		options?: Omit<RecordOptions, 'expand'> & { expand?: Texpand },
+	): Promise<CollectionResponses<Texpand>[Tcollection]>
 }
 
 // Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
+export type TypedPocketBase = {
+	collection(idOrName: "_authOrigins"): EnhancedRecordService<Collections.Authorigins> & RecordService
+	collection(idOrName: "_externalAuths"): EnhancedRecordService<Collections.Externalauths> & RecordService
+	collection(idOrName: "_mfas"): EnhancedRecordService<Collections.Mfas> & RecordService
+	collection(idOrName: "_otps"): EnhancedRecordService<Collections.Otps> & RecordService
+	collection(idOrName: "_superusers"): EnhancedRecordService<Collections.Superusers> & RecordService
+	collection(idOrName: "base"): EnhancedRecordService<Collections.Base> & RecordService
+	collection(idOrName: "custom_auth"): EnhancedRecordService<Collections.CustomAuth> & RecordService
+	collection(idOrName: "everything"): EnhancedRecordService<Collections.Everything> & RecordService
+	collection(idOrName: "images"): EnhancedRecordService<Collections.Images> & RecordService
+	collection(idOrName: "my_view"): EnhancedRecordService<Collections.MyView> & RecordService
+	collection(idOrName: "posts"): EnhancedRecordService<Collections.Posts> & RecordService
+	collection(idOrName: "tags"): EnhancedRecordService<Collections.Tags> & RecordService
+	collection(idOrName: "users"): EnhancedRecordService<Collections.Users> & RecordService
+} & PocketBase
 
-export type TypedPocketBase = PocketBase & {
-	collection(idOrName: '_authOrigins'): RecordService<AuthoriginsResponse>
-	collection(idOrName: '_externalAuths'): RecordService<ExternalauthsResponse>
-	collection(idOrName: '_mfas'): RecordService<MfasResponse>
-	collection(idOrName: '_otps'): RecordService<OtpsResponse>
-	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
-	collection(idOrName: 'base'): RecordService<BaseResponse>
-	collection(idOrName: 'custom_auth'): RecordService<CustomAuthResponse>
-	collection(idOrName: 'everything'): RecordService<EverythingResponse>
-	collection(idOrName: 'my_view'): RecordService<MyViewResponse>
-	collection(idOrName: 'posts'): RecordService<PostsResponse>
-	collection(idOrName: 'users'): RecordService<UsersResponse>
-}
 "
 `;
