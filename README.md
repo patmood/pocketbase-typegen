@@ -142,50 +142,7 @@ result.expand.user.username
 
 ## Create/Update types
 
-You can also type the create/update operations in two ways.
-
-1. Using collection model directly (you need to know if your collection is base/auth, but you can use your own custom models):
-
-```typescript
-import { Collections, CreateAuth, CreateBase, PostsRecord, UpdateAuth, UpdateBase, UsersRecord } from "./pocketbase-types"
-
-// For base collections
-const newPost: CreateBase<PostsRecord> = {
-  title: 'Post title',
-  description: 'Post description',
-  creator: 'USER_ID',
-  active: true
-}
-await pb.collection(Collections.Posts).create(newPost)
-
-const updatedPost: UpdateBase<PostsRecord> = {
-  title: 'New post title',
-  description: 'Updated post description',
-  active: false
-}
-await pb.collection(Collections.Posts).update('RECORD_ID', updatedPost)
-
-// For auth collections
-const newUser: CreateAuth<UsersRecord> = {
-  name: 'Name',
-  username: 'username',
-  password: 'password',
-  passwordConfirm: 'password',
-  email: 'user@mail.com',
-  emailVisibility: true,
-  verified: false
-}
-await pb.collection(Collections.Users).create(newUser)
-
-const updatedUser: UpdateAuth<UsersRecord> = {
-  name: 'Name',
-  email: 'user@mail.com',
-  verified: false
-}
-await pb.collection(Collections.Users).update('RECORD_ID', updatedUser)
-```
-
-2. Using Collections enum (type auto-infer if collection is base/auth):
+You can also type the create/update operations:
 
 ```typescript
 import { Collections, Create, Update } from "./pocketbase-types"
@@ -209,6 +166,30 @@ const updatedUser: Update<Collections.Users> = {
   verified: false
 }
 await pb.collection(Collections.Users).update('RECORD_ID', updatedUser)
+```
+
+## Automatic Type Generation
+
+Pocketbase [hooks](https://pocketbase.io/docs/js-event-hooks/) can be used to generate new types every time a collections is created/updated/deleted. Create a file `generateHooks.pb.js` and place it in a directory called `pb_hooks` along side your pocketbase executable.
+
+```javascript
+/// <reference path="../pb_data/types.d.ts" />
+
+const generateTypes = ((e) => {
+  console.log("Collection changed - Running type generation...")
+  const cmd = $os.cmd(
+    "npx", "pocketbase-typegen", '--db', "pb_data/data.db", "--out", "../client/src/pocketbase-types.ts", 
+    )
+  const result = toString(cmd.output());
+  console.log(result)
+
+  e.next()
+})
+
+
+onCollectionAfterCreateSuccess(generateTypes)
+onCollectionAfterUpdateSuccess(generateTypes)
+onCollectionAfterDeleteSuccess(generateTypes)
 ```
 
 ## Status
