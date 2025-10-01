@@ -54,4 +54,6 @@ export type RecordOptions = {
   max?: number | null
   pattern?: string
   values?: string[]
+  onCreate?: boolean
+  onUpdate?: boolean
 }

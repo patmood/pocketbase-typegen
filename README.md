@@ -140,6 +140,34 @@ const result = await pb
 result.expand.user.username
 ```
 
+## Create/Update types
+
+You can also type the create/update operations:
+
+```typescript
+import { Collections, Create, Update } from "./pocketbase-types"
+
+// Create
+const newUser: Create<Collections.Users> = {
+  name: 'Name',
+  username: 'username',
+  password: 'password',
+  passwordConfirm: 'password',
+  email: 'user@mail.com',
+  emailVisibility: true,
+  verified: false
+}
+await pb.collection(Collections.Users).create(newUser)
+
+// Update
+const updatedUser: Update<Collections.Users> = {
+  name: 'Updated name',
+  email: 'user@email.com',
+  verified: false
+}
+await pb.collection(Collections.Users).update('RECORD_ID', updatedUser)
+```
+
 ## Automatic Type Generation
 
 Pocketbase [hooks](https://pocketbase.io/docs/js-event-hooks/) can be used to generate new types every time a collections is created/updated/deleted. Create a file `generateHooks.pb.js` and place it in a directory called `pb_hooks` along side your pocketbase executable.
