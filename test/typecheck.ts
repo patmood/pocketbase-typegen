@@ -7,6 +7,7 @@ import {
   Collections,
   EverythingRecord,
   EverythingSelectFieldOptions,
+  IsoAutoDateString,
 } from "./pocketbase-types-example"
 
 // Utility function can to infer collection type
@@ -27,6 +28,7 @@ const everythingRecordWithGeneric: EverythingRecord<{ a: "some string" }> = {
   bool_field: true,
   json_field: { a: "some string" },
   number_field: 1,
+  created: '2025-04-02T00:46:53.108Z' as IsoAutoDateString
 }
 
 // Works without passing in JSON generic
@@ -35,6 +37,7 @@ const everythingRecordWithoutGeneric: EverythingRecord = {
   bool_field: true,
   json_field: { a: "some string" },
   number_field: 1,
+  created: '2025-04-02T00:46:53.108Z' as IsoAutoDateString
 }
 
 // Test select option enums
@@ -42,6 +45,7 @@ const selectOptions: EverythingRecord = {
   id: "abc",
   select_field: EverythingSelectFieldOptions.optionA,
   select_field_no_values: "foo",
+  created: '2025-04-02T00:46:53.108Z' as IsoAutoDateString
 }
 
 // Reference the created variables

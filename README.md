@@ -8,16 +8,84 @@ Generate typescript definitions from your [pocketbase.io](https://pocketbase.io/
 
 This will produce types for all your PocketBase collections to use in your frontend typescript codebase.
 
-## Version Support
+## Example Usage
 
-| PocketBase | pocketbase-typegen | npx command                                                                    |
-| ---------- | ------------------ | ------------------------------------------------------------------------------ |
-| v0.23.x    | v1.3.x             | npx pocketbase-typegen --db ./pb_data/data.db --out pocketbase-types.ts        |
-| v0.18.x    | v1.2.x             | npx pocketbase-typegen@1.2.1 --db ./pb_data/data.db --out pocketbase-types.ts  |
-| v0.8.x     | v1.1.x             | npx pocketbase-typegen@1.1.1 --db ./pb_data/data.db --out pocketbase-types.ts  |
-| v0.7.x     | v1.0.x             | npx pocketbase-typegen@1.0.13 --db ./pb_data/data.db --out pocketbase-types.ts |
+Collections can be [automatically typed](https://github.com/pocketbase/js-sdk#specify-typescript-definitions) using the generated `TypedPocketBase` type:
 
-## Usage
+```typescript
+import { TypedPocketBase } from "./pocketbase-types"
+
+const pb = new PocketBase("http://127.0.0.1:8090") as TypedPocketBase
+
+await pb.collection("tasks").getOne("RECORD_ID") // -> results in TaskResponse
+await pb.collection("posts").getOne("RECORD_ID") // -> results in PostResponse
+```
+
+Alternatively, you can use generic types for each request, eg:
+
+```typescript
+import { Collections, TasksResponse } from "./pocketbase-types"
+
+await pb.collection(Collections.Tasks).getOne<TasksResponse>("RECORD_ID") // -> results in TaskResponse
+```
+
+## Example Advanced Usage
+
+You can provide types for JSON fields and [expanded relations](https://pocketbase.io/docs/expanding-relations/) by passing generic arguments to the Response types:
+
+```typescript
+import { Collections, CommentsResponse, UserResponse } from "./pocketbase-types"
+
+/**
+  type CommentsRecord<Tmetadata = unknown> = {
+    text: string
+    metadata: null | Tmetadata // This is a json field
+    user: RecordIdString // This is a relation field
+  }
+*/
+type Metadata = {
+  likes: number
+}
+type Expand = {
+  user: UsersResponse
+}
+const result = await pb
+  .collection(Collections.Comments)
+  .getOne<CommentsResponse<Metadata, Expand>>("RECORD_ID", { expand: "user" })
+
+// Now you can access the expanded relation with type safety and hints in your IDE
+result.expand.user.username
+```
+
+## Create/Update types
+
+You can also type the create/update operations:
+
+```typescript
+import { Collections, Create, Update } from "./pocketbase-types"
+
+// Create
+const newUser: Create<Collections.Users> = {
+  name: "Name",
+  username: "username",
+  password: "password",
+  passwordConfirm: "password",
+  email: "user@mail.com",
+  emailVisibility: true,
+  verified: false,
+}
+await pb.collection(Collections.Users).create(newUser)
+
+// Update
+const updatedUser: Update<Collections.Users> = {
+  name: "Updated name",
+  email: "user@email.com",
+  verified: false,
+}
+await pb.collection(Collections.Users).update("RECORD_ID", updatedUser)
+```
+
+## Generating Types
 
 ```
 Options:
@@ -69,6 +137,34 @@ PB_TYPEGEN_TOKEN=eyJhbGciOiJI...ozhyQVfYm24
 
 `npx pocketbase-typegen --json ./pb_schema.json`
 
+### Automatic Type Generation
+
+Pocketbase [hooks](https://pocketbase.io/docs/js-event-hooks/) can be used to generate new types every time a collections is created/updated/deleted. Create a file `generateHooks.pb.js` and place it in a directory called `pb_hooks` along side your pocketbase executable.
+
+```javascript
+/// <reference path="../pb_data/types.d.ts" />
+
+const generateTypes = (e) => {
+  console.log("Collection changed - Running type generation...")
+  const cmd = $os.cmd(
+    "npx",
+    "pocketbase-typegen",
+    "--db",
+    "pb_data/data.db",
+    "--out",
+    "../client/src/pocketbase-types.ts"
+  )
+  const result = toString(cmd.output())
+  console.log(result)
+
+  e.next()
+}
+
+onCollectionAfterCreateSuccess(generateTypes)
+onCollectionAfterUpdateSuccess(generateTypes)
+onCollectionAfterDeleteSuccess(generateTypes)
+```
+
 ### Shortcut
 
 Add it to your projects `package.json`:
@@ -91,78 +187,14 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
 - `CollectionResponses` A type mapping each collection name to the response type.
 - `TypedPocketBase` A type for usage with type asserted PocketBase instance.
 
-## Example Usage
+## Version Support
 
-Using PocketBase SDK v0.18.3+, collections can be [automatically typed](https://github.com/pocketbase/js-sdk#specify-typescript-definitions) using the generated `TypedPocketBase` type:
-
-```typescript
-import { TypedPocketBase } from "./pocketbase-types"
-
-const pb = new PocketBase("http://127.0.0.1:8090") as TypedPocketBase
-
-await pb.collection("tasks").getOne("RECORD_ID") // -> results in TaskResponse
-await pb.collection("posts").getOne("RECORD_ID") // -> results in PostResponse
-```
-
-Alternatively, you can use generic types for each request, eg:
-
-```typescript
-import { Collections, TasksResponse } from "./pocketbase-types"
-
-await pb.collection(Collections.Tasks).getOne<TasksResponse>("RECORD_ID") // -> results in TaskResponse
-```
-
-## Example Advanced Usage
-
-You can provide types for JSON fields and [expanded relations](https://pocketbase.io/docs/expanding-relations/) by passing generic arguments to the Response types:
-
-```typescript
-import { Collections, CommentsResponse, UserResponse } from "./pocketbase-types"
-
-/**
-  type CommentsRecord<Tmetadata = unknown> = {
-    text: string
-    metadata: null | Tmetadata // This is a json field
-    user: RecordIdString // This is a relation field
-  }
-*/
-type Metadata = {
-  likes: number
-}
-type Expand = {
-  user: UsersResponse
-}
-const result = await pb
-  .collection(Collections.Comments)
-  .getOne<CommentsResponse<Metadata, Expand>>("RECORD_ID", { expand: "user" })
-
-// Now you can access the expanded relation with type safety and hints in your IDE
-result.expand.user.username
-```
-
-## Automatic Type Generation
-
-Pocketbase [hooks](https://pocketbase.io/docs/js-event-hooks/) can be used to generate new types every time a collections is created/updated/deleted. Create a file `generateHooks.pb.js` and place it in a directory called `pb_hooks` along side your pocketbase executable.
-
-```javascript
-/// <reference path="../pb_data/types.d.ts" />
-
-const generateTypes = ((e) => {
-  console.log("Collection changed - Running type generation...")
-  const cmd = $os.cmd(
-    "npx", "pocketbase-typegen", '--db', "pb_data/data.db", "--out", "../client/src/pocketbase-types.ts", 
-    )
-  const result = toString(cmd.output());
-  console.log(result)
-
-  e.next()
-})
-
-
-onCollectionAfterCreateSuccess(generateTypes)
-onCollectionAfterUpdateSuccess(generateTypes)
-onCollectionAfterDeleteSuccess(generateTypes)
-```
+| PocketBase | pocketbase-typegen |
+| ---------- | ------------------ |
+| v0.23.x    | v1.3.x             |
+| v0.18.x    | v1.2.x             |
+| v0.8.x     | v1.1.x             |
+| v0.7.x     | v1.0.x             |
 
 ## Status
 

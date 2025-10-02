@@ -168,7 +168,7 @@ describe("createTypeField", () => {
         name: "fileField",
         type: "file",
       })
-    ).toEqual("\tfileField: string")
+    ).toEqual("\tfileField: FileNameString")
   })
 
   it("converts file type with multiple files", () => {
@@ -179,7 +179,7 @@ describe("createTypeField", () => {
         maxSelect: 3,
         type: "file",
       })
-    ).toEqual("\tfileField: string[]")
+    ).toEqual("\tfileField: FileNameString[]")
   })
 
   it("converts relation type", () => {
