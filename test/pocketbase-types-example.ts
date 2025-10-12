@@ -94,12 +94,12 @@ export type OtpsRecord = {
 export type SuperusersRecord = {
 	created: IsoAutoDateString
 	email: string
-	emailVisibility?: boolean
+	emailVisibility: boolean
 	id: string
 	password: string
 	tokenKey: string
 	updated: IsoAutoDateString
-	verified?: boolean
+	verified: boolean
 }
 
 export type BaseRecord = {
@@ -113,12 +113,12 @@ export type CustomAuthRecord = {
 	created: IsoAutoDateString
 	custom_field?: string
 	email: string
-	emailVisibility?: boolean
+	emailVisibility: boolean
 	id: string
 	password: string
 	tokenKey: string
 	updated: IsoAutoDateString
-	verified?: boolean
+	verified: boolean
 }
 
 export enum EverythingSelectFieldOptions {
@@ -131,7 +131,7 @@ export enum EverythingSelectFieldOptions {
 }
 export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknown> = {
 	another_json_field?: null | Tanother_json_field
-	bool_field?: boolean
+	bool_field: boolean
 	created: IsoAutoDateString
 	custom_relation_field?: RecordIdString[]
 	date_field?: IsoDateString
@@ -172,13 +172,13 @@ export type UsersRecord = {
 	avatar?: FileNameString
 	created: IsoAutoDateString
 	email: string
-	emailVisibility?: boolean
+	emailVisibility: boolean
 	id: string
 	name?: string
 	password: string
 	tokenKey: string
 	updated: IsoAutoDateString
-	verified?: boolean
+	verified: boolean
 }
 
 // Response types include system fields and match responses from the PocketBase API

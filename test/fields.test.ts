@@ -65,6 +65,17 @@ describe("createTypeField", () => {
     ).toEqual("\tboolField: boolean")
   })
 
+  it("converts bool type to required (booleans are never optional)", () => {
+    expect(
+      createTypeField("test_collection", {
+        ...defaultFieldSchema,
+        name: "optionalBoolField",
+        type: "bool",
+        required: false,
+      })
+    ).toEqual("\toptionalBoolField: boolean")
+  })
+
   it("converts email type", () => {
     expect(
       createTypeField("test_collection", {

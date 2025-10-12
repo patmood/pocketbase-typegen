@@ -81,7 +81,7 @@ export function createTypeField(
   const fieldName = sanitizeFieldName(fieldSchema.name)
   const required =
     (fieldSchema.type === "autodate" && !fieldSchema.onCreate) ||
-    (fieldSchema.type !== "autodate" && !fieldSchema.required)
+    (fieldSchema.type !== "autodate" && fieldSchema.type !== "bool" && !fieldSchema.required)
       ? "?"
       : ""
 
