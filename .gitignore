@@ -1,5 +1,6 @@
 node_modules
 pocketbase-types.ts
+pocketbase-constraints.ts
 coverage
 *.db-shm
 *.db-wal

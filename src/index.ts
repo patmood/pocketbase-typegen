@@ -46,6 +46,8 @@ program
     "--no-sdk",
     "Removes the pocketbase package dependency. A typed version of the SDK will not be generated."
   )
+  .option('--constraints', 'Generate field constraints metadata')
+  .option('--constraints-out <path>', 'Output path for constraints file')
 
 program.parse(process.argv)
 const options = program.opts<Options>()
