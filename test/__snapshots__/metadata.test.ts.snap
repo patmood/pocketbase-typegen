@@ -23,27 +23,33 @@ exports[`createFieldMetadata generates metadata for the everything collection 1`
 	select_field: {
 		maxSelect: 1,
 		required: false,
+		unique: false,
 		values: ["optionA","OptionA","optionB"],
 	},
 	json_field: {
 		maxSize: 2000000,
 		required: false,
+		unique: false,
 	},
 	three_files_field: {
 		maxSelect: 99,
 		required: false,
+		unique: false,
 	},
 	custom_relation_field: {
 		maxSelect: 999,
 		required: false,
+		unique: false,
 	},
 	created: {
 		required: false,
+		unique: false,
 		onCreate: true,
 		onUpdate: false,
 	},
 	updated: {
 		required: false,
+		unique: false,
 		onCreate: false,
 		onUpdate: true,
 	},

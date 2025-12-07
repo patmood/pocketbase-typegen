@@ -4,7 +4,7 @@ import { FieldSchema } from "../src/types"
 describe("createFieldMetadata", () => {
   it("creates min/max metadata", () => {
     const schema: FieldSchema[] = [
-      ({
+      {
         id: "text3208210256",
         name: "id",
         type: "text",
@@ -13,7 +13,7 @@ describe("createFieldMetadata", () => {
         required: true,
         system: true,
         unique: false,
-      } as unknown) as FieldSchema,
+      },
     ]
 
     const result = createFieldMetadata("users", schema)
@@ -23,7 +23,7 @@ describe("createFieldMetadata", () => {
 
   it("generates metadata for the everything collection", () => {
     const schema: FieldSchema[] = [
-      ({
+      {
         id: "text3208210256",
         name: "id",
         type: "text",
@@ -33,8 +33,8 @@ describe("createFieldMetadata", () => {
         required: true,
         system: true,
         unique: false,
-      } as unknown) as FieldSchema,
-      ({
+      },
+      {
         id: "select1",
         name: "select_field",
         type: "select",
@@ -42,32 +42,36 @@ describe("createFieldMetadata", () => {
         values: ["optionA", "OptionA", "optionB"],
         required: false,
         system: false,
-      } as unknown) as FieldSchema,
-      ({
+        unique: false,
+      },
+      {
         id: "json1",
         name: "json_field",
         type: "json",
         maxSize: 2000000,
         required: false,
         system: false,
-      } as unknown) as FieldSchema,
-      ({
+        unique: false,
+      },
+      {
         id: "file1",
         name: "three_files_field",
         type: "file",
         maxSelect: 99,
         required: false,
         system: false,
-      } as unknown) as FieldSchema,
-      ({
+        unique: false,
+      },
+      {
         id: "rel1",
         name: "custom_relation_field",
         type: "relation",
         maxSelect: 999,
         required: false,
         system: false,
-      } as unknown) as FieldSchema,
-      ({
+        unique: false,
+      },
+      {
         id: "autodate1",
         name: "created",
         type: "autodate",
@@ -75,8 +79,9 @@ describe("createFieldMetadata", () => {
         onUpdate: false,
         required: false,
         system: false,
-      } as unknown) as FieldSchema,
-      ({
+        unique: false,
+      },
+      {
         id: "autodate2",
         name: "updated",
         type: "autodate",
@@ -84,7 +89,8 @@ describe("createFieldMetadata", () => {
         onUpdate: true,
         required: false,
         system: false,
-      } as unknown) as FieldSchema,
+        unique: false,
+      },
     ]
 
     const result = createFieldMetadata("everything", schema)
@@ -94,7 +100,7 @@ describe("createFieldMetadata", () => {
 
   it("includes other metadata fields when present", () => {
     const schema: FieldSchema[] = [
-      ({
+      {
         id: "file1",
         name: "avatar",
         type: "file",
@@ -108,7 +114,7 @@ describe("createFieldMetadata", () => {
         onCreate: true,
         onUpdate: false,
         system: false,
-      } as unknown) as FieldSchema,
+      },
     ]
 
     const result = createFieldMetadata("media", schema)

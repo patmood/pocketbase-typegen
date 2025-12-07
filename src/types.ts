@@ -53,6 +53,8 @@ export type CollectionRecord = {
 // Every field is optional
 export type RecordOptions = {
   maxSelect?: number | null
+  maxSize?: number | null
+  mimeTypes?: string[] | null
   min?: number | null
   max?: number | null
   pattern?: string
