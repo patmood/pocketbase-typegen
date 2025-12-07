@@ -8,9 +8,9 @@ export type Options = {
   token?: string
   sdk?: boolean
   env?: boolean | string
-  includeMetadata?: boolean  // New option
+  includeMetadata?: boolean // New option
   // Output path for metadata file. Default provided by CLI: "pocketbase-metadata.ts"
-  metadataOut?: string  // New option for output file
+  metadataOut?: string // New option for output file
 }
 
 export type FieldSchema = {

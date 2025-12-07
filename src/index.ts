@@ -46,8 +46,15 @@ program
     "--no-sdk",
     "Removes the pocketbase package dependency. A typed version of the SDK will not be generated."
   )
-  .option('--includeMetadata', '"Generates a secondary file containing JavaScript objects that represent your schema\'s metadata, such as constraints and enums.')
-  .option('--metadata-out <path>', 'Output path for metadata file', "pocketbase-metadata.ts")
+  .option(
+    "--includeMetadata",
+    "Generates a secondary file containing JavaScript objects that represent your schema's metadata, such as constraints and enums."
+  )
+  .option(
+    "--metadata-out <path>",
+    "Output path for metadata file",
+    "pocketbase-metadata.ts"
+  )
 
 program.parse(process.argv)
 const options = program.opts<Options>()
