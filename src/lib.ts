@@ -124,9 +124,6 @@ function createFieldMetadata(
     .filter((field) => {
       if (field.system || fieldsToIgnore.includes(field.name)) return false
       if (!textBasedTypes.includes(field.type)) return false
-      const hasMin = typeof field.min === "number" && field.min !== 0
-      const hasMax = typeof field.max === "number" && field.max !== 0
-      return hasMin || hasMax
     })
     .map((field) => {
       const parts: string[] = []
