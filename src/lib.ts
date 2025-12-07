@@ -23,6 +23,7 @@ import {
   getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
 } from "./generics"
+import { createFieldMetadata } from "./metadata"
 import { CollectionRecord, FieldSchema } from "./types"
 import { containsGeoPoint, getSystemFields, toPascalCase } from "./utils"
 
@@ -111,39 +112,6 @@ export function createResponseType(
   const expandArgString = `<T${EXPAND_GENERIC_NAME}>`
 
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`
-}
-
-function createFieldMetadata(
-  name: string,
-  schema: Array<FieldSchema>
-): string {
-  const fieldsToIgnore = ["id", "password", "tokenKey", "token"]
-  const textBasedTypes = ["text", "email", "url", "number"]
-
-  const metadata = schema
-    .filter((field) => {
-      if (field.system || fieldsToIgnore.includes(field.name)) return false
-      if (!textBasedTypes.includes(field.type)) return false
-    })
-    .map((field) => {
-      const parts: string[] = []
-      if (typeof field.min === "number" && field.min !== 0) {
-        parts.push(`\t\tmin: ${field.min},`)
-      }
-      if (typeof field.max === "number" && field.max !== 0) {
-        parts.push(`\t\tmax: ${field.max},`)
-      }
-
-      if (parts.length === 0) return null
-
-      return `\t${field.name}: {\n${parts.join("\n")}\n\t},`
-    })
-    .filter(Boolean)
-
-  if (metadata.length === 0) return ""
-
-  const typeName = toPascalCase(name)
-  return `export const ${typeName}FieldMetadata = {\n${metadata.join("\n")}\n} as const`
 }
 
 export function generateMetadata(results: Array<CollectionRecord>): string {
