@@ -8,7 +8,7 @@ import {
   fromURLWithToken,
 } from "./schema"
 
-import { generate, generateConstraints } from "./lib"
+import { generate, generateMetadata } from "./lib"
 import { saveFile } from "./utils"
 
 export async function main(options: Options) {
@@ -61,12 +61,10 @@ export async function main(options: Options) {
   })
   await saveFile(options.out, typeString)
 
-  // Generate and save constraints if requested
-  if (options.constraints) {
-    const constraintsString = generateConstraints(schema)
-    const constraintsFile =
-      options.constraintsOut ?? options.out.replace(".ts", ".constraints.ts")
-    await saveFile(constraintsFile, constraintsString)
+  // Generate and save metadata if requested
+  if (options.includeMetadata) {
+    const metadataString = generateMetadata(schema)
+    await saveFile(options.metadataOut, metadataString)
   }
 
   return typeString

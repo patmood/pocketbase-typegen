@@ -37,7 +37,7 @@ export function generate(
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
-  const fieldConstraints: Array<string> = []
+  const fieldMetadata: Array<string> = []
 
   results
     .sort((a, b) => (a.name <= b.name ? -1 : 1))
@@ -46,8 +46,8 @@ export function generate(
       if (row.fields) {
         recordTypes.push(createRecordType(row.name, row.fields))
         responseTypes.push(createResponseType(row))
-        const constraints = createFieldConstraints(row.name, row.fields)
-        if (constraints) fieldConstraints.push(constraints)
+        const metadata = createFieldMetadata(row.name, row.fields)
+        if (metadata) fieldMetadata.push(metadata)
       }
     })
   const sortedCollectionNames = collectionNames
@@ -113,14 +113,14 @@ export function createResponseType(
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`
 }
 
-function createFieldConstraints(
+function createFieldMetadata(
   name: string,
   schema: Array<FieldSchema>
 ): string {
   const fieldsToIgnore = ["id", "password", "tokenKey", "token"]
   const textBasedTypes = ["text", "email", "url", "number"]
 
-  const constraints = schema
+  const metadata = schema
     .filter((field) => {
       if (field.system || fieldsToIgnore.includes(field.name)) return false
       if (!textBasedTypes.includes(field.type)) return false
@@ -131,42 +131,41 @@ function createFieldConstraints(
     .map((field) => {
       const parts: string[] = []
       if (typeof field.min === "number" && field.min !== 0) {
-        parts.push(`min: ${field.min}`)
+        parts.push(`\t\tmin: ${field.min},`)
       }
       if (typeof field.max === "number" && field.max !== 0) {
-        parts.push(`max: ${field.max}`)
+        parts.push(`\t\tmax: ${field.max},`)
       }
 
       if (parts.length === 0) return null
-      return `  ${field.name}: { ${parts.join(", ")} }`
+
+      return `\t${field.name}: {\n${parts.join("\n")}\n\t},`
     })
     .filter(Boolean)
 
-  if (constraints.length === 0) return ""
+  if (metadata.length === 0) return ""
 
   const typeName = toPascalCase(name)
-  return `export const ${typeName}FieldConstraints = {
-${constraints.join(",\n")}
-}`
+  return `export const ${typeName}FieldMetadata = {\n${metadata.join("\n")}\n} as const`
 }
 
-export function generateConstraints(results: Array<CollectionRecord>): string {
-  const fieldConstraints: Array<string> = []
+export function generateMetadata(results: Array<CollectionRecord>): string {
+  const fieldMetadata: Array<string> = []
 
   results
     .sort((a, b) => (a.name <= b.name ? -1 : 1))
     .forEach((row) => {
       if (row.name && row.fields) {
-        const constraints = createFieldConstraints(row.name, row.fields)
-        if (constraints) fieldConstraints.push(constraints)
+        const metadata = createFieldMetadata(row.name, row.fields)
+        if (metadata) fieldMetadata.push(metadata)
       }
     })
 
   const fileParts = [
     EXPORT_COMMENT,
-    fieldConstraints.length > 0
-      ? fieldConstraints.join("\n")
-      : "// No field constraints found",
+    fieldMetadata.length > 0
+      ? fieldMetadata.join("\n")
+      : "// No field metadata found",
   ]
 
   return fileParts.filter(Boolean).join("\n\n") + "\n"

@@ -8,8 +8,8 @@ export type Options = {
   token?: string
   sdk?: boolean
   env?: boolean | string
-  constraints?: boolean  // New option
-  constraintsOut?: string  // New option for output file
+  includeMetadata?: boolean  // New option
+  metadataOut: string  // New option for output file
 }
 
 export type FieldSchema = {
