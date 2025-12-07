@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createFieldMetadata creates min/max metadata 1`] = `
+"export const UsersFieldMetadata = {
+	id: {
+		min: 15,
+		max: 15,
+		required: true,
+		unique: false,
+	},
+} as const"
+`;
+
+exports[`createFieldMetadata generates metadata for the everything collection 1`] = `
+"export const EverythingFieldMetadata = {
+	id: {
+		min: 15,
+		max: 15,
+		required: true,
+		unique: false,
+		pattern: "^[a-z0-9]+$",
+	},
+	select_field: {
+		maxSelect: 1,
+		required: false,
+		values: ["optionA","OptionA","optionB"],
+	},
+	json_field: {
+		maxSize: 2000000,
+		required: false,
+	},
+	three_files_field: {
+		maxSelect: 99,
+		required: false,
+	},
+	custom_relation_field: {
+		maxSelect: 999,
+		required: false,
+	},
+	created: {
+		required: false,
+		onCreate: true,
+		onUpdate: false,
+	},
+	updated: {
+		required: false,
+		onCreate: false,
+		onUpdate: true,
+	},
+} as const"
+`;
+
+exports[`createFieldMetadata includes other metadata fields when present 1`] = `
+"export const MediaFieldMetadata = {
+	avatar: {
+		maxSelect: 1,
+		maxSize: 1024,
+		mimeTypes: ["image/png"],
+		required: false,
+		unique: true,
+		pattern: "^abc$",
+		values: ["a","b"],
+		onCreate: true,
+		onUpdate: false,
+	},
+} as const"
+`;
