@@ -64,7 +64,8 @@ export async function main(options: Options) {
   // Generate and save metadata if requested
   if (options.includeMetadata) {
     const metadataString = generateMetadata(schema)
-    await saveFile(options.metadataOut, metadataString)
+    const metadataOutPath = options.metadataOut ?? "pocketbase-metadata.ts"
+    await saveFile(metadataOutPath, metadataString)
   }
 
   return typeString
