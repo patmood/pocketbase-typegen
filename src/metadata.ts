@@ -61,5 +61,5 @@ export function createFieldMetadata(
   if (metadata.length === 0) return ""
 
   const typeName = toPascalCase(name)
-  return `export const ${typeName}FieldMetadata = {\n${metadata.join("\n")}\n} as const`
+  return `export const ${typeName}FieldMetadata = {\n${metadata.join("\n")}\n} as const\n`
 }

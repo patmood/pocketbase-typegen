@@ -8,7 +8,8 @@ exports[`createFieldMetadata creates min/max metadata 1`] = `
 		required: true,
 		unique: false,
 	},
-} as const"
+} as const
+"
 `;
 
 exports[`createFieldMetadata generates metadata for the everything collection 1`] = `
@@ -53,7 +54,8 @@ exports[`createFieldMetadata generates metadata for the everything collection 1`
 		onCreate: false,
 		onUpdate: true,
 	},
-} as const"
+} as const
+"
 `;
 
 exports[`createFieldMetadata includes other metadata fields when present 1`] = `
@@ -69,5 +71,6 @@ exports[`createFieldMetadata includes other metadata fields when present 1`] = `
 		onCreate: true,
 		onUpdate: false,
 	},
-} as const"
+} as const
+"
 `;
