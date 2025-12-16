@@ -35,9 +35,9 @@ export const pbSchemaTypescriptMap = {
   json: (fieldSchema: FieldSchema) =>
     `null | ${fieldNameToGeneric(fieldSchema.name)}`,
   relation: (fieldSchema: FieldSchema) =>
-    fieldSchema.maxSelect && fieldSchema.maxSelect === 1
-      ? RECORD_ID_STRING_NAME
-      : `${RECORD_ID_STRING_NAME}[]`,
+    fieldSchema.maxSelect && fieldSchema.maxSelect > 1
+      ? `${RECORD_ID_STRING_NAME}[]`
+      : RECORD_ID_STRING_NAME,
   select: (fieldSchema: FieldSchema, collectionName: string) => {
     // pocketbase v0.8+ values are required
     const valueType = fieldSchema.values
