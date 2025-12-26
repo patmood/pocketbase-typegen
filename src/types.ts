@@ -8,6 +8,9 @@ export type Options = {
   token?: string
   sdk?: boolean
   env?: boolean | string
+  includeMetadata?: boolean // New option
+  // Output path for metadata file. Default provided by CLI: "pocketbase-metadata.ts"
+  metadataOut?: string // New option for output file
 }
 
 export type FieldSchema = {
@@ -50,6 +53,8 @@ export type CollectionRecord = {
 // Every field is optional
 export type RecordOptions = {
   maxSelect?: number | null
+  maxSize?: number | null
+  mimeTypes?: string[] | null
   min?: number | null
   max?: number | null
   pattern?: string

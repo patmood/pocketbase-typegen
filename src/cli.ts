@@ -8,7 +8,7 @@ import {
   fromURLWithToken,
 } from "./schema"
 
-import { generate } from "./lib"
+import { generate, generateMetadata } from "./lib"
 import { saveFile } from "./utils"
 
 export async function main(options: Options) {
@@ -60,5 +60,13 @@ export async function main(options: Options) {
     sdk: options.sdk ?? true,
   })
   await saveFile(options.out, typeString)
+
+  // Generate and save metadata if requested
+  if (options.includeMetadata) {
+    const metadataString = generateMetadata(schema)
+    const metadataOutPath = options.metadataOut ?? "pocketbase-metadata.ts"
+    await saveFile(metadataOutPath, metadataString)
+  }
+
   return typeString
 }
