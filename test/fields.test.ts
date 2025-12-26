@@ -189,7 +189,7 @@ describe("createTypeField", () => {
         name: "relationField",
         type: "relation",
       })
-    ).toEqual("\trelationField: RecordIdString[]")
+    ).toEqual("\trelationField: RecordIdString")
   })
 
   it("converts relation type with multiple options", () => {
@@ -211,7 +211,7 @@ describe("createTypeField", () => {
         maxSelect: null,
         type: "relation",
       })
-    ).toEqual("\trelationFieldMany: RecordIdString[]")
+    ).toEqual("\trelationFieldMany: RecordIdString")
   })
 
   // DEPRECATED: This was removed in PocketBase v0.8
