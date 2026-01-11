@@ -1,7 +1,7 @@
 import {
   createCollectionEnum,
   createCollectionRecords,
-  createCollectionResponses
+  createCollectionResponses,
 } from "./collections"
 import {
   ALIAS_TYPE_DEFINITIONS,
@@ -16,13 +16,14 @@ import {
   RECORD_TYPE_COMMENT,
   RESPONSE_TYPE_COMMENT,
   TYPED_POCKETBASE_TYPE,
-  UTILITY_TYPES
+  UTILITY_TYPES,
 } from "./constants"
 import { createSelectOptions, createTypeField } from "./fields"
 import {
   getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
 } from "./generics"
+import { createFieldMetadata } from "./metadata"
 import { CollectionRecord, FieldSchema } from "./types"
 import { containsGeoPoint, getSystemFields, toPascalCase } from "./utils"
 
@@ -37,6 +38,7 @@ export function generate(
   const collectionNames: Array<string> = []
   const recordTypes: Array<string> = []
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
+  const fieldMetadata: Array<string> = []
 
   results
     .sort((a, b) => (a.name <= b.name ? -1 : 1))
@@ -45,6 +47,8 @@ export function generate(
       if (row.fields) {
         recordTypes.push(createRecordType(row.name, row.fields))
         responseTypes.push(createResponseType(row))
+        const metadata = createFieldMetadata(row.name, row.fields)
+        if (metadata) fieldMetadata.push(metadata)
       }
     })
   const sortedCollectionNames = collectionNames
@@ -108,4 +112,26 @@ export function createResponseType(
   const expandArgString = `<T${EXPAND_GENERIC_NAME}>`
 
   return `export type ${pascaleName}Response${genericArgsWithDefaults} = Required<${pascaleName}Record${genericArgsForRecord}> & ${systemFields}${expandArgString}`
+}
+
+export function generateMetadata(results: Array<CollectionRecord>): string {
+  const fieldMetadata: Array<string> = []
+
+  results
+    .sort((a, b) => (a.name <= b.name ? -1 : 1))
+    .forEach((row) => {
+      if (row.name && row.fields) {
+        const metadata = createFieldMetadata(row.name, row.fields)
+        if (metadata) fieldMetadata.push(metadata)
+      }
+    })
+
+  const fileParts = [
+    EXPORT_COMMENT,
+    fieldMetadata.length > 0
+      ? fieldMetadata.join("\n")
+      : "// No field metadata found",
+  ]
+
+  return fileParts.filter(Boolean).join("\n\n") + "\n"
 }
