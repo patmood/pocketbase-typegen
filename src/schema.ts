@@ -2,18 +2,17 @@ import { CollectionRecord } from "./types"
 import FormData from "form-data"
 import fetch from "cross-fetch"
 import { promises as fs } from "fs"
-import { open } from "sqlite"
-import sqlite3 from "sqlite3"
+import Database from "better-sqlite3"
 
 export async function fromDatabase(
   dbPath: string
 ): Promise<Array<CollectionRecord>> {
-  const db = await open({
-    driver: sqlite3.Database,
-    filename: dbPath,
-  })
+  const db = new Database(dbPath, { readonly: true })
 
-  const result = await db.all("SELECT * FROM _collections")
+  const result = db.prepare("SELECT * FROM _collections").all() as Array<
+    CollectionRecord & { fields?: string; schema?: string }
+  >
+  db.close()
   return result.map((collection) => ({
     ...collection,
     fields: JSON.parse(collection.fields ?? collection.schema ?? "{}"),

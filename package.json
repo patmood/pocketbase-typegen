@@ -35,14 +35,14 @@
   "author": "@patmood",
   "license": "ISC",
   "dependencies": {
+    "better-sqlite3": "^12.6.0",
     "commander": "^9.4.1",
     "cross-fetch": "^3.1.5",
     "dotenv-flow": "^4.1.0",
-    "form-data": "^4.0.1",
-    "sqlite": "^4.1.2",
-    "sqlite3": "^5.1.4"
+    "form-data": "^4.0.1"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^29.4.0",
     "@types/node": "^18.13.0",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
