@@ -28,6 +28,7 @@ import { containsGeoPoint, getSystemFields, toPascalCase } from "./utils"
 
 type GenerateOptions = {
   sdk: boolean
+  useConst?: boolean
 }
 
 export function generate(
@@ -43,7 +44,7 @@ export function generate(
     .forEach((row) => {
       if (row.name) collectionNames.push(row.name)
       if (row.fields) {
-        recordTypes.push(createRecordType(row.name, row.fields))
+        recordTypes.push(createRecordType(row.name, row.fields, options.useConst))
         responseTypes.push(createResponseType(row))
       }
     })
@@ -53,7 +54,7 @@ export function generate(
   const fileParts = [
     EXPORT_COMMENT,
     options.sdk && IMPORTS,
-    createCollectionEnum(sortedCollectionNames),
+    createCollectionEnum(sortedCollectionNames, options.useConst),
     ALIAS_TYPE_DEFINITIONS,
     includeGeoPoint && GEOPOINT_TYPE_DEFINITION,
     EXPAND_TYPE_DEFINITION,
@@ -74,9 +75,10 @@ export function generate(
 
 export function createRecordType(
   name: string,
-  schema: Array<FieldSchema>
+  schema: Array<FieldSchema>,
+  useConst?: boolean
 ): string {
-  const selectOptionEnums = createSelectOptions(name, schema)
+  const selectOptionEnums = createSelectOptions(name, schema, useConst)
   const typeName = toPascalCase(name)
   const genericArgs = getGenericArgStringWithDefault(schema, {
     includeExpand: false,

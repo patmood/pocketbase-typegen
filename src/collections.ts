@@ -1,6 +1,19 @@
 import { toPascalCase } from "./utils"
 
-export function createCollectionEnum(collectionNames: Array<string>): string {
+export function createCollectionEnum(
+  collectionNames: Array<string>,
+  useConst?: boolean
+): string {
+  if (useConst) {
+    const collections = collectionNames
+      .map((name) => `\t${toPascalCase(name)}: "${name}",`)
+      .join("\n")
+    return `export const Collections = {
+${collections}
+} as const
+export type Collections = typeof Collections[keyof typeof Collections]`
+  }
+
   const collections = collectionNames
     .map((name) => `\t${toPascalCase(name)} = "${name}",`)
     .join("\n")

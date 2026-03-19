@@ -9,6 +9,11 @@ describe("createCollectionEnum", () => {
     const names = ["book", "magazine"]
     expect(createCollectionEnum(names)).toMatchSnapshot()
   })
+
+  it("creates as const object when useConst is true", () => {
+    const names = ["book", "magazine"]
+    expect(createCollectionEnum(names, true)).toMatchSnapshot()
+  })
 })
 
 describe("createCollectionRecords", () => {

@@ -46,6 +46,10 @@ program
     "--no-sdk",
     "Removes the pocketbase package dependency. A typed version of the SDK will not be generated."
   )
+  .option(
+    "--use-const",
+    "Use 'as const' objects instead of TypeScript enums. Compatible with erasableSyntaxOnly."
+  )
 
 program.parse(process.argv)
 const options = program.opts<Options>()

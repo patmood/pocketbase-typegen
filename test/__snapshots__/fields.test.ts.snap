@@ -1,5 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`createSelectOptions creates as const objects when useConst is true 1`] = `
+"export const ChooseTitleOptions = {
+	"one": "one",
+	"two": "two",
+	"space space": "space space",
+	"$@#*(&#%": "$@#*(&#%",
+} as const
+export type ChooseTitleOptions = typeof ChooseTitleOptions[keyof typeof ChooseTitleOptions]
+"
+`;
+
 exports[`createSelectOptions creates enum types for select options 1`] = `
 "export enum ChooseTitleOptions {
 	"one" = "one",

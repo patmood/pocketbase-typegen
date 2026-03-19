@@ -58,6 +58,7 @@ export async function main(options: Options) {
   }
   const typeString = generate(schema, {
     sdk: options.sdk ?? true,
+    useConst: options.useConst ?? false,
   })
   await saveFile(options.out, typeString)
   return typeString

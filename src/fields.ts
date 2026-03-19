@@ -90,9 +90,31 @@ export function createTypeField(
 
 export function createSelectOptions(
   recordName: string,
-  fields: Array<FieldSchema>
+  fields: Array<FieldSchema>,
+  useConst?: boolean
 ): string {
   const selectFields = fields.filter((field) => field.type === "select")
+
+  if (useConst) {
+    const typestring = selectFields
+      .map((field) => {
+        const name = getOptionEnumName(recordName, field.name)
+        const values = getOptionValues(field)
+        const entries = values
+          .map(
+            (val) => `\t"${getSelectOptionEnumName(val)}": "${val}",`
+          )
+          .join("\n")
+        return `export const ${name} = {
+${entries}
+} as const
+export type ${name} = typeof ${name}[keyof typeof ${name}]
+`
+      })
+      .join("\n")
+    return typestring
+  }
+
   const typestring = selectFields
     .map(
       (field) => `export enum ${getOptionEnumName(recordName, field.name)} {

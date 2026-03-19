@@ -8,6 +8,7 @@ export type Options = {
   token?: string
   sdk?: boolean
   env?: boolean | string
+  useConst?: boolean
 }
 
 export type FieldSchema = {
