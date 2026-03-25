@@ -8,19 +8,20 @@ exports[`creates a type file from json schema 1`] = `
 import type PocketBase from 'pocketbase'
 import type { RecordService } from 'pocketbase'
 
-export enum Collections {
-	Authorigins = "_authOrigins",
-	Externalauths = "_externalAuths",
-	Mfas = "_mfas",
-	Otps = "_otps",
-	Superusers = "_superusers",
-	Base = "base",
-	CustomAuth = "custom_auth",
-	Everything = "everything",
-	MyView = "my_view",
-	Posts = "posts",
-	Users = "users",
-}
+export const Collections = {
+	Authorigins: "_authOrigins",
+	Externalauths: "_externalAuths",
+	Mfas: "_mfas",
+	Otps: "_otps",
+	Superusers: "_superusers",
+	Base: "base",
+	CustomAuth: "custom_auth",
+	Everything: "everything",
+	MyView: "my_view",
+	Posts: "posts",
+	Users: "users",
+} as const
+export type Collections = typeof Collections[keyof typeof Collections]
 
 // Alias types for improved usability
 export type IsoDateString = string
@@ -124,14 +125,15 @@ export type CustomAuthRecord = {
 	verified?: boolean
 }
 
-export enum EverythingSelectFieldOptions {
-	"optionA" = "optionA",
-	"OptionA" = "OptionA",
-	"optionB" = "optionB",
-	"optionC" = "optionC",
-	"option with space" = "option with space",
-	"sy?mb@!$" = "sy?mb@!$",
-}
+export const EverythingSelectFieldOptions = {
+	"optionA": "optionA",
+	"OptionA": "OptionA",
+	"optionB": "optionB",
+	"optionC": "optionC",
+	"option with space": "option with space",
+	"sy?mb@!$": "sy?mb@!$",
+} as const
+export type EverythingSelectFieldOptions = typeof EverythingSelectFieldOptions[keyof typeof EverythingSelectFieldOptions]
 export type EverythingRecord<Tanother_json_field = unknown, Tjson_field = unknown> = {
 	another_json_field?: null | Tanother_json_field
 	bool_field?: boolean

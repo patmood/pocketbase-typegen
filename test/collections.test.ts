@@ -5,14 +5,9 @@ import {
 } from "../src/collections"
 
 describe("createCollectionEnum", () => {
-  it("creates enum of collection names", () => {
+  it("creates as const object of collection names", () => {
     const names = ["book", "magazine"]
     expect(createCollectionEnum(names)).toMatchSnapshot()
-  })
-
-  it("creates as const object when useConst is true", () => {
-    const names = ["book", "magazine"]
-    expect(createCollectionEnum(names, true)).toMatchSnapshot()
   })
 })
 

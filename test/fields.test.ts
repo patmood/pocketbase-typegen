@@ -239,7 +239,7 @@ describe("createTypeField", () => {
 })
 
 describe("createSelectOptions", () => {
-  it("creates enum types for select options", () => {
+  it("creates as const objects for select options", () => {
     const name = "choose"
     const schema: FieldSchema[] = [
       {
@@ -253,23 +253,6 @@ describe("createSelectOptions", () => {
       },
     ]
     const result = createSelectOptions(name, schema)
-    expect(result).toMatchSnapshot()
-  })
-
-  it("creates as const objects when useConst is true", () => {
-    const name = "choose"
-    const schema: FieldSchema[] = [
-      {
-        id: "hhnwjkke",
-        name: "title",
-        values: ["one", "one", "two", "space space", "$@#*(&#%"],
-        required: false,
-        system: false,
-        type: "select",
-        unique: false,
-      },
-    ]
-    const result = createSelectOptions(name, schema, true)
     expect(result).toMatchSnapshot()
   })
 })

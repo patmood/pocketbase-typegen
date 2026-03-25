@@ -28,43 +28,6 @@ describe("generate", () => {
     ]
     const result = generate(collections, { sdk: true })
     expect(result).toMatchSnapshot()
-  })
-
-  it("generates as const output when useConst is true", () => {
-    const collections: Array<CollectionRecord> = [
-      {
-        createRule: null,
-        deleteRule: null,
-        id: "123",
-        listRule: null,
-        name: "books",
-        fields: [
-          {
-            id: "xyz",
-            name: "title",
-            required: false,
-            system: false,
-            type: "text",
-            unique: false,
-          },
-          {
-            id: "abc",
-            name: "status",
-            required: false,
-            system: false,
-            type: "select",
-            unique: false,
-            values: ["draft", "published"],
-          },
-        ],
-        system: false,
-        type: "base",
-        updateRule: null,
-        viewRule: null,
-      },
-    ]
-    const result = generate(collections, { sdk: true, useConst: true })
-    expect(result).toMatchSnapshot()
     // Verify no enum keyword in output
     expect(result).not.toMatch(/\benum\b/)
     // Verify as const pattern is used
