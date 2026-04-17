@@ -28,6 +28,10 @@ describe("generate", () => {
     ]
     const result = generate(collections, { sdk: true })
     expect(result).toMatchSnapshot()
+    // Verify no enum keyword in output
+    expect(result).not.toMatch(/\benum\b/)
+    // Verify as const pattern is used
+    expect(result).toMatch(/as const/)
   })
 
   it("skips generatic sdk if told not to", () => {

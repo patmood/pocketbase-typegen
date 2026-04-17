@@ -1,13 +1,15 @@
 import { toPascalCase } from "./utils"
 
-export function createCollectionEnum(collectionNames: Array<string>): string {
+export function createCollectionEnum(
+  collectionNames: Array<string>
+): string {
   const collections = collectionNames
-    .map((name) => `\t${toPascalCase(name)} = "${name}",`)
+    .map((name) => `\t${toPascalCase(name)}: "${name}",`)
     .join("\n")
-  const typeString = `export enum Collections {
+  return `export const Collections = {
 ${collections}
-}`
-  return typeString
+} as const
+export type Collections = typeof Collections[keyof typeof Collections]`
 }
 
 export function createCollectionRecords(

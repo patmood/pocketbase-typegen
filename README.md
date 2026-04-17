@@ -179,10 +179,10 @@ Add it to your projects `package.json`:
 
 The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketbase-types-example.ts)) which will contain:
 
-- `Collections` An enum of all collections.
+- `Collections` A const object mapping PascalCase names to collection IDs, with a companion union type.
 - `[CollectionName]Record` One type for each collection (eg ProfilesRecord).
 - `[CollectionName]Response` One response type for each collection (eg ProfilesResponse) which includes system fields. This is what is returned from the PocketBase API.
-  - `[CollectionName][FieldName]Options` If the collection contains a select field with set values, an enum of the options will be generated.
+  - `[CollectionName][FieldName]Options` If the collection contains a select field with set values, a const object and companion union type of the options will be generated.
 - `CollectionRecords` A type mapping each collection name to the record type.
 - `CollectionResponses` A type mapping each collection name to the response type.
 - `TypedPocketBase` A type for usage with type asserted PocketBase instance.

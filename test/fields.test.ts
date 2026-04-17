@@ -239,7 +239,7 @@ describe("createTypeField", () => {
 })
 
 describe("createSelectOptions", () => {
-  it("creates enum types for select options", () => {
+  it("creates as const objects for select options", () => {
     const name = "choose"
     const schema: FieldSchema[] = [
       {
