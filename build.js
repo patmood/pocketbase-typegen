@@ -8,7 +8,8 @@ esbuild
     treeShaking: true,
     platform: "node",
     format: "esm",
-    target: "node14",
+    target: "node18",
+    external: ["bun:sqlite"],
     plugins: [nodeExternalsPlugin()],
   })
   .catch(() => process.exit(1))

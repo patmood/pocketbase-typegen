@@ -1,5 +1,5 @@
 # Dockerfile to run e2e integration tests against a test PocketBase server
-FROM node:lts-alpine
+FROM node:20-alpine
 
 ARG POCKETBASE_VERSION=0.31.0
 
@@ -7,11 +7,18 @@ WORKDIR /app/
 
 # Install the dependencies
 RUN apk add --no-cache \
+  bash \
   ca-certificates \
+  curl \
+  gcompat \
   unzip \
   wget \
   zip \
   zlib-dev
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
 
 # Build project
 COPY . .
