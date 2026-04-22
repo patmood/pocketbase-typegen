@@ -2,8 +2,8 @@ import esbuild from "esbuild"
 import { nodeExternalsPlugin } from "esbuild-node-externals"
 esbuild
   .build({
-    entryPoints: ["./src/index.ts"],
-    outfile: "dist/index.js",
+    entryPoints: [{ in: "./src/cli.ts", out: "cli" }, { in: "./src/index.ts", out: "index" }],
+    outdir: "dist",
     bundle: true,
     treeShaking: true,
     platform: "node",
