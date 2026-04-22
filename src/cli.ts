@@ -13,6 +13,7 @@ import { saveFile } from "./utils"
 
 export async function main(options: Options) {
   let schema: Array<CollectionRecord>
+  try {
   if (options.db) {
     schema = await fromDatabase(options.db)
   } else if (options.json) {
@@ -55,6 +56,10 @@ export async function main(options: Options) {
     return console.error(
       "Missing schema path. Check options: pocketbase-typegen --help"
     )
+  }
+  } catch (e) {
+    console.error(e instanceof Error ? e.message : e)
+    process.exit(1)
   }
   const typeString = generate(schema, {
     sdk: options.sdk ?? true,
