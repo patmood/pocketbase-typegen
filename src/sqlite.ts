@@ -21,6 +21,7 @@ async function createNodeAdapter(): Promise<SQLiteAdapter> {
   }
 }
 
+/* istanbul ignore next -- bun:sqlite only available in Bun runtime */
 async function createBunAdapter(): Promise<SQLiteAdapter> {
   // @ts-ignore: bun:sqlite is only available in the Bun runtime
   const { Database } = await import("bun:sqlite")
@@ -35,6 +36,7 @@ async function createBunAdapter(): Promise<SQLiteAdapter> {
 }
 
 export async function getSQLiteAdapter(): Promise<SQLiteAdapter> {
+  /* istanbul ignore next -- bun branch not testable in Node */
   if (isBun) {
     return createBunAdapter()
   }

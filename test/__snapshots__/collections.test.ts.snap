@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`createCollectionEnum creates as const object of collection names 1`] = `
+exports[`createCollectionEnum > creates as const object of collection names 1`] = `
 "export const Collections = {
 	Book: "book",
 	Magazine: "magazine",
@@ -8,14 +8,14 @@ exports[`createCollectionEnum creates as const object of collection names 1`] = 
 export type Collections = typeof Collections[keyof typeof Collections]"
 `;
 
-exports[`createCollectionRecords creates mapping of collection name to record type 1`] = `
+exports[`createCollectionRecords > creates mapping of collection name to record type 1`] = `
 "export type CollectionRecords = {
 	book: BookRecord
 	magazine: MagazineRecord
 }"
 `;
 
-exports[`createCollectionResponses creates mapping of collection name to response type 1`] = `
+exports[`createCollectionResponses > creates mapping of collection name to response type 1`] = `
 "export type CollectionResponses = {
 	book: BookResponse
 	magazine: MagazineResponse

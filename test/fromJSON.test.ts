@@ -1,15 +1,18 @@
+import { expect, it } from "vitest"
+
 import { promises as fs } from "fs"
-import { main } from "../src/cli"
+import { generateFromSchema } from "../src/index"
+import { fromJSON } from "../src/schema"
 import path from "path"
+import { fileURLToPath } from "url"
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 it("creates a type file from json schema", async () => {
   const out = path.resolve(__dirname, "pocketbase-types-example.ts")
-  const result = await main({
-    json: path.resolve(__dirname, "pb_schema.json"),
-    out,
-  })
+  const schema = await fromJSON(path.resolve(__dirname, "pb_schema.json"))
+  const result = generateFromSchema(schema)
 
-  const fileOutput = await fs.readFile(out, { encoding: "utf-8" })
-  expect(fileOutput).toEqual(result)
-  expect(fileOutput).toMatchSnapshot()
+  await fs.writeFile(out, result, { encoding: "utf-8" })
+  expect(result).toMatchSnapshot()
 })

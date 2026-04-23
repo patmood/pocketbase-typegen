@@ -165,6 +165,24 @@ onCollectionAfterUpdateSuccess(generateTypes)
 onCollectionAfterDeleteSuccess(generateTypes)
 ```
 
+### Programmatic API
+
+You can also use `pocketbase-typegen` as a library — useful for Vite plugins, build hooks, or watch-mode generators:
+
+```typescript
+import { generateFromSchema } from "pocketbase-typegen"
+
+// Load your schema however you like — from a JSON file, API, etc.
+const collections = JSON.parse(await fs.readFile("./pb_schema.json", "utf8"))
+const typeDefinitions = generateFromSchema(collections)
+```
+
+`generateFromSchema` accepts an optional second argument:
+
+```typescript
+generateFromSchema(collections, { sdk: false }) // omit TypedPocketBase type
+```
+
 ### Shortcut
 
 Add it to your projects `package.json`:

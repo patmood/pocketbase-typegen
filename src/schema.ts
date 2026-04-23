@@ -25,19 +25,15 @@ export async function fromURLWithToken(
   url: string,
   token: string = ""
 ): Promise<Array<CollectionRecord>> {
-  let collections: Array<CollectionRecord> = []
   try {
     const result = (await fetchWithAuth(
       `${url}/api/collections?perPage=200`,
       token
     )) as { items: Array<CollectionRecord> }
-    collections = result.items
+    return result.items
   } catch (error) {
-    console.error(error)
-    process.exit(1)
+    throw new Error(`Failed to load schema from URL: ${error}`)
   }
-
-  return collections
 }
 
 export async function fromURLWithPassword(
@@ -53,7 +49,6 @@ export async function fromURLWithPassword(
     )) as { items: Array<CollectionRecord> }
     return result.items
   } catch (error) {
-    console.error(error)
-    process.exit(1)
+    throw new Error(`Failed to load schema from URL: ${error}`)
   }
 }

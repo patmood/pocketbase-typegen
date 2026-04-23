@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest"
+
 import { CollectionRecord, FieldSchema } from "../src/types"
 import { createRecordType, createResponseType, generate } from "../src/lib"
 
@@ -98,6 +100,13 @@ describe("createRecordType", () => {
     ]
     const result = createRecordType(name, schema)
     expect(result).toMatchSnapshot()
+  })
+
+  it("returns never when schema has no fields", () => {
+    const name = "empty"
+    const schema: FieldSchema[] = []
+    const result = createRecordType(name, schema)
+    expect(result).toContain("= never")
   })
 
   it("sorts fields alphabetically", () => {

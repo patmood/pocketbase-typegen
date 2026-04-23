@@ -4,15 +4,15 @@
 
   "compilerOptions": {
     "lib": ["es2022"],
-    "module": "commonjs",
+    "module": "esnext",
     "target": "es2022",
-    "types": ["node", "jest"],
+    "types": ["node"],
 
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "noEmit": true
   }

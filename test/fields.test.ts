@@ -1,3 +1,5 @@
+import { describe, expect, it, vi } from "vitest"
+
 import {
   createSelectOptions,
   createTypeField,
@@ -225,8 +227,19 @@ describe("createTypeField", () => {
     ).toEqual("\tuserRelationField: RecordIdString")
   })
 
+  it("converts user relation type with multiple options", () => {
+    expect(
+      createTypeField("test_collection", {
+        ...defaultFieldSchema,
+        name: "userRelationFieldMany",
+        maxSelect: 3,
+        type: "user",
+      })
+    ).toEqual("\tuserRelationFieldMany: RecordIdString[]")
+  })
+
   it("warns when encountering unexpected types", () => {
-    const logSpy = jest.spyOn(console, "log")
+    const logSpy = vi.spyOn(console, "log")
     createTypeField("test_collection", {
       ...defaultFieldSchema,
       // @ts-ignore

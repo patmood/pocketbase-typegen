@@ -1,3 +1,5 @@
+import { afterEach, describe, expect, it, vi } from "vitest"
+
 import {
   getOptionEnumName,
   getOptionValues,
@@ -72,5 +74,44 @@ describe("getOptionValues", () => {
       unique: false,
     }
     expect(getOptionValues(fieldWithValues)).toEqual(["one", "two"])
+  })
+})
+
+const { mockWriteFile } = vi.hoisted(() => ({
+  mockWriteFile: vi.fn().mockResolvedValue(undefined),
+}))
+
+vi.mock("fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("fs")>()
+  return {
+    ...actual,
+    promises: {
+      ...actual.promises,
+      writeFile: mockWriteFile,
+    },
+  }
+})
+
+describe("saveFile", () => {
+  afterEach(() => {
+    mockWriteFile.mockClear()
+  })
+
+  it("writes the file and logs the path", async () => {
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {})
+
+    const { saveFile } = await import("../src/utils")
+    await saveFile("/tmp/output.ts", "type Foo = string")
+
+    expect(mockWriteFile).toHaveBeenCalledWith(
+      "/tmp/output.ts",
+      "type Foo = string",
+      "utf8"
+    )
+    expect(logSpy).toHaveBeenCalledWith(
+      "Created typescript definitions at /tmp/output.ts"
+    )
+
+    logSpy.mockRestore()
   })
 })

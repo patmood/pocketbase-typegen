@@ -1,10 +1,9 @@
-type AnyFetch = (input: any, init?: any) => Promise<any>
-const fetchFn: AnyFetch = (globalThis as any).fetch
-const FormDataCtor: any = (globalThis as any).FormData
+export type FetchFn = typeof fetch
 
 export async function fetchWithAuth(
   url: string,
-  token: string
+  token: string,
+  fetchFn: FetchFn = globalThis.fetch
 ): Promise<unknown> {
   const res = await fetchFn(url, {
     headers: {
@@ -18,9 +17,10 @@ export async function fetchWithAuth(
 export async function loginAndFetch(
   url: string,
   email: string,
-  password: string
+  password: string,
+  fetchFn: FetchFn = globalThis.fetch
 ): Promise<unknown> {
-  const formData = new FormDataCtor()
+  const formData = new FormData()
   formData.append("identity", email)
   formData.append("password", password)
 
@@ -34,5 +34,9 @@ export async function loginAndFetch(
   if (!loginRes?.ok) throw loginRes
   const loginData = (await loginRes.json()) as { token: string }
 
-  return fetchWithAuth(`${url}/api/collections?perPage=200`, loginData.token)
+  return fetchWithAuth(
+    `${url}/api/collections?perPage=200`,
+    loginData.token,
+    fetchFn
+  )
 }
