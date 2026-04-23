@@ -74,3 +74,27 @@ describe("getOptionValues", () => {
     expect(getOptionValues(fieldWithValues)).toEqual(["one", "two"])
   })
 })
+
+describe("saveFile", () => {
+  it("writes the file and logs the path", async () => {
+    const writeSpy = jest
+      .spyOn(require("fs").promises, "writeFile")
+      .mockResolvedValue(undefined)
+    const logSpy = jest.spyOn(console, "log").mockImplementation()
+
+    const { saveFile } = require("../src/utils")
+    await saveFile("/tmp/output.ts", "type Foo = string")
+
+    expect(writeSpy).toHaveBeenCalledWith(
+      "/tmp/output.ts",
+      "type Foo = string",
+      "utf8"
+    )
+    expect(logSpy).toHaveBeenCalledWith(
+      "Created typescript definitions at /tmp/output.ts"
+    )
+
+    writeSpy.mockRestore()
+    logSpy.mockRestore()
+  })
+})

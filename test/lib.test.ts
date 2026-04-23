@@ -100,6 +100,13 @@ describe("createRecordType", () => {
     expect(result).toMatchSnapshot()
   })
 
+  it("returns never when schema has no fields", () => {
+    const name = "empty"
+    const schema: FieldSchema[] = []
+    const result = createRecordType(name, schema)
+    expect(result).toContain("= never")
+  })
+
   it("sorts fields alphabetically", () => {
     const name = "books"
     const schema: FieldSchema[] = [

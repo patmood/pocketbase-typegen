@@ -96,4 +96,49 @@ describe("loginAndFetch", () => {
       loginAndFetch("http://localhost:8090", "admin@test.com", "wrong", fetch)
     ).rejects.toBe(err)
   })
+
+  it("uses globalThis.fetch as default when fetchFn is not provided", async () => {
+    const originalFetch = globalThis.fetch
+    const mock = jest.fn(() =>
+      Promise.resolve(okResponse({ items: [] }))
+    )
+    globalThis.fetch = mock as unknown as FetchFn
+
+    const result = await fetchWithAuth(
+      "http://localhost:8090/api/collections?perPage=200",
+      "test-token"
+    )
+
+    expect(result).toEqual({ items: [] })
+    expect(mock).toHaveBeenCalledWith(
+      "http://localhost:8090/api/collections?perPage=200",
+      {
+        headers: { Authorization: "test-token" },
+      }
+    )
+
+    globalThis.fetch = originalFetch
+  })
+})
+
+describe("loginAndFetch default parameter", () => {
+  it("uses globalThis.fetch as default when fetchFn is not provided", async () => {
+    const originalFetch = globalThis.fetch
+    const mock = jest
+      .fn()
+      .mockResolvedValueOnce(okResponse({ token: "auth-token-123" }))
+      .mockResolvedValueOnce(okResponse({ items: [{ name: "posts" }] }))
+    globalThis.fetch = mock as unknown as FetchFn
+
+    const result = await loginAndFetch(
+      "http://localhost:8090",
+      "admin@test.com",
+      "secret"
+    )
+
+    expect(result).toEqual({ items: [{ name: "posts" }] })
+    expect(mock).toHaveBeenCalledTimes(2)
+
+    globalThis.fetch = originalFetch
+  })
 })
