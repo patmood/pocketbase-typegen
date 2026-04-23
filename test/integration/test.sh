@@ -11,15 +11,15 @@ while ! nc -z localhost 8090 </dev/null; do sleep 1; done
 
 # Node tests
 echo "Running Node integration tests..."
-node ../../dist/index.js --url http://0.0.0.0:8090 --email test@test.com --password testpassword --out ./output/pocketbase-types-url.ts
-node ../../dist/index.js --db pb_data/data.db --out ./output/pocketbase-types-db.ts
-node ../../dist/index.js --env --out ./output/pocketbase-types-env.ts
+node ../../dist/cli.js --url http://0.0.0.0:8090 --email test@test.com --password testpassword --out ./output/pocketbase-types-url.ts
+node ../../dist/cli.js --db pb_data/data.db --out ./output/pocketbase-types-db.ts
+node ../../dist/cli.js --env --out ./output/pocketbase-types-env.ts
 
 # Bun tests
 echo "Running Bun integration tests..."
-bun ../../dist/index.js --url http://0.0.0.0:8090 --email test@test.com --password testpassword --out ./output/bun-pocketbase-types-url.ts
-bun ../../dist/index.js --db pb_data/data.db --out ./output/bun-pocketbase-types-db.ts
-bun ../../dist/index.js --env --out ./output/bun-pocketbase-types-env.ts
+bun ../../dist/cli.js --url http://0.0.0.0:8090 --email test@test.com --password testpassword --out ./output/bun-pocketbase-types-url.ts
+bun ../../dist/cli.js --db pb_data/data.db --out ./output/bun-pocketbase-types-db.ts
+bun ../../dist/cli.js --env --out ./output/bun-pocketbase-types-env.ts
 
 node integration.js
 exit_status=$?

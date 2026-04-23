@@ -15,6 +15,48 @@ import { saveFile } from "./utils"
 import { program } from "commander"
 import { version } from "../package.json"
 
+type SchemaSource = {
+  resolve: () => Promise<Array<CollectionRecord>>
+}
+
+function resolveFromEnv(options: Options): SchemaSource | null {
+  dotenv.config(
+    typeof options.env === "string" ? { path: options.env } : undefined
+  )
+  const url = process.env.PB_TYPEGEN_URL
+  if (!url) return null
+  if (process.env.PB_TYPEGEN_TOKEN) {
+    return {
+      resolve: () => fromURLWithToken(url, process.env.PB_TYPEGEN_TOKEN!),
+    }
+  }
+  if (process.env.PB_TYPEGEN_EMAIL && process.env.PB_TYPEGEN_PASSWORD) {
+    return {
+      resolve: () =>
+        fromURLWithPassword(
+          url,
+          process.env.PB_TYPEGEN_EMAIL,
+          process.env.PB_TYPEGEN_PASSWORD
+        ),
+    }
+  }
+  return null
+}
+
+function resolveSchemaSource(options: Options): SchemaSource | null {
+  if (options.db) return { resolve: () => fromDatabase(options.db!) }
+  if (options.json) return { resolve: () => fromJSON(options.json!) }
+  if (options.url && options.token)
+    return { resolve: () => fromURLWithToken(options.url!, options.token!) }
+  if (options.url)
+    return {
+      resolve: () =>
+        fromURLWithPassword(options.url!, options.email, options.password),
+    }
+  if (options.env) return resolveFromEnv(options)
+  return null
+}
+
 program
   .name("Pocketbase Typegen")
   .version(version)
@@ -61,51 +103,23 @@ program.parse(process.argv)
 const options = program.opts<Options>()
 
 async function main(options: Options) {
-  let schema: Array<CollectionRecord>
-  try {
-    if (options.db) {
-      schema = await fromDatabase(options.db)
-    } else if (options.json) {
-      schema = await fromJSON(options.json)
-    } else if (options.url && options.token) {
-      schema = await fromURLWithToken(options.url, options.token)
-    } else if (options.url) {
-      schema = await fromURLWithPassword(
-        options.url,
-        options.email,
-        options.password
+  const source = resolveSchemaSource(options)
+  if (!source) {
+    if (options.env) {
+      console.error(
+        "Missing PB_TYPEGEN_URL or PB_TYPEGEN_TOKEN environment variables"
       )
-    } else if (options.env) {
-      dotenv.config(
-        typeof options.env === "string" ? { path: options.env } : undefined
-      )
-      if (!process.env.PB_TYPEGEN_URL) {
-        return console.error("Missing PB_TYPEGEN_URL environment variable")
-      }
-      if (process.env.PB_TYPEGEN_TOKEN) {
-        schema = await fromURLWithToken(
-          process.env.PB_TYPEGEN_URL,
-          process.env.PB_TYPEGEN_TOKEN
-        )
-      } else if (
-        process.env.PB_TYPEGEN_EMAIL &&
-        process.env.PB_TYPEGEN_PASSWORD
-      ) {
-        schema = await fromURLWithPassword(
-          process.env.PB_TYPEGEN_URL,
-          process.env.PB_TYPEGEN_EMAIL,
-          process.env.PB_TYPEGEN_PASSWORD
-        )
-      } else {
-        return console.error(
-          "Missing PB_TYPEGEN_URL or PB_TYPEGEN_TOKEN environment variables"
-        )
-      }
     } else {
-      return console.error(
+      console.error(
         "Missing schema path. Check options: pocketbase-typegen --help"
       )
     }
+    return
+  }
+
+  let schema: Array<CollectionRecord>
+  try {
+    schema = await source.resolve()
   } catch (e) {
     console.error(e instanceof Error ? e.message : e)
     process.exit(1)
