@@ -1,26 +1,26 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`createRecordType creates type definition for a record 1`] = `
+exports[`createRecordType > creates type definition for a record 1`] = `
 "export type BooksRecord = {
 	title?: string
 }"
 `;
 
-exports[`createRecordType handles file fields with multiple files 1`] = `
+exports[`createRecordType > handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
 	avatars?: FileNameString[]
 }"
 `;
 
-exports[`createResponseType creates type definition for a response 1`] = `"export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>"`;
+exports[`createResponseType > creates type definition for a response 1`] = `"export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>"`;
 
-exports[`createResponseType handles file fields with multiple files 1`] = `
+exports[`createResponseType > handles file fields with multiple files 1`] = `
 "export type BooksRecord = {
 	avatars?: FileNameString[]
 }"
 `;
 
-exports[`generate generates correct output given db input 1`] = `
+exports[`generate > generates correct output given db input 1`] = `
 "/**
 * This file was @generated using pocketbase-typegen
 */

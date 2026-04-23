@@ -1,8 +1,10 @@
+import { afterEach, describe, expect, it, vi } from "vitest"
+
 import { fetchWithAuth, loginAndFetch, FetchFn } from "../src/http"
 
 function mockFetch(responses: Array<unknown>): FetchFn {
   let callIndex = 0
-  return jest.fn(() => {
+  return vi.fn(() => {
     const response = responses[callIndex++]
     return Promise.resolve(response)
   }) as unknown as FetchFn
@@ -96,12 +98,16 @@ describe("loginAndFetch", () => {
       loginAndFetch("http://localhost:8090", "admin@test.com", "wrong", fetch)
     ).rejects.toBe(err)
   })
+})
+
+describe("fetchWithAuth default parameter", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 
   it("uses globalThis.fetch as default when fetchFn is not provided", async () => {
     const originalFetch = globalThis.fetch
-    const mock = jest.fn(() =>
-      Promise.resolve(okResponse({ items: [] }))
-    )
+    const mock = vi.fn(() => Promise.resolve(okResponse({ items: [] })))
     globalThis.fetch = mock as unknown as FetchFn
 
     const result = await fetchWithAuth(
@@ -122,9 +128,13 @@ describe("loginAndFetch", () => {
 })
 
 describe("loginAndFetch default parameter", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("uses globalThis.fetch as default when fetchFn is not provided", async () => {
     const originalFetch = globalThis.fetch
-    const mock = jest
+    const mock = vi
       .fn()
       .mockResolvedValueOnce(okResponse({ token: "auth-token-123" }))
       .mockResolvedValueOnce(okResponse({ items: [{ name: "posts" }] }))

@@ -1,18 +1,19 @@
+import { describe, expect, it, vi } from "vitest"
+
 import { getSQLiteAdapter } from "../src/sqlite"
 
 // Mock better-sqlite3 for the dynamic import inside createNodeAdapter
-jest.mock("better-sqlite3", () => {
-  const mockClose = jest.fn()
-  const mockAll = jest.fn().mockReturnValue([
-    { id: "1", name: "test", fields: "[]", schema: "[]" },
-  ])
-  const mockPrepare = jest.fn().mockReturnValue({ all: mockAll })
-  const mockConstructor = jest.fn().mockReturnValue({
+vi.mock("better-sqlite3", () => {
+  const mockClose = vi.fn()
+  const mockAll = vi
+    .fn()
+    .mockReturnValue([{ id: "1", name: "test", fields: "[]", schema: "[]" }])
+  const mockPrepare = vi.fn().mockReturnValue({ all: mockAll })
+  const mockConstructor = vi.fn().mockReturnValue({
     prepare: mockPrepare,
     close: mockClose,
   })
   return {
-    __esModule: true,
     default: mockConstructor,
   }
 })
@@ -25,7 +26,8 @@ describe("getSQLiteAdapter", () => {
   })
 
   it("queryAll creates a readonly db, executes query, and closes", async () => {
-    const mockConstructor = require("better-sqlite3").default as jest.Mock
+    const mockConstructor = (await import("better-sqlite3"))
+      .default as unknown as ReturnType<typeof vi.fn>
     const adapter = await getSQLiteAdapter()
 
     const rows = adapter.queryAll(

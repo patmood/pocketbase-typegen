@@ -12,12 +12,6 @@ export default tseslint.config(
     },
   },
   {
-    files: ["test/**"],
-    rules: {
-      "@typescript-eslint/no-require-imports": "off",
-    },
-  },
-  {
     ignores: [
       "dist/**",
       "pocketbase-types.ts",

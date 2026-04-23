@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest"
+
 import { CollectionRecord, FieldSchema } from "../src/types"
 import { createRecordType, createResponseType, generate } from "../src/lib"
 

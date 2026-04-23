@@ -1,3 +1,5 @@
+import { describe, expect, it, vi } from "vitest"
+
 import {
   createSelectOptions,
   createTypeField,
@@ -237,7 +239,7 @@ describe("createTypeField", () => {
   })
 
   it("warns when encountering unexpected types", () => {
-    const logSpy = jest.spyOn(console, "log")
+    const logSpy = vi.spyOn(console, "log")
     createTypeField("test_collection", {
       ...defaultFieldSchema,
       // @ts-ignore

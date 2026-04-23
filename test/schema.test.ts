@@ -1,33 +1,38 @@
-import { fromDatabase, fromJSON, fromURLWithPassword, fromURLWithToken } from "../src/schema"
+import { afterEach, describe, expect, it, vi } from "vitest"
+
+import {
+  fromDatabase,
+  fromJSON,
+  fromURLWithPassword,
+  fromURLWithToken,
+} from "../src/schema"
 
 import { CollectionRecord } from "../src/types"
+import path from "path"
+import { fileURLToPath } from "url"
 
-jest.mock("../src/sqlite", () => ({
-  getSQLiteAdapter: jest.fn(),
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+vi.mock("../src/sqlite", () => ({
+  getSQLiteAdapter: vi.fn(),
 }))
 
-jest.mock("../src/http", () => ({
-  fetchWithAuth: jest.fn(),
-  loginAndFetch: jest.fn(),
+vi.mock("../src/http", () => ({
+  fetchWithAuth: vi.fn(),
+  loginAndFetch: vi.fn(),
 }))
 
 import { getSQLiteAdapter } from "../src/sqlite"
 import { fetchWithAuth, loginAndFetch } from "../src/http"
 
-const mockGetSQLiteAdapter = getSQLiteAdapter as jest.MockedFunction<
-  typeof getSQLiteAdapter
->
-const mockFetchWithAuth = fetchWithAuth as jest.MockedFunction<
-  typeof fetchWithAuth
->
-const mockLoginAndFetch = loginAndFetch as jest.MockedFunction<
-  typeof loginAndFetch
->
+const mockGetSQLiteAdapter = vi.mocked(getSQLiteAdapter)
+const mockFetchWithAuth = vi.mocked(fetchWithAuth)
+const mockLoginAndFetch = vi.mocked(loginAndFetch)
 
 describe("fromDatabase", () => {
   it("parses collections with fields JSON", async () => {
     mockGetSQLiteAdapter.mockResolvedValue({
-      queryAll: jest.fn().mockReturnValue([
+      queryAll: vi.fn().mockReturnValue([
         {
           id: "1",
           name: "posts",
@@ -51,7 +56,7 @@ describe("fromDatabase", () => {
 
   it("falls back to schema when fields is undefined", async () => {
     mockGetSQLiteAdapter.mockResolvedValue({
-      queryAll: jest.fn().mockReturnValue([
+      queryAll: vi.fn().mockReturnValue([
         {
           id: "2",
           name: "comments",
@@ -68,14 +73,12 @@ describe("fromDatabase", () => {
     })
 
     const result = await fromDatabase("/fake/db.sqlite")
-    expect(result[0].fields).toEqual([
-      { id: "f2", name: "body", type: "text" },
-    ])
+    expect(result[0].fields).toEqual([{ id: "f2", name: "body", type: "text" }])
   })
 
   it("falls back to empty object when both fields and schema are undefined", async () => {
     mockGetSQLiteAdapter.mockResolvedValue({
-      queryAll: jest.fn().mockReturnValue([
+      queryAll: vi.fn().mockReturnValue([
         {
           id: "3",
           name: "minimal",
@@ -97,13 +100,17 @@ describe("fromDatabase", () => {
 
 describe("fromJSON", () => {
   it("reads and parses a JSON schema file", async () => {
-    const result = await fromJSON(require.resolve("./pb_schema.json"))
+    const result = await fromJSON(path.resolve(__dirname, "pb_schema.json"))
     expect(Array.isArray(result)).toBe(true)
     expect(result.length).toBeGreaterThan(0)
   })
 })
 
 describe("fromURLWithToken", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("returns items on success", async () => {
     const items: Array<CollectionRecord> = [
       {
@@ -150,6 +157,10 @@ describe("fromURLWithToken", () => {
 })
 
 describe("fromURLWithPassword", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("returns items on success", async () => {
     const items: Array<CollectionRecord> = [
       {

@@ -1,3 +1,5 @@
+import { afterEach, describe, expect, it, vi } from "vitest"
+
 import {
   getOptionEnumName,
   getOptionValues,
@@ -75,17 +77,33 @@ describe("getOptionValues", () => {
   })
 })
 
-describe("saveFile", () => {
-  it("writes the file and logs the path", async () => {
-    const writeSpy = jest
-      .spyOn(require("fs").promises, "writeFile")
-      .mockResolvedValue(undefined)
-    const logSpy = jest.spyOn(console, "log").mockImplementation()
+const { mockWriteFile } = vi.hoisted(() => ({
+  mockWriteFile: vi.fn().mockResolvedValue(undefined),
+}))
 
-    const { saveFile } = require("../src/utils")
+vi.mock("fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("fs")>()
+  return {
+    ...actual,
+    promises: {
+      ...actual.promises,
+      writeFile: mockWriteFile,
+    },
+  }
+})
+
+describe("saveFile", () => {
+  afterEach(() => {
+    mockWriteFile.mockClear()
+  })
+
+  it("writes the file and logs the path", async () => {
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {})
+
+    const { saveFile } = await import("../src/utils")
     await saveFile("/tmp/output.ts", "type Foo = string")
 
-    expect(writeSpy).toHaveBeenCalledWith(
+    expect(mockWriteFile).toHaveBeenCalledWith(
       "/tmp/output.ts",
       "type Foo = string",
       "utf8"
@@ -94,7 +112,6 @@ describe("saveFile", () => {
       "Created typescript definitions at /tmp/output.ts"
     )
 
-    writeSpy.mockRestore()
     logSpy.mockRestore()
   })
 })

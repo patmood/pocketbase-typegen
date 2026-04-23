@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`createSelectOptions creates as const objects for select options 1`] = `
+exports[`createSelectOptions > creates as const objects for select options 1`] = `
 "export const ChooseTitleOptions = {
 	"one": "one",
 	"two": "two",
