@@ -39,7 +39,7 @@ export function generate(
   const responseTypes: Array<string> = [RESPONSE_TYPE_COMMENT]
 
   results
-    .sort((a, b) => (a.name <= b.name ? -1 : 1))
+    .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((row) => {
       if (row.name) collectionNames.push(row.name)
       if (row.fields) {
