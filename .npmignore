@@ -10,3 +10,4 @@ Dockerfile
 .eslintrc
 .prettierignore
 scratchpad
+AGENTS.md
