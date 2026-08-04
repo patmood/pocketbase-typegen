@@ -1,5 +1,24 @@
 export type FetchFn = typeof fetch
 
+async function throwResponseError(
+  res: Response | undefined,
+  context: string
+): Promise<never> {
+  const status = res?.status ?? "unknown"
+  const statusText = res?.statusText ? ` ${res.statusText}` : ""
+  let body = ""
+  try {
+    body = res?.text ? await res.text() : ""
+  } catch {
+    // Ignore errors reading the response body
+  }
+  throw new Error(
+    `${context} failed with status ${status}${statusText}${
+      body ? `: ${body}` : ""
+    }`
+  )
+}
+
 export async function fetchWithAuth(
   url: string,
   token: string,
@@ -10,7 +29,7 @@ export async function fetchWithAuth(
       Authorization: token,
     },
   })
-  if (!res?.ok) throw res
+  if (!res?.ok) await throwResponseError(res, `Fetching ${url}`)
   return res.json()
 }
 
@@ -31,7 +50,9 @@ export async function loginAndFetch(
       method: "POST",
     }
   )
-  if (!loginRes?.ok) throw loginRes
+  if (!loginRes?.ok) {
+    await throwResponseError(loginRes, "PocketBase authentication")
+  }
   const loginData = (await loginRes.json()) as { token: string }
 
   return fetchWithAuth(
