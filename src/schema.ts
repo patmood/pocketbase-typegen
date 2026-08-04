@@ -7,9 +7,10 @@ export async function fromDatabase(
   dbPath: string
 ): Promise<Array<CollectionRecord>> {
   const adapter = await getSQLiteAdapter()
-  const result = adapter.queryAll(dbPath, "SELECT * FROM _collections") as Array<
-    CollectionRecord & { fields?: string; schema?: string }
-  >
+  const result = adapter.queryAll(
+    dbPath,
+    "SELECT * FROM _collections"
+  ) as Array<CollectionRecord & { fields?: string; schema?: string }>
   return result.map((collection) => ({
     ...collection,
     fields: JSON.parse(collection.fields ?? collection.schema ?? "{}"),
@@ -32,7 +33,7 @@ export async function fromURLWithToken(
     )) as { items: Array<CollectionRecord> }
     return result.items
   } catch (error) {
-    throw new Error(`Failed to load schema from URL: ${error}`)
+    throw new Error(`Failed to load schema from URL: ${toMessage(error)}`)
   }
 }
 
@@ -42,13 +43,15 @@ export async function fromURLWithPassword(
   password = ""
 ): Promise<Array<CollectionRecord>> {
   try {
-    const result = (await loginAndFetch(
-      url,
-      email,
-      password
-    )) as { items: Array<CollectionRecord> }
+    const result = (await loginAndFetch(url, email, password)) as {
+      items: Array<CollectionRecord>
+    }
     return result.items
   } catch (error) {
-    throw new Error(`Failed to load schema from URL: ${error}`)
+    throw new Error(`Failed to load schema from URL: ${toMessage(error)}`)
   }
+}
+
+function toMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error)
 }

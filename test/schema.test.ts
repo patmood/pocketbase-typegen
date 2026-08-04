@@ -154,6 +154,28 @@ describe("fromURLWithToken", () => {
       fromURLWithToken("http://localhost:8090", "bad-token")
     ).rejects.toThrow("Failed to load schema from URL")
   })
+
+  it("surfaces the underlying error message", async () => {
+    mockFetchWithAuth.mockRejectedValue(
+      new Error(
+        "Fetching http://localhost:8090/api/collections failed with status 401 Unauthorized: invalid token"
+      )
+    )
+
+    await expect(
+      fromURLWithToken("http://localhost:8090", "bad-token")
+    ).rejects.toThrow(
+      "Failed to load schema from URL: Fetching http://localhost:8090/api/collections failed with status 401 Unauthorized: invalid token"
+    )
+  })
+
+  it("surfaces non-Error rejections", async () => {
+    mockFetchWithAuth.mockRejectedValue("network down")
+
+    await expect(
+      fromURLWithToken("http://localhost:8090", "bad-token")
+    ).rejects.toThrow("Failed to load schema from URL: network down")
+  })
 })
 
 describe("fromURLWithPassword", () => {
@@ -209,5 +231,19 @@ describe("fromURLWithPassword", () => {
     await expect(
       fromURLWithPassword("http://localhost:8090", "admin@test.com", "wrong")
     ).rejects.toThrow("Failed to load schema from URL")
+  })
+
+  it("surfaces the underlying authentication error message", async () => {
+    mockLoginAndFetch.mockRejectedValue(
+      new Error(
+        "PocketBase authentication failed with status 400 Bad Request: Failed to authenticate."
+      )
+    )
+
+    await expect(
+      fromURLWithPassword("http://localhost:8090", "admin@test.com", "wrong")
+    ).rejects.toThrow(
+      "Failed to load schema from URL: PocketBase authentication failed with status 400 Bad Request: Failed to authenticate."
+    )
   })
 })
