@@ -1,5 +1,18 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`createRecordType > adds help text as JSDoc comments above fields 1`] = `
+"export type BooksRecord = {
+	pages?: number
+	/**
+	 * Short summary.
+	 * Shown on the *\\/ listing page.
+	 */
+	summary?: string
+	/** The book title */
+	title: string
+}"
+`;
+
 exports[`createRecordType > creates type definition for a record 1`] = `
 "export type BooksRecord = {
 	title?: string

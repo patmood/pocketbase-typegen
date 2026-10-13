@@ -18,7 +18,11 @@ import {
   TYPED_POCKETBASE_TYPE,
   UTILITY_TYPES
 } from "./constants"
-import { createSelectOptions, createTypeField } from "./fields"
+import {
+  createFieldComment,
+  createSelectOptions,
+  createTypeField,
+} from "./fields"
 import {
   getGenericArgStringForRecord,
   getGenericArgStringWithDefault,
@@ -82,8 +86,13 @@ export function createRecordType(
     includeExpand: false,
   })
   const fields = schema
-    .map((fieldSchema: FieldSchema) => createTypeField(name, fieldSchema))
-    .sort()
+    .map((fieldSchema: FieldSchema) => ({
+      comment: createFieldComment(fieldSchema),
+      line: createTypeField(name, fieldSchema),
+    }))
+    // Sort on the field line only, so help comments never change field order
+    .sort(compareFieldLines)
+    .map(({ comment, line }) => (comment ? `${comment}\n${line}` : line))
     .join("\n")
 
   return `${selectOptionEnums}export type ${typeName}Record${genericArgs} = ${
@@ -93,6 +102,15 @@ ${fields}
 }`
       : "never"
   }`
+}
+
+type FieldLine = { comment: string; line: string }
+
+// Same ordering as the default Array.prototype.sort() on the field lines
+function compareFieldLines(a: FieldLine, b: FieldLine): number {
+  if (a.line < b.line) return -1
+  if (a.line > b.line) return 1
+  return 0
 }
 
 export function createResponseType(

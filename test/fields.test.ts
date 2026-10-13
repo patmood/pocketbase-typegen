@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
 
 import {
+  createFieldComment,
   createSelectOptions,
   createTypeField,
   getSelectOptionEnumName,
@@ -248,6 +249,73 @@ describe("createTypeField", () => {
     expect(logSpy).toHaveBeenCalledWith(
       'WARNING: unknown type "unknowntype" found in schema'
     )
+  })
+})
+
+describe("createFieldComment", () => {
+  it("returns an empty string when there is no help text", () => {
+    expect(createFieldComment(defaultFieldSchema)).toEqual("")
+  })
+
+  it("returns an empty string when help is not a string", () => {
+    expect(
+      // @ts-ignore
+      createFieldComment({ ...defaultFieldSchema, help: null })
+    ).toEqual("")
+  })
+
+  it("returns an empty string for empty or whitespace help text", () => {
+    expect(createFieldComment({ ...defaultFieldSchema, help: "" })).toEqual("")
+    expect(
+      createFieldComment({ ...defaultFieldSchema, help: "  \n\t \r\n " })
+    ).toEqual("")
+  })
+
+  it("creates a single-line JSDoc comment", () => {
+    expect(
+      createFieldComment({
+        ...defaultFieldSchema,
+        help: "  The title shown on the page  ",
+      })
+    ).toEqual("\t/** The title shown on the page */")
+  })
+
+  it("creates a multi-line JSDoc comment", () => {
+    expect(
+      createFieldComment({
+        ...defaultFieldSchema,
+        help: "First line\nSecond line  \n\n  - indented item",
+      })
+    ).toEqual(
+      [
+        "\t/**",
+        "\t * First line",
+        "\t * Second line",
+        "\t *",
+        "\t *   - indented item",
+        "\t */",
+      ].join("\n")
+    )
+  })
+
+  it("normalizes CRLF and CR line endings", () => {
+    expect(
+      createFieldComment({
+        ...defaultFieldSchema,
+        help: "\r\nOne\r\nTwo\rThree\r\n",
+      })
+    ).toEqual(
+      ["\t/**", "\t * One", "\t * Two", "\t * Three", "\t */"].join("\n")
+    )
+  })
+
+  it("escapes comment terminators in the help text", () => {
+    expect(
+      createFieldComment({
+        ...defaultFieldSchema,
+        help: "Use */ carefully, even **/ twice */",
+      })
+    ).toEqual("\t/** Use *\\/ carefully, even **\\/ twice *\\/ */")
   })
 })
 
