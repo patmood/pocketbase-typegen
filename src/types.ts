@@ -49,6 +49,8 @@ export type CollectionRecord = {
 
 // Every field is optional
 export type RecordOptions = {
+  // Field help text from the admin UI (PocketBase v0.37+)
+  help?: string
   maxSelect?: number | null
   min?: number | null
   max?: number | null

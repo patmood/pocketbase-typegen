@@ -205,6 +205,30 @@ The output is a typescript file `pocketbase-types.ts` ([example](./test/pocketba
 - `CollectionResponses` A type mapping each collection name to the response type.
 - `TypedPocketBase` A type for usage with type asserted PocketBase instance.
 
+### Field help text
+
+If a field has "Help text" set in the PocketBase dashboard, it is added as a JSDoc comment on that field, so it shows up in your editor's hover and autocomplete. For example, a `products` collection with these field help texts:
+
+- `price`: `Price in cents`
+- `sku`: `Stock keeping unit.` and `Must be unique per warehouse.` on two lines
+
+generates:
+
+```ts
+export type ProductsRecord = {
+	/** Price in cents */
+	price?: number
+	/**
+	 * Stock keeping unit.
+	 * Must be unique per warehouse.
+	 */
+	sku?: string
+	title?: string
+}
+```
+
+Field help text was added in PocketBase v0.37.0. Schemas from older versions have no help text, so their output is unchanged.
+
 ## Version Support
 
 | PocketBase | pocketbase-typegen |

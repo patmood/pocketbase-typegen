@@ -136,6 +136,114 @@ describe("createRecordType", () => {
     expect(bIndex).toBeGreaterThan(0)
     expect(aIndex).toBeLessThan(bIndex)
   })
+
+  it("adds help text as JSDoc comments above fields", () => {
+    const name = "books"
+    const schema: FieldSchema[] = [
+      {
+        help: "The book title",
+        id: "1",
+        name: "title",
+        required: true,
+        system: false,
+        type: "text",
+        unique: false,
+      },
+      {
+        help: "Short summary.\r\nShown on the */ listing page.",
+        id: "2",
+        name: "summary",
+        required: false,
+        system: false,
+        type: "text",
+        unique: false,
+      },
+      {
+        help: "   ",
+        id: "3",
+        name: "pages",
+        required: false,
+        system: false,
+        type: "number",
+        unique: false,
+      },
+    ]
+    const result = createRecordType(name, schema)
+    expect(result).toEqual(`export type BooksRecord = {
+\tpages?: number
+\t/**
+\t * Short summary.
+\t * Shown on the *\\/ listing page.
+\t */
+\tsummary?: string
+\t/** The book title */
+\ttitle: string
+}`)
+    expect(result).toMatchSnapshot()
+  })
+
+  it("does not change field order when fields have help text", () => {
+    const name = "books"
+    const fields: FieldSchema[] = [
+      {
+        id: "1",
+        name: "banana",
+        required: false,
+        system: false,
+        type: "text",
+        unique: false,
+      },
+      {
+        id: "2",
+        name: "cherry",
+        required: true,
+        system: false,
+        type: "number",
+        unique: false,
+      },
+      {
+        id: "3",
+        name: "apple",
+        required: false,
+        system: false,
+        type: "bool",
+        unique: false,
+      },
+    ]
+    const withHelp: FieldSchema[] = fields.map((field, i) => ({
+      ...field,
+      // Help text that would sort in the reverse order of the field names
+      help: i === 1 ? undefined : `${String.fromCharCode(122 - i)} help`,
+    }))
+    const stripComments = (output: string) =>
+      output
+        .split("\n")
+        .filter((line) => !/^\t(\/\*\*| \*)/.test(line))
+        .join("\n")
+
+    const plain = createRecordType(name, fields)
+    const commented = createRecordType(name, withHelp)
+    expect(commented).not.toEqual(plain)
+    expect(stripComments(commented)).toEqual(plain)
+    expect(commented).toContain("\t/** z help */\n\tbanana?: string")
+    expect(commented).toContain("\t/** x help */\n\tapple?: boolean")
+  })
+
+  it("keeps the original order of identical field lines", () => {
+    const field: FieldSchema = {
+      id: "1",
+      name: "title",
+      required: false,
+      system: false,
+      type: "text",
+      unique: false,
+    }
+    const result = createRecordType("books", [
+      { ...field, help: "first" },
+      { ...field, help: "second" },
+    ])
+    expect(result.indexOf("first")).toBeLessThan(result.indexOf("second"))
+  })
 })
 
 describe("createResponseType", () => {

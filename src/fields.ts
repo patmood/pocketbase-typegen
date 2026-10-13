@@ -88,6 +88,27 @@ export function createTypeField(
   return `\t${fieldName}${required}: ${typeString}`
 }
 
+/**
+ * Build a JSDoc comment from the field's help text (PocketBase v0.37+).
+ * Returns an empty string when the field has no help text.
+ */
+export function createFieldComment(fieldSchema: FieldSchema): string {
+  if (typeof fieldSchema.help !== "string") return ""
+
+  const help = fieldSchema.help
+    .replace(/\r\n?/g, "\n")
+    // Prevent the help text from closing the comment early
+    .replace(/\*\//g, "*\\/")
+    .trim()
+  if (!help) return ""
+
+  const lines = help.split("\n").map((line) => line.trimEnd())
+  if (lines.length === 1) return `\t/** ${lines[0]} */`
+
+  const body = lines.map((line) => (line ? `\t * ${line}` : "\t *"))
+  return ["\t/**", ...body, "\t */"].join("\n")
+}
+
 export function createSelectOptions(
   recordName: string,
   fields: Array<FieldSchema>
