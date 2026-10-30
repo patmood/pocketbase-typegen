@@ -1056,6 +1056,7 @@
         "type": "text"
       },
       {
+        "help": "Any number, positive or negative",
         "hidden": false,
         "id": "number3770467984",
         "max": null,
@@ -1068,6 +1069,7 @@
         "type": "number"
       },
       {
+        "help": "Whether the record is enabled.\nDefaults to false.",
         "hidden": false,
         "id": "bool2425384623",
         "name": "bool_field",
