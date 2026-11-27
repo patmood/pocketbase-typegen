@@ -21,13 +21,13 @@ const defaultFieldSchema: FieldSchema = {
 describe("createTypeField", () => {
   it("handles required and optional fields", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         required: false,
       })
     ).toEqual("\tdefaultName?: string")
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         required: true,
       })
@@ -36,12 +36,12 @@ describe("createTypeField", () => {
 
   it("converts default types to typescript", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
       })
     ).toEqual("\tdefaultName: string")
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "textField",
       })
@@ -50,7 +50,7 @@ describe("createTypeField", () => {
 
   it("converts number type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "numberField",
         type: "number",
@@ -60,7 +60,7 @@ describe("createTypeField", () => {
 
   it("converts bool type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "boolField",
         type: "bool",
@@ -70,7 +70,7 @@ describe("createTypeField", () => {
 
   it("converts email type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "emailField",
         type: "email",
@@ -80,7 +80,7 @@ describe("createTypeField", () => {
 
   it("converts url type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "urlField",
         type: "url",
@@ -90,7 +90,7 @@ describe("createTypeField", () => {
 
   it("converts date type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "dateField",
         type: "date",
@@ -100,7 +100,7 @@ describe("createTypeField", () => {
 
   it("converts select type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "selectField",
         type: "select",
@@ -110,7 +110,7 @@ describe("createTypeField", () => {
 
   it("converts select type with value", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "selectFieldWithOpts",
         values: ["one", "two", "three"],
@@ -121,7 +121,7 @@ describe("createTypeField", () => {
 
   it("converts multi-select type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "selectField",
         maxSelect: 2,
@@ -132,7 +132,7 @@ describe("createTypeField", () => {
 
   it("converts multi-select type with values", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "selectFieldWithOpts",
         maxSelect: 2,
@@ -146,7 +146,7 @@ describe("createTypeField", () => {
 
   it("converts json type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "jsonField",
         type: "json",
@@ -156,7 +156,7 @@ describe("createTypeField", () => {
 
   it("converts editor type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "editorField",
         type: "editor",
@@ -166,7 +166,7 @@ describe("createTypeField", () => {
 
   it("converts file type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "fileField",
         type: "file",
@@ -176,7 +176,7 @@ describe("createTypeField", () => {
 
   it("converts file type with multiple files", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "fileField",
         maxSelect: 3,
@@ -187,7 +187,7 @@ describe("createTypeField", () => {
 
   it("converts relation type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "relationField",
         type: "relation",
@@ -197,7 +197,7 @@ describe("createTypeField", () => {
 
   it("converts relation type with multiple options", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "relationFieldMany",
         maxSelect: 3,
@@ -208,7 +208,7 @@ describe("createTypeField", () => {
 
   it("converts relation type with unset maxSelect", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "relationFieldMany",
         maxSelect: null,
@@ -220,7 +220,7 @@ describe("createTypeField", () => {
   // DEPRECATED: This was removed in PocketBase v0.8
   it("converts user relation type", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "userRelationField",
         type: "user",
@@ -230,7 +230,7 @@ describe("createTypeField", () => {
 
   it("converts user relation type with multiple options", () => {
     expect(
-      createTypeField("test_collection", {
+      createTypeField("TestCollection", {
         ...defaultFieldSchema,
         name: "userRelationFieldMany",
         maxSelect: 3,
@@ -241,7 +241,7 @@ describe("createTypeField", () => {
 
   it("warns when encountering unexpected types", () => {
     const logSpy = vi.spyOn(console, "log")
-    createTypeField("test_collection", {
+    createTypeField("TestCollection", {
       ...defaultFieldSchema,
       // @ts-ignore
       type: "unknowntype",
@@ -321,7 +321,7 @@ describe("createFieldComment", () => {
 
 describe("createSelectOptions", () => {
   it("creates as const objects for select options", () => {
-    const name = "choose"
+    const name = "Choose"
     const schema: FieldSchema[] = [
       {
         id: "hhnwjkke",

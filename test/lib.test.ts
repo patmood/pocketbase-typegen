@@ -1,7 +1,62 @@
+import { runInNewContext } from "node:vm"
+import ts from "typescript"
 import { describe, expect, it } from "vitest"
 
+import { generateFromSchema } from "../src/index"
 import { CollectionRecord, FieldSchema } from "../src/types"
 import { createRecordType, createResponseType, generate } from "../src/lib"
+
+function collection(
+  name: string,
+  field: Partial<FieldSchema>
+): CollectionRecord {
+  return {
+    createRule: null,
+    deleteRule: null,
+    fields: [
+      {
+        id: "field-id",
+        name: "size",
+        required: false,
+        system: false,
+        type: "text",
+        unique: false,
+        ...field,
+      },
+    ],
+    id: name,
+    listRule: null,
+    name,
+    system: false,
+    type: "base",
+    updateRule: null,
+    viewRule: null,
+  }
+}
+
+function compileGeneratedTypes(source: string) {
+  const filename = "generated.ts"
+  const options: ts.CompilerOptions = {
+    module: ts.ModuleKind.CommonJS,
+    strict: true,
+    types: [],
+  }
+  const host = ts.createCompilerHost(options)
+  const getSourceFile = host.getSourceFile
+  host.getSourceFile = (path, languageVersion, ...rest) =>
+    path === filename
+      ? ts.createSourceFile(path, source, languageVersion)
+      : getSourceFile(path, languageVersion, ...rest)
+
+  const program = ts.createProgram([filename], options, host)
+  expect(
+    ts.getPreEmitDiagnostics(program).map(({ messageText }) => messageText)
+  ).toEqual([])
+
+  const exports: Record<string, Record<string, string>> = {}
+  program.emit(undefined, (_, output) => runInNewContext(output, { exports }))
+  return exports
+}
 
 describe("generate", () => {
   it("generates correct output given db input", () => {
@@ -63,11 +118,67 @@ describe("generate", () => {
     const result = generate(collections, { sdk: false })
     expect(result).not.toMatch(/import .* from 'pocketbase'/)
   })
+
+  it.each(['5" pipe', "first\nsecond", "C:\\temp"])(
+    "round-trips select option %j",
+    (value) => {
+      const source = generateFromSchema(
+        [collection("parts", { type: "select", values: [value] })],
+        { sdk: false }
+      )
+      const { PartsSizeOptions } = compileGeneratedTypes(source)
+      expect(Object.entries(PartsSizeOptions)).toEqual([[value, value]])
+    }
+  )
+
+  it("keeps a leading digit in collection names while generating valid identifiers", () => {
+    const source = generateFromSchema(
+      [collection("2fa_codes", { type: "select", values: ["sms"] })],
+      { sdk: false }
+    )
+    const { Collections } = compileGeneratedTypes(`${source}
+type RecordSize = CollectionRecords["2fa_codes"]["size"]
+const recordSize: RecordSize = "sms"
+const responseSize: CollectionResponses["2fa_codes"]["size"] = recordSize
+`)
+    expect(Collections).toEqual({ _2faCodes: "2fa_codes" })
+  })
+
+  it("keeps collections with the same PascalCase name distinct", () => {
+    const source = generateFromSchema(
+      [
+        collection("user_posts", { type: "select", values: ["draft"] }),
+        collection("userPosts", { type: "select", values: ["published"] }),
+      ],
+      { sdk: false }
+    )
+    const { Collections } = compileGeneratedTypes(`${source}
+const draft: CollectionRecords["user_posts"]["size"] = "draft"
+const published: CollectionResponses["userPosts"]["size"] = "published"
+// @ts-expect-error The two collections have distinct select options
+const wrong: CollectionRecords["userPosts"]["size"] = draft
+`)
+    expect(Object.values(Collections).sort()).toEqual([
+      "userPosts",
+      "user_posts",
+    ])
+  })
+
+  it("keeps select options with the same generated key distinct", () => {
+    const values = ["1", "E1", "E1_2"]
+    const source = generateFromSchema(
+      [collection("parts", { type: "select", values })],
+      { sdk: false }
+    )
+    const { PartsSizeOptions } = compileGeneratedTypes(source)
+    expect(Object.values(PartsSizeOptions)).toEqual(values)
+    expect(PartsSizeOptions.E1_2).toBe("E1_2")
+  })
 })
 
 describe("createRecordType", () => {
   it("creates type definition for a record", () => {
-    const name = "books"
+    const name = "Books"
     const schema: FieldSchema[] = [
       {
         id: "hhnwjkke",
@@ -86,7 +197,7 @@ describe("createRecordType", () => {
   })
 
   it("handles file fields with multiple files", () => {
-    const name = "books"
+    const name = "Books"
     const schema: FieldSchema[] = [
       {
         id: "hhnwjkke",
@@ -103,14 +214,14 @@ describe("createRecordType", () => {
   })
 
   it("returns never when schema has no fields", () => {
-    const name = "empty"
+    const name = "Empty"
     const schema: FieldSchema[] = []
     const result = createRecordType(name, schema)
     expect(result).toContain("= never")
   })
 
   it("sorts fields alphabetically", () => {
-    const name = "books"
+    const name = "Books"
     const schema: FieldSchema[] = [
       {
         id: "1",
@@ -138,7 +249,7 @@ describe("createRecordType", () => {
   })
 
   it("adds help text as JSDoc comments above fields", () => {
-    const name = "books"
+    const name = "Books"
     const schema: FieldSchema[] = [
       {
         help: "The book title",
@@ -183,7 +294,7 @@ describe("createRecordType", () => {
   })
 
   it("does not change field order when fields have help text", () => {
-    const name = "books"
+    const name = "Books"
     const fields: FieldSchema[] = [
       {
         id: "1",
@@ -238,7 +349,7 @@ describe("createRecordType", () => {
       type: "text",
       unique: false,
     }
-    const result = createRecordType("books", [
+    const result = createRecordType("Books", [
       { ...field, help: "first" },
       { ...field, help: "second" },
     ])
@@ -273,12 +384,12 @@ describe("createResponseType", () => {
       viewRule: null,
     }
 
-    const result = createResponseType(row)
+    const result = createResponseType(row, "Books")
     expect(result).toMatchSnapshot()
   })
 
   it("handles file fields with multiple files", () => {
-    const name = "books"
+    const name = "Books"
     const schema: FieldSchema[] = [
       {
         id: "hhnwjkke",

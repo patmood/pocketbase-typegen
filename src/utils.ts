@@ -16,8 +16,30 @@ export function toPascalCase(str: string) {
 }
 
 export function sanitizeFieldName(name: string) {
-  // If the first character is a number, wrap it in quotes to pass typecheck
-  return !isNaN(parseFloat(name.charAt(0))) ? `"${name}"` : name
+  return /^[$_\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/u.test(name)
+    ? name
+    : JSON.stringify(name)
+}
+
+export function toCollectionIdentifier(name: string) {
+  const identifier = toPascalCase(name)
+  return /^\p{ID_Start}/u.test(identifier) ? identifier : `_${identifier}`
+}
+
+export function getUniqueNames(names: string[]) {
+  const reserved = new Set(names)
+  const used = new Set<string>()
+
+  return names.map((name) => {
+    let unique = name
+    let suffix = 2
+    // Leave preferred names available to their first occurrence.
+    while (used.has(unique) || (unique !== name && reserved.has(unique))) {
+      unique = `${name}_${suffix++}`
+    }
+    used.add(unique)
+    return unique
+  })
 }
 
 export async function saveFile(outPath: string, typeString: string) {
@@ -35,8 +57,11 @@ export function getSystemFields(type: CollectionRecord["type"]) {
   }
 }
 
-export function getOptionEnumName(recordName: string, fieldName: string) {
-  return `${toPascalCase(recordName)}${toPascalCase(fieldName)}Options`
+export function getOptionEnumName(
+  collectionIdentifier: string,
+  fieldName: string
+) {
+  return `${collectionIdentifier}${toPascalCase(fieldName)}Options`
 }
 
 export function getOptionValues(field: FieldSchema) {
