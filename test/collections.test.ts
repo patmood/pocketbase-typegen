@@ -6,23 +6,25 @@ import {
   createCollectionResponses,
 } from "../src/collections"
 
+const names = new Map([
+  ["book", "Book"],
+  ["magazine", "Magazine"],
+])
+
 describe("createCollectionEnum", () => {
   it("creates as const object of collection names", () => {
-    const names = ["book", "magazine"]
     expect(createCollectionEnum(names)).toMatchSnapshot()
   })
 })
 
 describe("createCollectionRecords", () => {
   it("creates mapping of collection name to record type", () => {
-    const names = ["book", "magazine"]
     expect(createCollectionRecords(names)).toMatchSnapshot()
   })
 })
 
 describe("createCollectionResponses", () => {
   it("creates mapping of collection name to response type", () => {
-    const names = ["book", "magazine"]
     expect(createCollectionResponses(names)).toMatchSnapshot()
   })
 })

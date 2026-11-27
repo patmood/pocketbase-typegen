@@ -6,7 +6,12 @@ import {
   HTML_STRING_NAME,
   RECORD_ID_STRING_NAME,
 } from "./constants"
-import { getOptionEnumName, getOptionValues, sanitizeFieldName } from "./utils"
+import {
+  getOptionEnumName,
+  getOptionValues,
+  getUniqueNames,
+  sanitizeFieldName,
+} from "./utils"
 
 import { fieldNameToGeneric } from "./generics"
 import { FieldSchema } from "./types"
@@ -38,10 +43,10 @@ export const pbSchemaTypescriptMap = {
     fieldSchema.maxSelect && fieldSchema.maxSelect > 1
       ? `${RECORD_ID_STRING_NAME}[]`
       : RECORD_ID_STRING_NAME,
-  select: (fieldSchema: FieldSchema, collectionName: string) => {
+  select: (fieldSchema: FieldSchema, collectionIdentifier: string) => {
     // pocketbase v0.8+ values are required
     const valueType = fieldSchema.values
-      ? getOptionEnumName(collectionName, fieldSchema.name)
+      ? getOptionEnumName(collectionIdentifier, fieldSchema.name)
       : "string"
     return fieldSchema.maxSelect && fieldSchema.maxSelect > 1
       ? `${valueType}[]`
@@ -56,12 +61,12 @@ export const pbSchemaTypescriptMap = {
 }
 
 export function createTypeField(
-  collectionName: string,
+  collectionIdentifier: string,
   fieldSchema: FieldSchema
 ): string {
   let typeStringOrFunc:
     | string
-    | ((fieldSchema: FieldSchema, collectionName: string) => string)
+    | ((fieldSchema: FieldSchema, collectionIdentifier: string) => string)
 
   if (!(fieldSchema.type in pbSchemaTypescriptMap)) {
     console.log(`WARNING: unknown type "${fieldSchema.type}" found in schema`)
@@ -75,7 +80,7 @@ export function createTypeField(
 
   const typeString =
     typeof typeStringOrFunc === "function"
-      ? typeStringOrFunc(fieldSchema, collectionName)
+      ? typeStringOrFunc(fieldSchema, collectionIdentifier)
       : typeStringOrFunc
 
   const fieldName = sanitizeFieldName(fieldSchema.name)
@@ -110,18 +115,20 @@ export function createFieldComment(fieldSchema: FieldSchema): string {
 }
 
 export function createSelectOptions(
-  recordName: string,
+  collectionIdentifier: string,
   fields: Array<FieldSchema>
 ): string {
   const selectFields = fields.filter((field) => field.type === "select")
 
   const typestring = selectFields
     .map((field) => {
-      const name = getOptionEnumName(recordName, field.name)
+      const name = getOptionEnumName(collectionIdentifier, field.name)
       const values = getOptionValues(field)
+      const keys = getUniqueNames(values.map(getSelectOptionEnumName))
       const entries = values
         .map(
-          (val) => `\t"${getSelectOptionEnumName(val)}": "${val}",`
+          (value, index) =>
+            `\t${JSON.stringify(keys[index])}: ${JSON.stringify(value)},`
         )
         .join("\n")
       return `export const ${name} = {
